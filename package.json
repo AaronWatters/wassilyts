@@ -2,7 +2,21 @@
   "name": "wassilyts",
   "version": "1.0.0",
   "description": "Infrastructure for building scientific diagrams in 2d and 3d using HTML5 canvases with animations and interactivity.",
-  "main": "index.js",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/wassilyts.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/wassilyts.js"
+      }
+    }
+  },
+  "main": "dist/wassilyts.js",
+  "module": "dist/wassilyts.mjs",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "vite build",
     "test": "vitest",
@@ -14,13 +28,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "typescript": "^5.7.3",
-    "vite": "^6.2.0",
-    "vitest": "^3.0.7"
+    "tsvector": "github:AaronWatters/tsVector",
+    "typescript": "^5.7.3"
   },
   "devDependencies": {
     "@playwright/test": "^1.50.1",
     "@vitest/coverage-v8": "^3.0.7",
-    "vite-plugin-dts": "^4.5.1"
+    "vite": "^6.2.1",
+    "vite-plugin-dts": "^4.5.1",
+    "vitest": "^3.0.8"
   }
 }
