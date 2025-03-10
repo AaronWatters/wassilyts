@@ -4,10 +4,11 @@ import dts from 'vite-plugin-dts';
 
 export default defineConfig({
   build: {
+    minify: false, // Disable minification
     lib: {
       entry: 'src/index.ts',
-      name: 'tsVector',
-      fileName: 'tsVector',
+      name: 'wassilyts',
+      fileName: 'wassilyts',
       formats: ['es', 'cjs', 'umd']
     }
   },
