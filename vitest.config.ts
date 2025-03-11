@@ -3,9 +3,10 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    setupFiles: "./test/vitest.setup.ts", // 👈 Register global setup
     globals: true,
     include: ['test/**/*.test.ts'],
-    environment: 'node',
+    environment: "jsdom", // 👈 Ensures a browser-like environment
     coverage: {
       provider: 'v8', // or 'c8'
       reportsDirectory: './coverage',

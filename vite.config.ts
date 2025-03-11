@@ -12,5 +12,10 @@ export default defineConfig({
       formats: ['es', 'cjs', 'umd']
     }
   },
+  test: {
+    environment: "jsdom", // 👈 Ensures a browser-like environment
+    setupFiles: "./tests/vitest.setup.ts", // 👈 Runs the setup before tests
+    globals: true,
+  },
   plugins: [dts()]
 });
