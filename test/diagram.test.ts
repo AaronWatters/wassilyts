@@ -16,4 +16,13 @@ describe('diagram module', () => {
     expect(diag.ctx).toBeDefined();
     expect(diag.stats).toBeDefined();
   });
+  it('should clear the diagram', () => {
+    const container = document.createElement('div');
+    const diag = new diagram.Diagram(container, 120, 100);
+    diag.clear();
+    expect(diag.stats.minxy).toBeNull();
+    expect(diag.stats.maxxy).toBeNull();
+    const ctx = diag.ctx!;
+    expect(ctx.clearRect).toHaveBeenCalledWith(0, 0, 120, 100);
+  });
 });
