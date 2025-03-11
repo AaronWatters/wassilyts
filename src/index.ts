@@ -4,3 +4,6 @@ export const name = 'wassilyjs';
 
 // expose all tsVector functions
 export * as tsvector from 'tsvector' ;
+
+// export the diagram module
+export * as diagram from './diagram';
