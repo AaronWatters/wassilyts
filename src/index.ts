@@ -7,3 +7,6 @@ export * as tsvector from 'tsvector' ;
 
 // export the diagram module
 export * as diagram from './diagram';
+
+// export the frame module
+export * as frame from './frame';
