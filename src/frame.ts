@@ -33,17 +33,60 @@ export function applyAffine(affine: tsvector.Matrix, xy: tsvector.Vector): tsvec
     return [v3[0], v3[1]];
 };
 
+const identity = tsvector.eye(4);
+
 export class Frame {
     diagram: diagram.Diagram;
-    affine: tsvector.Matrix;
-    inv: tsvector.Matrix;
-    constructor(inDiagram: diagram.Diagram, affineMatrix: tsvector.Matrix) {
+    affine: tsvector.Matrix = identity;
+    inv: tsvector.Matrix = identity;
+    pixelToModel: tsvector.Matrix = identity;
+    ModelToPixel: tsvector.Matrix = identity;
+    parent: Frame | null;
+    constructor(
+        inDiagram: diagram.Diagram, 
+        affineMatrix: tsvector.Matrix | null = null,
+        parent: Frame | null = null,
+    ) {
         this.diagram = inDiagram;
+        this.parent = parent;
+        if (affineMatrix === null) {
+            if (parent !== null) {
+                affineMatrix = identity;
+            } else {
+                const width = this.diagram.width;
+                const height = this.diagram.height;
+                const minxy = [0, height];
+                const maxxy = [width, 0];
+                const origin = [0, 0];
+                const wh = [width, height];
+                affineMatrix = regionMap(origin, wh, minxy, maxxy);
+            }
+        }
+        this.setAffine(affineMatrix);
+    };
+    setAffine(affineMatrix: tsvector.Matrix) {
         this.affine = affineMatrix;
         this.inv = tsvector.MInverse(affineMatrix);
+        this.pixelToModel = this.affine;
+        this.ModelToPixel = this.inv;
+        if (this.parent !== null) {
+            this.pixelToModel = tsvector.MMProduct(this.affine, this.parent.pixelToModel);
+            this.ModelToPixel = tsvector.MMProduct(this.parent.ModelToPixel, this.inv);
+        } 
     };
-    applyAffine(affine: tsvector.Matrix, xy: tsvector.Vector): tsvector.Vector {
-        const v3 = tsvector.MvProduct(affine, [...xy, 1]);
-        return [v3[0], v3[1]];
+    toPixel(xy: tsvector.Vector): tsvector.Vector {
+        return applyAffine(this.ModelToPixel, xy);
     };
-}
+    toModel(xy: tsvector.Vector): tsvector.Vector {
+        return applyAffine(this.pixelToModel, xy);
+    };
+    regionFrame(
+        fromMinxy: tsvector.Vector,
+        fromMaxxy: tsvector.Vector,
+        toMinxy: tsvector.Vector,
+        toMaxxy: tsvector.Vector
+    ): Frame {
+        const affine = regionMap(fromMinxy, fromMaxxy, toMinxy, toMaxxy);
+        return new Frame(this.diagram, affine, this);
+    };
+};
