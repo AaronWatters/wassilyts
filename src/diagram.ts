@@ -30,6 +30,12 @@ export class Diagram {
         this.ctx!.clearRect(0, 0, this.width, this.height);
         this.stats = new CanvasStats();
     };
+    addPoint(xy: tsvector.Vector) {
+        this.stats.addPoint(xy);
+    };
+    addxy(x: number, y: number) {
+        this.stats.addxy(x, y);
+    };
 };
 
 export class CanvasStats {
