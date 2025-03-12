@@ -1,5 +1,12 @@
 
 import * as tsvector from 'tsvector';
+import * as frame from './frame';
+
+/** Draw on an HTML element.  Return a frame for the diagram. */
+export function drawOn(container: HTMLElement, width: number, height: number): frame.Frame {
+    const diag = new Diagram(container, width, height);
+    return diag.mainFrame;
+};
 
 export class Diagram {
 
@@ -9,6 +16,7 @@ export class Diagram {
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D | null;
     stats: CanvasStats;
+    mainFrame: frame.Frame;
 
     constructor(domObject: HTMLElement, width: number, height: number) {
         this.container = domObject;
@@ -25,6 +33,7 @@ export class Diagram {
         // Get the context
         this.ctx = this.canvas.getContext("2d");
         this.stats = new CanvasStats();
+        this.mainFrame = new frame.Frame(this, null, null);
     };
     clear() {
         this.ctx!.clearRect(0, 0, this.width, this.height);
