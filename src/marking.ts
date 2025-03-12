@@ -1,21 +1,46 @@
 
 import * as tsvector from 'tsvector';
-import * as diagram from './diagram';
+//import * as diagram from './diagram';
 import * as frame from './frame';
+import * as styled from './styled';
 
-export abstract class Marking {
+export abstract class Marking extends styled.Styled {
     onFrame: frame.Frame;
     constructor(frame: frame.Frame) {
+        super();
+        // by default inherit the style of the frame
+        this.color = frame.color;
+        this.lineWidth = frame.lineWidth;
+        this.lineDash = frame.lineDash;
         this.onFrame = frame;
     };
     abstract drawPath(): Path2D;
     // default draw method
     draw() {
         const path = this.drawPath();
-        this.onFrame.diagram.ctx!.stroke(path);
+        const prep = this.prepare();
+        const ctx = this.onFrame.diagram.ctx!;
+        if (this.stroke) {
+            ctx.stroke(path);
+        } else {
+            ctx.fill(path);
+        };
+        ctx.restore();
+    };
+    // prepare the context for drawing, return false if no change.
+    // save state if changed.
+    prepare(): boolean {
+        const ctx = this.onFrame.diagram.ctx!;
+        ctx.save();
+        this.applyStyle(ctx);
+        return true;
     };
     testPixel(xy: tsvector.Vector): boolean {
+        const prep = this.prepare();
         const path = this.drawPath();
-        return this.onFrame.diagram.ctx!.isPointInStroke(path, xy[0], xy[1]);
+        const ctx = this.onFrame.diagram.ctx!;
+        const result = ctx.isPointInPath(path, xy[0], xy[1]);
+        ctx.restore();
+        return result;
     };
 };

@@ -10,10 +10,31 @@
 <h1>wassilyjs Library Demo</h1>
 
 <p>Please look at the console.</p>
+
+<div id="output"></div>
+
 <script type="module">
-  import { name } from '../dist/wassilyts.mjs';
+  import { 
+    name,
+    diagram,
+    drawOn,
+  } from '../dist/wassilyts.mjs';
   console.log("Hello from wassilyjs Library!");
   console.log("The name of the library is: " + name);
+  const output = document.getElementById('output');
+  //const d = new diagram.Diagram(output, 520, 600);
+  const frame0 = drawOn(output, 600, 400);
+  // make a subframe
+  const fromMin = [0,0];
+  const fromMax = [600,400];
+  const toMin = [-1, -1];
+  const toMax = [1, 1];
+  const frame1 = frame0.regionFrame(fromMin, fromMax, toMin, toMax);
+  frame1.colored("blue");
+  // draw a circle
+  const dot = frame1.dot([1,-1], 100).colored('red');
+  frame0.draw();
+  console.log("dot = ", dot);
 </script>
 </body>
 </html>

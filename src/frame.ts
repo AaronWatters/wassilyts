@@ -1,6 +1,9 @@
 
 import * as tsvector from 'tsvector';
 import * as diagram from './diagram';
+import * as styled from './styled';
+import * as circle from './circle';
+import * as styled from './styled';
 
 export function translateScaleMatrix(
     translate: tsvector.Vector,
@@ -35,18 +38,21 @@ export function applyAffine(affine: tsvector.Matrix, xy: tsvector.Vector): tsvec
 
 const identity = tsvector.eye(4);
 
-export class Frame {
+export class Frame extends styled.Styled {
     diagram: diagram.Diagram;
     affine: tsvector.Matrix = identity;
     inv: tsvector.Matrix = identity;
     pixelToModel: tsvector.Matrix = identity;
     ModelToPixel: tsvector.Matrix = identity;
     parent: Frame | null;
+    nameToMarking: Map<string, styled.Styled> = new Map();
+
     constructor(
         inDiagram: diagram.Diagram, 
         affineMatrix: tsvector.Matrix | null = null,
         parent: Frame | null = null,
     ) {
+        super();
         this.diagram = inDiagram;
         this.parent = parent;
         if (affineMatrix === null) {
@@ -87,6 +93,26 @@ export class Frame {
         toMaxxy: tsvector.Vector
     ): Frame {
         const affine = regionMap(fromMinxy, fromMaxxy, toMinxy, toMaxxy);
-        return new Frame(this.diagram, affine, this);
+        const result = new Frame(this.diagram, affine, this);
+        this.addElement(result);
+        return result;
+    };
+    /** Record a marking */
+    addElement(styled: styled.Styled) {
+        const name = styled.objectName
+        this.nameToMarking.set(name, styled);
+    };
+    /** iterate over all markings to draw. */
+    draw() {
+        this.nameToMarking.forEach((element) => {
+            element.draw();
+        });
+    };
+    /** A dot is a circle with an unscaled radius. */
+    dot(center: tsvector.Vector, radius: number, scaled=false): circle.Circle {
+        const result = new circle.Circle(this, center, radius, scaled);
+        //result.draw();
+        this.addElement(result);
+        return result;
     };
 };

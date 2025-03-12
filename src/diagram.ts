@@ -35,6 +35,9 @@ export class Diagram {
         this.stats = new CanvasStats();
         this.mainFrame = new frame.Frame(this, null, null);
     };
+    draw() {
+        this.mainFrame.draw();
+    };
     clear() {
         this.ctx!.clearRect(0, 0, this.width, this.height);
         this.stats = new CanvasStats();
