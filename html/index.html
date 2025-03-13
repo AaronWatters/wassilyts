@@ -24,6 +24,17 @@
   const output = document.getElementById('output');
   //const d = new diagram.Diagram(output, 520, 600);
   const frame0 = drawOn(output, 600, 400);
+  const dot1 = frame0.circle([20,0], 10).colored('red');
+  const dot2 = frame0.circle([20,30], 20).colored('blue');
+  const dot3 = frame0.circle([50,30], 10).colored('green');
+  const dot4 = frame0.circle([50,50], 10).colored('salmon');
+  const dot5 = frame0.circle([-70, 3], 10).colored('purple');
+  frame0.draw();
+  debugger;
+  frame0.fit();
+  frame0.diagram.clear();
+  frame0.draw();
+  /*
   // make a subframe
   const fromMin = [0,0];
   const fromMax = [600,400];
@@ -31,14 +42,19 @@
   const toMax = [1, 1];
   const frame1 = frame0.regionFrame(fromMin, fromMax, toMin, toMax);
   frame1.colored("blue");
-  // draw a circle
+  // draw a red dot
   const dot = frame1.dot([1,-1], 100).colored('red');
+  frame1.dot([-3,-1], 100).colored('red');
+  // draw a green circle
+  //frame1.circle([0,-4], 0.3, 100).colored('green');
   frame0.draw();
   console.log("dot = ", dot);
   console.log("frame0 = ", frame0);
+  debugger;
   frame0.fit();
   frame0.diagram.clear();
   frame0.draw()
+  */
 </script>
 </body>
 </html>

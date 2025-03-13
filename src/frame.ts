@@ -35,7 +35,7 @@ export function applyAffine(affine: tsvector.Matrix, xy: tsvector.Vector): tsvec
     return [v3[0], v3[1]];
 };
 
-const identity = tsvector.eye(4);
+const identity = tsvector.eye(3);
 
 export class Frame extends styled.Styled {
     diagram: diagram.Diagram;
@@ -55,25 +55,24 @@ export class Frame extends styled.Styled {
         this.diagram = inDiagram;
         this.parent = parent;
         if (affineMatrix === null) {
-            if (parent !== null) {
-                affineMatrix = identity;
-            } else {
-                const width = this.diagram.width;
-                const height = this.diagram.height;
-                const minxy = [0, height];
-                const maxxy = [width, 0];
-                const origin = [0, 0];
-                const wh = [width, height];
-                affineMatrix = regionMap(origin, wh, minxy, maxxy);
-            }
+            // by default don't change coordinates
+            affineMatrix = identity;
         }
         this.setAffine(affineMatrix);
     };
     fit() {
         this.diagram.fit();
     };
-    addPixelPoint(xy: tsvector.Vector) {
-        this.diagram.addPoint(xy);
+    /** record a cartesian pixel point and convert to canvas coords */
+    addPixelPoint(xy: tsvector.Vector): tsvector.Vector {
+        const diagram = this.diagram;
+        diagram.addPoint(xy);
+        return diagram.toCanvas(xy);
+    };
+    /** Add a model point, record its cartesian pixel coords and convert to canvas. */
+    addPoint(xy: tsvector.Vector): tsvector.Vector {
+        const pixel = this.toPixel(xy);
+        return this.addPixelPoint(pixel);
     };
     setAffine(affineMatrix: tsvector.Matrix) {
         this.affine = affineMatrix;
@@ -88,12 +87,15 @@ export class Frame extends styled.Styled {
             this.ModelToPixel = tsvector.MMProduct(this.parent.ModelToPixel, this.inv);
         } 
     };
+    /** Convert from model space to cartesian pixel space */
     toPixel(xy: tsvector.Vector): tsvector.Vector {
         return applyAffine(this.ModelToPixel, xy);
     };
+    /** Convert from cartesian pixel space to model space */
     toModel(xy: tsvector.Vector): tsvector.Vector {
         return applyAffine(this.pixelToModel, xy);
     };
+    /** Create a frame for a subregion and record it. */
     regionFrame(
         fromMinxy: tsvector.Vector,
         fromMaxxy: tsvector.Vector,
@@ -123,5 +125,9 @@ export class Frame extends styled.Styled {
         //result.draw();
         this.addElement(result);
         return result;
+    };
+    /** A circle is a circle with a scaled radius. */
+    circle(center: tsvector.Vector, radius: number, scaled=true): circle.Circle {
+        return this.dot(center, radius, scaled);
     };
 };
