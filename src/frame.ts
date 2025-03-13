@@ -3,7 +3,6 @@ import * as tsvector from 'tsvector';
 import * as diagram from './diagram';
 import * as styled from './styled';
 import * as circle from './circle';
-import * as styled from './styled';
 
 export function translateScaleMatrix(
     translate: tsvector.Vector,
@@ -70,9 +69,18 @@ export class Frame extends styled.Styled {
         }
         this.setAffine(affineMatrix);
     };
+    fit() {
+        this.diagram.fit();
+    };
+    addPixelPoint(xy: tsvector.Vector) {
+        this.diagram.addPoint(xy);
+    };
     setAffine(affineMatrix: tsvector.Matrix) {
         this.affine = affineMatrix;
         this.inv = tsvector.MInverse(affineMatrix);
+        this.syncToParent();
+    };
+    syncToParent() {
         this.pixelToModel = this.affine;
         this.ModelToPixel = this.inv;
         if (this.parent !== null) {
@@ -104,6 +112,7 @@ export class Frame extends styled.Styled {
     };
     /** iterate over all markings to draw. */
     draw() {
+        this.syncToParent();
         this.nameToMarking.forEach((element) => {
             element.draw();
         });

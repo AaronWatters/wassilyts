@@ -31,7 +31,7 @@ export abstract class Styled {
         this.lineWidth = width;
         return this;
     };
-    dashed(dash: string) {
+    dashed(dash: tsvector.Vector | null) {
         this.lineDash = dash;
         return this;
     };

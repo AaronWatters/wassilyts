@@ -15,6 +15,28 @@ describe('frame module', () => {
         const result = frame.applyAffine(affine, test);
         expect(result).toEqual([101, 190]);
     });
+    it('should expand a region', () => {
+        const fromMinxy = [1, 17];
+        const fromMaxxy = [2, 10];
+        const toMinxy = [256, 512];
+        const toMaxxy = [1024, 1024];
+        const affine = frame.regionMap(fromMinxy, fromMaxxy, toMinxy, toMaxxy);
+        const result = frame.applyAffine(affine, fromMinxy);
+        expect(result).toEqual(toMinxy);
+        const result2 = frame.applyAffine(affine, fromMaxxy);
+        expect(result2).toEqual(toMaxxy);
+    });
+    it('should shrink a region', () => {
+        const toMinxy = [1, 17];
+        const toMaxxy = [2, 10];
+        const fromMinxy = [256, 512];
+        const fromMaxxy = [1024, 1024];
+        const affine = frame.regionMap(fromMinxy, fromMaxxy, toMinxy, toMaxxy);
+        const result = frame.applyAffine(affine, fromMinxy);
+        expect(result).toEqual(toMinxy);
+        const result2 = frame.applyAffine(affine, fromMaxxy);
+        expect(result2).toEqual(toMaxxy);
+    });
     it('should make a frame with no parent', () => {
         const container = document.createElement('div');
         const width = 120;

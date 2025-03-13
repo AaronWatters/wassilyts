@@ -48,6 +48,53 @@ export class Diagram {
     addxy(x: number, y: number) {
         this.stats.addxy(x, y);
     };
+    // use the stats to fit the diagram to the points
+    fit() {
+        if (this.stats.minxy === null || this.stats.maxxy === null) {
+            return;
+        };
+        const minxy = this.stats.minxy;
+        const maxxy = this.stats.maxxy;
+        const width = this.width;
+        const height = this.height;
+        const diff = tsvector.vSub(maxxy, minxy);
+        const [dw, dh] = diff;
+        if (dw === 0 || dh === 0) {
+            return;
+        }
+        const aspect = dh / dw;
+        const myAspect = height / width;
+        //console.log(`aspect: ${aspect}, myAspect: ${myAspect}`);
+        let fromMinX = 0;
+        let fromMaxX = width;
+        let fromMinY = 0;
+        let fromMaxY = height;
+        if (aspect > myAspect) {
+            //console.log('The region is taller than the diagram, center the width and expand the height');
+            const newWidth = dh / myAspect;
+            //console.log(`newWidth: ${newWidth}; old width: ${width}`);
+            fromMinX = (width - newWidth) / 2;
+            fromMaxX = fromMinX + newWidth;
+        } else {
+            //console.log('The region is wider than the diagram, center the height and expand the width');
+            const newHeight = dw * myAspect;
+            //console.log(`newHeight: ${newHeight}; old height: ${height}`);
+            fromMinY = (height - newHeight) / 2;
+            fromMaxY = fromMinY + newHeight;
+        }
+        //console.log(`fromMinX: ${fromMinX}, fromMaxX: ${fromMaxX}, fromMinY: ${fromMinY}, fromMaxY: ${fromMaxY}`);
+        const fromMinXY = [fromMinX, fromMinY];
+        const fromMaxXY = [fromMaxX, fromMaxY];
+        const affine = frame.regionMap(minxy, maxxy, fromMinXY, fromMaxXY);
+        //console.log(`affine:`, affine);
+        const mainFrame = this.mainFrame;
+        const currentAffine = mainFrame.ModelToPixel!;
+        //console.log(`currentAffine:`, currentAffine);
+        const adjustedAffine = tsvector.MMProduct(affine, currentAffine);
+        //console.log(`adjustedAffine:`, adjustedAffine);
+        const pixelToModel = tsvector.MInverse(adjustedAffine);
+        mainFrame.setAffine(pixelToModel);
+    };
 };
 
 export class CanvasStats {

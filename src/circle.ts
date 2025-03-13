@@ -14,18 +14,25 @@ export class Circle extends marking.Marking {
         this.scaled = scaled;
     };
     drawPath(): Path2D {
+        const frame = this.onFrame;
         const path = new Path2D();
         const center = this.center;
         let radius = this.radius;
-        const pixelCenter = this.onFrame.toPixel(center);
+        const pixelCenter = frame.toPixel(center);
         if (this.scaled) {
             const offset = [center[0] + radius, center[1]];
-            const pixelOffset = this.onFrame.toPixel(offset);
+            const pixelOffset = frame.toPixel(offset);
             const pixelRadius = tsvector.vLength(tsvector.vSub(pixelCenter, pixelOffset));
             radius = pixelRadius;
         }
         const [px, py] = pixelCenter;
+        console.log(`circle at ${px}, ${py} with radius ${radius}`);
         path.arc(px, py, radius, 0, 2 * Math.PI);
+        // add reference points to diagram
+        frame.addPixelPoint(tsvector.vAdd(pixelCenter, [radius, 0]));
+        frame.addPixelPoint(tsvector.vAdd(pixelCenter, [0, radius]));
+        frame.addPixelPoint(tsvector.vAdd(pixelCenter, [-radius, 0]));
+        frame.addPixelPoint(tsvector.vAdd(pixelCenter, [0, -radius]));
         return path;
     };
 }
