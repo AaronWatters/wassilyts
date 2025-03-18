@@ -10,12 +10,15 @@ export function drawOn(container: HTMLElement, width: number, height: number): f
 
 export class Diagram {
 
+    // The container for the canvas
     container: HTMLElement;
     width: number;
     height: number;
     canvas: HTMLCanvasElement;
     ctx: CanvasRenderingContext2D | null;
+    // Record of coordinate extremes in cartesian coordinates
     stats: CanvasStats;
+    // The primary frame for the diagram
     mainFrame: frame.Frame;
 
     constructor(domObject: HTMLElement, width: number, height: number) {
@@ -37,11 +40,15 @@ export class Diagram {
     };
     /** Convert cartesian xy to canvas xy (with y inverted) */
     toCanvas(xy: tsvector.Vector): tsvector.Vector {
-        return [xy[0], this.height - xy[1]];
+        const result = [xy[0], this.height - xy[1]];
+        console.log(`toCanvas: ${xy} -> ${result}`);
+        return result;
     };
     /** Convert canvas xy to cartesian xy (with y inverted) */
     toCartesian(xy: tsvector.Vector): tsvector.Vector {
-        return [xy[0], this.height - xy[1]];
+        const result = [xy[0], this.height - xy[1]];
+        console.log(`toCartesian: ${xy} -> ${result}`);
+        return result;
     };
     draw() {
         this.mainFrame.draw();

@@ -1,0 +1,62 @@
+import * as tsvector from 'tsvector';
+//import * as diagram from './diagram';
+import * as frame from './frame';
+import * as marking from './marking';
+import ts from 'typescript';
+
+// A simple unrotated rectangle with optional offset.
+export class Rectangle extends marking.Marking {
+    point: tsvector.Vector;
+    size: tsvector.Vector;
+    offset: tsvector.Vector;
+    scaled: boolean;
+    constructor(
+        frame: frame.Frame, 
+        point: tsvector.Vector, 
+        size: tsvector.Vector,
+        offset: tsvector.Vector = [0, 0],
+        scaled: boolean = true
+    ) {
+        super(frame);
+        this.point = point;
+        this.size = size;
+        this.offset = offset;
+        this.scaled = scaled;
+    };
+    drawPath(): Path2D {
+        const frame = this.onFrame;
+        const path = new Path2D();
+        let pixelStart: tsvector.Vector;
+        let pixelSize: tsvector.Vector;
+        if (this.scaled) {
+            // offset and size are scaled
+            const start = tsvector.vAdd(this.point, this.offset);
+            const end = tsvector.vAdd(start, this.size);
+            pixelStart = frame.toPixel(start);
+            pixelSize = tsvector.vSub(frame.toPixel(end), pixelStart);
+        } else {
+            // offset and size are unscaled, invert y
+            const offset1 = [this.offset[0], -this.offset[1]];
+            const size1 = [this.size[0], -this.size[1]];
+            pixelStart = tsvector.vAdd(frame.toPixel(this.point), offset1);
+            pixelSize = size1;
+        }
+        const [px, py] = pixelStart;
+        const [sx, sy] = pixelSize;
+        path.rect(px, py, sx, -sy);
+        return path;
+    };
+};
+
+export function Square(
+    frame: frame.Frame, 
+    point: tsvector.Vector, 
+    size: number, 
+    offset: tsvector.Vector | null = null, 
+    scaled: boolean = false) {
+    if (offset === null) {
+        const half = size / 2;
+        offset = [-half, -half];
+    }
+    return new Rectangle(frame, point, [size, size], offset, scaled);
+};

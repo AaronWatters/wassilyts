@@ -3,10 +3,17 @@ import * as tsvector from 'tsvector';
 import * as diagram from './diagram';
 import * as styled from './styled';
 import * as circle from './circle';
+import * as rect from './rect';
 
 export function translateScaleMatrix(
-    translate: tsvector.Vector,
-    scale: tsvector.Vector): tsvector.Matrix {
+    translate: tsvector.Vector | null,
+    scale: tsvector.Vector | null): tsvector.Matrix {
+    if (translate === null) {
+        translate = [0, 0];
+    }
+    if (scale === null) {
+        scale = [1, 1];
+    }
     return [
         [scale[0], 0, translate[0]],
         [0, scale[1], translate[1]],
@@ -39,11 +46,17 @@ const identity = tsvector.eye(3);
 
 export class Frame extends styled.Styled {
     diagram: diagram.Diagram;
+    // convert from parent model to local model
     affine: tsvector.Matrix = identity;
+    // convert from local model to parent model
     inv: tsvector.Matrix = identity;
+    // convert from cartesian pixel to local model
     pixelToModel: tsvector.Matrix = identity;
+    // convert from local model to cartesian pixel
     ModelToPixel: tsvector.Matrix = identity;
+    // parent frame or if null this is the primary frame.
     parent: Frame | null;
+    // record of all markings
     nameToMarking: Map<string, styled.Styled> = new Map();
 
     constructor(
@@ -74,6 +87,14 @@ export class Frame extends styled.Styled {
         const pixel = this.toPixel(xy);
         return this.addPixelPoint(pixel);
     };
+    /** Add a canvas pixel point, record its cartesian pixel coords and return frame model point */
+    addPixel(xy: tsvector.Vector): tsvector.Vector {
+        const diagram = this.diagram;
+        const cartesian = diagram.toCartesian(xy);
+        const model = this.toModel(cartesian);
+        diagram.addPoint(cartesian);
+        return model;
+    }
     setAffine(affineMatrix: tsvector.Matrix) {
         this.affine = affineMatrix;
         this.inv = tsvector.MInverse(affineMatrix);
@@ -85,7 +106,11 @@ export class Frame extends styled.Styled {
         if (this.parent !== null) {
             this.pixelToModel = tsvector.MMProduct(this.affine, this.parent.pixelToModel);
             this.ModelToPixel = tsvector.MMProduct(this.parent.ModelToPixel, this.inv);
-        } 
+        }
+        // sync all children
+        this.nameToMarking.forEach((element) => {
+            element.syncToParent();
+        });
     };
     /** Convert from model space to cartesian pixel space */
     toPixel(xy: tsvector.Vector): tsvector.Vector {
@@ -95,7 +120,10 @@ export class Frame extends styled.Styled {
     toModel(xy: tsvector.Vector): tsvector.Vector {
         return applyAffine(this.pixelToModel, xy);
     };
-    /** Create a frame for a subregion and record it. */
+    /** Create a frame for a subregion and record it. 
+     * fromMinxy..fromMaxxy is the region in the parent frame.
+     * toMinxy..toMaxxy is the region in the new frame.
+    */
     regionFrame(
         fromMinxy: tsvector.Vector,
         fromMaxxy: tsvector.Vector,
@@ -129,5 +157,25 @@ export class Frame extends styled.Styled {
     /** A circle is a circle with a scaled radius. */
     circle(center: tsvector.Vector, radius: number, scaled=true): circle.Circle {
         return this.dot(center, radius, scaled);
+    };
+    rect(
+        point: tsvector.Vector,
+        size: tsvector.Vector,
+        offset: tsvector.Vector = [0, 0],
+        scaled: boolean = true
+    ): rect.Rectangle {
+        const result = new rect.Rectangle(this, point, size, offset, scaled);
+        this.addElement(result);
+        return result;
+    };
+    square(
+        point: tsvector.Vector,
+        size: number,
+        offset: tsvector.Vector | null = null,
+        scaled: boolean = false
+    ): rect.Rectangle {
+        const result = rect.Square(this, point, size, offset, scaled);
+        this.addElement(result);
+        return result;
     };
 };

@@ -15,6 +15,9 @@ export abstract class Styled {
         globalCounter += 1;
     };
     abstract draw(): void;
+    syncToParent() {
+        // do nothing by default
+    };
     stroked() {
         this.stroke = true;
         return this;
