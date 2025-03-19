@@ -44,6 +44,16 @@ export class Rectangle extends marking.Marking {
         const [px, py] = pixelStart;
         const [sx, sy] = pixelSize;
         path.rect(px, py, sx, -sy);
+        //const cstart = frame.diagram.toCartesian(pixelStart);
+        const [cx, cy] = frame.diagram.toCanvas(pixelStart);
+        console.log(`translated rectangle at ${this.point} with size ${this.size}`);
+        console.log(`to rectangle at ${cx}, ${cy} with size ${this.size}`);
+        console.log("sx, sy: ", sx, sy);
+        // add reference points to diagram
+        frame.addPixelPoint(pixelStart);
+        frame.addPixelPoint(tsvector.vAdd(pixelStart, [sx, 0]));
+        frame.addPixelPoint(tsvector.vAdd(pixelStart, [0, sy]));
+        frame.addPixelPoint(tsvector.vAdd(pixelStart, pixelSize));
         return path;
     };
 };
