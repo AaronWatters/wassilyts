@@ -19,6 +19,7 @@ export class Circle extends marking.Marking {
         const center = this.center;
         let radius = this.radius;
         const pixelCenter = frame.addPoint(center);
+        const ccenter = frame.diagram.toCanvas(pixelCenter);
         if (this.scaled) {
             const offset = [center[0] + radius, center[1]];
             const pixelOffset = frame.addPoint(offset);
@@ -30,10 +31,10 @@ export class Circle extends marking.Marking {
         console.log(`to circle at ${px}, ${py} with radius ${radius}`);
         path.arc(px, py, radius, 0, 2 * Math.PI);
         // add reference points to diagram
-        frame.addPixelPoint(tsvector.vAdd(pixelCenter, [radius, 0]));
-        frame.addPixelPoint(tsvector.vAdd(pixelCenter, [0, radius]));
-        frame.addPixelPoint(tsvector.vAdd(pixelCenter, [-radius, 0]));
-        frame.addPixelPoint(tsvector.vAdd(pixelCenter, [0, -radius]));
+        frame.addPixelPoint(tsvector.vAdd(ccenter, [radius, 0]));
+        frame.addPixelPoint(tsvector.vAdd(ccenter, [0, radius]));
+        frame.addPixelPoint(tsvector.vAdd(ccenter, [-radius, 0]));
+        frame.addPixelPoint(tsvector.vAdd(ccenter, [0, -radius]));
         return path;
     };
 }
