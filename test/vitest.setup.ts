@@ -20,3 +20,16 @@ global.HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   fillText: vi.fn(),
   strokeText: vi.fn(),
 }) as unknown as CanvasRenderingContext2D);
+
+
+class MockPath2D {
+  constructor(path?: string | Path2D) {}
+  addPath() {}
+  rect() {}
+  arc() {}
+  moveTo() {}
+  lineTo() {}
+  closePath() {}
+}
+
+global.Path2D = MockPath2D as any;
