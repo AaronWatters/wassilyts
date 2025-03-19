@@ -19,7 +19,7 @@ export class Circle extends marking.Marking {
         const center = this.center;
         let radius = this.radius;
         const pixelCenter = frame.addPoint(center);
-        const ccenter = frame.diagram.toCanvas(pixelCenter);
+        const ccenter = frame.diagram.toCartesian(pixelCenter);
         if (this.scaled) {
             const offset = [center[0] + radius, center[1]];
             const pixelOffset = frame.addPoint(offset);
