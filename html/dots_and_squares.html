@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>wassilyjs Library Demo</title>
+</head>
+<body>
+<h1>dots and squares test page</h1>
+
+<p>Please look at the console.</p>
+
+<p>400 x 200 canvas scaled to range (1,1)..(5,3)</p>
+<p>Gray background rectangle.</p>
+<p>Blue squares with side 20 centered at n/4, m/4 with an orange dot of radius 5 in the center</p>
+
+<div id="output"></div>
+
+<script type="module">
+  import { 
+    name,
+    diagram,
+    drawOn,
+  } from '../dist/wassilyts.mjs';
+  console.log("Hello from wassilyjs Library!");
+  console.log("The name of the library is: " + name);
+  const output = document.getElementById('output');
+  //const d = new diagram.Diagram(output, 520, 600);
+  const frame0 = drawOn(output, 400, 200);
+  debugger;
+  // make a subframe
+  const fromMin = [0,0];
+  const fromMax = [400,200];
+  const toMin = [1,1];
+  const toMax = [5,3];
+  const frame1 = frame0.regionFrame(fromMin, fromMax, toMin, toMax);
+  // background rectangle
+  frame1.rect([1,1], [4,2]).colored('#aaa');
+  for (let n = 1; n < 4*4; n++) {
+    for (let m = 1; m < 2*4; m++) {
+      const n4 = 1 + n/4;
+      const m4 = 1 + m/4;
+      frame1.square([n4,m4], 20).colored('blue');
+      frame1.dot([n4,m4], 5).colored('orange');
+      //break;
+    }
+    //break;
+  }
+
+  frame0.draw()
+  console.log("frame0 = ", frame0);
+  console.log("frame1 = ", frame1);
+  frame0.fit();
+  //frame0.diagram.clear();
+  //frame0.draw();
+</script>
+</body>
+</html>

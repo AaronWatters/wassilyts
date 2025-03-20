@@ -1,0 +1,61 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>wassilyjs Library Demo</title>
+</head>
+<body>
+<h1>circles test page</h1>
+
+<p>Please look at the console.</p>
+
+<p>400 x 400 canvas scaled to range (1,1)..(2,2)</p>
+<p>Gray background rectangle.</p>
+<p>Blue circle at (1,1) with radius 0.3</p>
+<p>Red circle at (1,2) with radius 0.5</p>
+<p>Green circle at (2,1) with radius 0.1</p>
+<p>Salmon circle at (2,2) with radius 0.2</p>
+<p>Fit to frame.</p>
+
+<div id="output"></div>
+
+<script type="module">
+  import { 
+    name,
+    diagram,
+    drawOn,
+  } from '../dist/wassilyts.mjs';
+  console.log("Hello from wassilyjs Library!");
+  console.log("The name of the library is: " + name);
+  const output = document.getElementById('output');
+  //const d = new diagram.Diagram(output, 520, 600);
+  const frame0 = drawOn(output, 400, 400);
+  debugger;
+  // make a subframe
+  const fromMin = [0,0];
+  const fromMax = [400,400];
+  const toMin = [1,1];
+  const toMax = [2,2];
+  const frame1 = frame0.regionFrame(fromMin, fromMax, toMin, toMax);
+  // background rectangle
+  frame1.rect([1,1], [1,1]).colored('#aaa');
+
+  // draw a blue circle
+  frame1.circle([1,1], 0.3).colored('blue');
+  // draw a red circle
+  frame1.circle([1,2], 0.5).colored('red');
+  // draw a green circle
+  frame1.circle([2,1], 0.1).colored('green');
+  // draw a salmon circle
+  frame1.circle([2,2], 0.2).colored('salmon');
+  frame0.draw()
+  console.log("frame0 = ", frame0);
+  console.log("frame1 = ", frame1);
+  frame0.fit();
+  frame0.diagram.clear();
+  frame0.draw();
+</script>
+</body>
+</html>

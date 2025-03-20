@@ -1,0 +1,20 @@
+
+<h1>Convenience index for debugging.</h1>
+
+You should only see this page if you are running vite in dev mode.
+
+<pre>
+    npm run dev
+</pre>
+
+The page should redirect to 
+<a href="./html/index.html">./html/index.html</a> in 15 seconds.</a>
+
+<script>
+    // wait for a minute and then redirect to "./html/index.html"
+    console.log("Redirecting to ./html/index.html in 15 seconds.");
+    setTimeout(() => {
+        console.log("Redirecting to ./html/index.html.");
+        window.location.href = "./html/index.html";
+    }, 15000);
+</script>
