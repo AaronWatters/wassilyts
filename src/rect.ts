@@ -2,7 +2,6 @@ import * as tsvector from 'tsvector';
 //import * as diagram from './diagram';
 import * as frame from './frame';
 import * as marking from './marking';
-import ts from 'typescript';
 
 // A simple unrotated rectangle with optional offset.
 export class Rectangle extends marking.Marking {
@@ -43,9 +42,9 @@ export class Rectangle extends marking.Marking {
         }
         const [px, py] = pixelStart;
         const [sx, sy] = pixelSize;
-        path.rect(px, py, sx, -sy);
         //const cstart = frame.diagram.toCartesian(pixelStart);
         const [cx, cy] = frame.diagram.toCanvas(pixelStart);
+        path.rect(cx, cy, sx, -sy);
         console.log(`translated rectangle at ${this.point} with size ${this.size}`);
         console.log(`to rectangle at ${cx}, ${cy} with size ${this.size}`);
         console.log("sx, sy: ", sx, sy);

@@ -57,4 +57,22 @@ describe('rect shape', () => {
         expect(diag.stats.maxxy).toEqual([100, 100]);
     });
 
+    it('should make a square', () => {
+        const container = document.createElement('div');
+        const width = 100;
+        const height = 100;
+        const diag = new diagram.Diagram(container, width, height);
+        const frm = diag.mainFrame; //new frame.Frame(diag);
+        const square = frm.square([50, 40], 20);
+        diag.draw();
+        expect(square.point).toEqual([50, 40]);
+        expect(square.size).toEqual([20, 20]);
+        expect(square.offset).toEqual([-10, -10]);
+        expect(square.scaled).toBeFalsy();
+        expect(diag.stats.minxy).toEqual([50 - 10, 40 - 10]);
+        expect(diag.stats.maxxy).toEqual([50 + 10, 40 + 10]);
+        expect(diag.ctx).toBeDefined();
+        //expect(diag.ctx.rect).toHaveBeenCalledWith(40, 30, 20, 20);
+    });
+
 });

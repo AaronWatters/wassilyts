@@ -168,10 +168,20 @@ export class Frame extends styled.Styled {
         this.addElement(result);
         return result;
     };
+    /** A box is an unscaled rectangle. */
+    box(
+        point: tsvector.Vector,
+        size: tsvector.Vector,
+        offset: tsvector.Vector = [0, 0],
+        scaled: boolean = false
+    ): rect.Rectangle {
+        return this.rect(point, size, offset, scaled);
+    };
+    /** A square is a centered unscaled rectangle with equal sides */
     square(
         point: tsvector.Vector,
         size: number,
-        offset: tsvector.Vector | null = null,
+        offset: tsvector.Vector | null = null, // default to center
         scaled: boolean = false
     ): rect.Rectangle {
         const result = rect.Square(this, point, size, offset, scaled);
