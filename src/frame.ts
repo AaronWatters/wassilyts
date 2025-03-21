@@ -5,6 +5,7 @@ import * as styled from './styled';
 import * as circle from './circle';
 import * as rect from './rect';
 import * as line from './line';
+import * as poly from './poly';
 
 export function translateScaleMatrix(
     translate: tsvector.Vector | null,
@@ -192,6 +193,20 @@ export class Frame extends styled.Styled {
         scaled: boolean = false
     ): rect.Rectangle {
         const result = rect.Square(this, point, size, offset, scaled);
+        this.addElement(result);
+        return result;
+    };
+    /** a polyline is a poly that is stroked and not closed */
+    polyline(points: tsvector.Vector[]): poly.Poly {
+        const result = new poly.Poly(this, points);
+        result.opened().stroked();
+        this.addElement(result);
+        return result;
+    };
+    /** a polygon is a poly that is filled and closed */
+    polygon(points: tsvector.Vector[]): poly.Poly {
+        const result = new poly.Poly(this, points);
+        result.closed().filled();
         this.addElement(result);
         return result;
     };
