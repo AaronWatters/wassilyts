@@ -41,13 +41,13 @@ export class Diagram {
     /** Convert cartesian xy to canvas xy (with y inverted) */
     toCanvas(xy: tsvector.Vector): tsvector.Vector {
         const result = [xy[0], this.height - xy[1]];
-        console.log(`toCanvas: ${xy} -> ${result}`);
+        //console.log(`toCanvas: ${xy} -> ${result}`);
         return result;
     };
     /** Convert canvas xy to cartesian xy (with y inverted) */
     toCartesian(xy: tsvector.Vector): tsvector.Vector {
         const result = [xy[0], this.height - xy[1]];
-        console.log(`toCartesian: ${xy} -> ${result}`);
+        //console.log(`toCartesian: ${xy} -> ${result}`);
         return result;
     };
     draw() {
@@ -80,33 +80,33 @@ export class Diagram {
         }
         const aspect = dh / dw;
         const myAspect = height / width;
-        console.log(`aspect: ${aspect}, myAspect: ${myAspect}`);
+        //console.log(`aspect: ${aspect}, myAspect: ${myAspect}`);
         let fromMinX = 0;
         let fromMaxX = width;
         let fromMinY = 0;
         let fromMaxY = height;
         if (aspect > myAspect) {
-            console.log('The region is taller than the diagram, center the width and expand the height');
+            //console.log('The region is taller than the diagram, center the width and expand the height');
             const ddw = height / aspect;
-            console.log(`newWidth: ${ddw}; old width: ${width}`);
+            //console.log(`newWidth: ${ddw}; old width: ${width}`);
             fromMinX = (width - ddw) / 2;
             fromMaxX = fromMinX + ddw;
         } else {
-            console.log('The region is wider than the diagram, center the height and expand the width');
+            //console.log('The region is wider than the diagram, center the height and expand the width');
             const ddh = width * aspect;
             fromMinY = (height - ddh) / 2;
             fromMaxY = fromMinY + ddh;
         }
-        console.log(`fromMinX: ${fromMinX}, fromMaxX: ${fromMaxX}, fromMinY: ${fromMinY}, fromMaxY: ${fromMaxY}`);
+        //console.log(`fromMinX: ${fromMinX}, fromMaxX: ${fromMaxX}, fromMinY: ${fromMinY}, fromMaxY: ${fromMaxY}`);
         const fromMinXY = [fromMinX, fromMinY];
         const fromMaxXY = [fromMaxX, fromMaxY];
         const affine = frame.regionMap(minxy, maxxy, fromMinXY, fromMaxXY);
-        console.log(`affine:`, affine);
+        //console.log(`affine:`, affine);
         const mainFrame = this.mainFrame;
         const currentAffine = mainFrame.ModelToPixel!;
-        console.log(`currentAffine:`, currentAffine);
+        //console.log(`currentAffine:`, currentAffine);
         const adjustedAffine = tsvector.MMProduct(affine, currentAffine);
-        console.log(`adjustedAffine:`, adjustedAffine);
+        //console.log(`adjustedAffine:`, adjustedAffine);
         const pixelToModel = tsvector.MInverse(adjustedAffine);
         mainFrame.setAffine(pixelToModel);
     };

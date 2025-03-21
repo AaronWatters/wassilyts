@@ -6,6 +6,7 @@ import * as styled from './styled';
 
 export abstract class Marking extends styled.Styled {
     onFrame: frame.Frame;
+    stroke: boolean = false;
     constructor(frame: frame.Frame) {
         super();
         // by default inherit the style of the frame
@@ -35,6 +36,7 @@ export abstract class Marking extends styled.Styled {
         this.applyStyle(ctx);
         return true;
     };
+    /** Test whether pixel lies on the marking. */
     testPixel(xy: tsvector.Vector): boolean {
         const prep = this.prepare();
         const path = this.drawPath();

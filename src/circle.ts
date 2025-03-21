@@ -27,8 +27,8 @@ export class Circle extends marking.Marking {
             radius = pixelRadius;
         }
         const [px, py] = pixelCenter;
-        console.log(`translated circle at ${center} with radius ${this.radius}`);
-        console.log(`to circle at ${px}, ${py} with radius ${radius}`);
+        //console.log(`translated circle at ${center} with radius ${this.radius}`);
+        //console.log(`to circle at ${px}, ${py} with radius ${radius}`);
         path.arc(px, py, radius, 0, 2 * Math.PI);
         // add reference points to diagram
         frame.addPixelPoint(tsvector.vAdd(ccenter, [radius, 0]));
