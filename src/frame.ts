@@ -4,6 +4,7 @@ import * as diagram from './diagram';
 import * as styled from './styled';
 import * as circle from './circle';
 import * as rect from './rect';
+import * as line from './line';
 
 export function translateScaleMatrix(
     translate: tsvector.Vector | null,
@@ -146,6 +147,12 @@ export class Frame extends styled.Styled {
         this.nameToMarking.forEach((element) => {
             element.draw();
         });
+    };
+    /** line between two end points. */
+    line(start: tsvector.Vector, end: tsvector.Vector): line.Line {
+        const result = new line.Line(this, start, end);
+        this.addElement(result);
+        return result;
     };
     /** A dot is a circle with an unscaled radius. */
     dot(center: tsvector.Vector, radius: number, scaled=false): circle.Circle {

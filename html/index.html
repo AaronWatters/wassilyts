@@ -29,6 +29,7 @@
   const output = document.getElementById('output');
   //const d = new diagram.Diagram(output, 520, 600);
   const frame0 = drawOn(output, 600, 400);
+  frame0.linedWidth(3);
   const dot1 = frame0.circle([20,0], 10).colored('red');
   //const rect1 = frame0.rect([20,0], [10,15], [-5,0]).colored('blue');
   const square1 = frame0.square([20,0], 10).colored('green');
@@ -36,6 +37,19 @@
   const dot3 = frame0.circle([50,30], 10).colored('green');
   const dot4 = frame0.circle([50,50], 10).colored('salmon');
   const dot5 = frame0.circle([-70, 3], 10).colored('purple');
+  const start = [100, 100]
+  const delta = 40;
+  debugger;
+  
+  for (let degrees=0; degrees<360; degrees+=30) {
+    const radians = degrees * Math.PI / 180;
+    const x = start[0] + delta * Math.cos(radians);
+    const y = start[1] + delta * Math.sin(radians);
+    frame0.line([x, y], start).colored('blue');
+    console.log("degrees = ", degrees, "radians = ", radians, "x = ", x, "y = ", y);
+    //break;
+  }
+    
   frame0.draw();
   debugger;
   frame0.fit();
