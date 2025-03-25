@@ -16,4 +16,12 @@ test('Library function works', async ({ page }) => {
 
     // Assert that the expected console message is present
     expect(consoleMessages).toContain("The name of the library is: wassilyjs");
+
+    // assert that the page contains a canvas element
+    expect(await page.locator('canvas')).toBeTruthy();
+
+    // assert that the test pixel value is green
+    //expect(await page.window.pixelData).toEqual([0, 255, 0, 55]);
+    const globalValue = await page.evaluate(() => window.pixelData);
+    expect(globalValue).toEqual([0, 255, 0, 255]);
 });

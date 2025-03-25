@@ -64,6 +64,26 @@ export class Diagram {
     addxy(x: number, y: number) {
         this.stats.addxy(x, y);
     };
+    // get pixels from the canvas
+    getImageData(fromCanvasXY: tsvector.Vector | null, toCanvasXY: tsvector.Vector | null): ImageData {
+        if (fromCanvasXY === null) {
+            fromCanvasXY = [0, 0];
+        }
+        const [x, y] = fromCanvasXY;
+        if (toCanvasXY === null) {
+            toCanvasXY = [this.width, this.height];
+        }
+        const [width, height] = tsvector.vSub(toCanvasXY, fromCanvasXY);
+        return this.ctx!.getImageData(x, y, width, height);
+    };
+    // get the rgba values from a pixel on the canvas
+    getPixelData(canvasXY: tsvector.Vector): tsvector.Vector {
+        const [x, y] = canvasXY;
+        const toCanvasXY = tsvector.vAdd(canvasXY, [1, 1]);
+        const imageData = this.getImageData(canvasXY, toCanvasXY);
+        const index = 0;
+        return Array.from(imageData.data.slice(index, index + 4));
+    };
     // use the stats to fit the diagram to the points
     fit() {
         if (this.stats.minxy === null || this.stats.maxxy === null) {
