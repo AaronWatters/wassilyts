@@ -39,7 +39,6 @@
   const dot5 = frame0.circle([-70, 3], 10).colored('purple');
   const start = [100, 100]
   const delta = 40;
-  debugger;
   
   for (let degrees=0; degrees<360; degrees+=30) {
     const radians = degrees * Math.PI / 180;
@@ -49,6 +48,27 @@
     console.log("degrees = ", degrees, "radians = ", radians, "x = ", x, "y = ", y);
     //break;
   }
+
+  debugger;
+  function starPoints(cx, cy, r1, r2, n) {
+    const points = [];
+    for (let i=0; i<n; i++) {
+      const angle = 2 * i * Math.PI / n;
+      const x = cx + r1 * Math.cos(angle);
+      const y = cy + r1 * Math.sin(angle);
+      points.push([x, y]);
+      const angle2 = (2 * i +1) * Math.PI / n;
+      const x2 = cx + r2 * Math.cos(angle2);
+      const y2 = cy + r2 * Math.sin(angle2);
+      points.push([x2, y2]);
+    }
+    return points;
+  };
+
+  const star1 = starPoints(100, 30, 15, 10, 5);
+  frame0.polygon(star1).colored('red');
+  const star2 = starPoints(100, 15, 15, 10, 7);
+  frame0.polyline(star2).colored('green');
     
   frame0.draw();
   debugger;
