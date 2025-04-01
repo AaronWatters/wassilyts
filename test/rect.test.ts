@@ -4,7 +4,6 @@ import {
   diagram,
 } from '../src/index';
 
-
 describe('rect shape', () => {
 
     it('should make a rect', () => {
