@@ -23,6 +23,11 @@ export function translateScaleMatrix(
     ];
 };
 
+/** Create a matrix that maps a region from one coordinate system to another.
+ * fromMinxy..fromMaxxy is the region in the parent frame.
+ * toMinxy..toMaxxy is the region in the new frame.
+ * The resulting matrix can be used to convert points from the parent frame to the new frame.
+ */
 export function regionMap(
     fromMinxy: tsvector.Vector, 
     fromMaxxy: tsvector.Vector, 
@@ -46,6 +51,11 @@ export function applyAffine(affine: tsvector.Matrix, xy: tsvector.Vector): tsvec
 
 const identity = tsvector.eye(3);
 
+/**
+ * A frame is a coordinate system in which markings are drawn.
+ * It can be nested, with a parent frame and child frames.
+ * The affine matrix defines the transformation from the parent frame to this frame.
+ */
 export class Frame extends styled.Styled {
     diagram: diagram.Diagram;
     // convert from parent model to local model
@@ -75,6 +85,12 @@ export class Frame extends styled.Styled {
         }
         this.setAffine(affineMatrix);
     };
+    /** Make an image usable in a diagram by name. */
+    nameImage(name: string, image: HTMLImageElement) {
+        this.diagram.nameImage(name, image);
+        return this;
+    };
+    /** Fit visible elements into canvas */
     fit() {
         this.diagram.fit();
     };

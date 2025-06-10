@@ -4,6 +4,9 @@ import * as tsvector from 'tsvector';
 import * as frame from './frame';
 import * as styled from './styled';
 
+/**
+ * A visible marking on a frame.
+ */
 export abstract class Marking extends styled.Styled {
     onFrame: frame.Frame;
     stroke: boolean = false;

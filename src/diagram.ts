@@ -8,6 +8,11 @@ export function drawOn(container: HTMLElement, width: number, height: number): f
     return diag.mainFrame;
 };
 
+/**
+ * A diagram is a canvas with a frame.
+ * It can be used to draw shapes, lines, and images.
+ * The diagram is the main entry point for drawing.
+ */
 export class Diagram {
 
     // The container for the canvas
@@ -20,11 +25,13 @@ export class Diagram {
     stats: CanvasStats;
     // The primary frame for the diagram
     mainFrame: frame.Frame;
+    nameToImage: Map<string, HTMLImageElement>;
 
     constructor(domObject: HTMLElement, width: number, height: number) {
         this.container = domObject;
         this.width = width;
         this.height = height;
+        this.nameToImage = new Map<string, HTMLImageElement>();
         // Create and configure canvas
         this.canvas = document.createElement("canvas");
         this.canvas.width = width;
@@ -37,6 +44,19 @@ export class Diagram {
         this.ctx = this.canvas.getContext("2d");
         this.stats = new CanvasStats();
         this.mainFrame = new frame.Frame(this, null, null);
+    };
+    /** set image smoothing */
+    smoothImages(smooth: boolean=true) {
+        if (this.ctx === null) {
+            return;
+        }
+        this.ctx.imageSmoothingEnabled = smooth;
+        return this;
+    };
+    /** Make an image usable in a diagram by name. */
+    nameImage(name: string, image: HTMLImageElement) {
+        this.nameToImage.set(name, image);
+        return this;
     };
     /** Convert cartesian xy to canvas xy (with y inverted) */
     toCanvas(xy: tsvector.Vector): tsvector.Vector {
@@ -132,6 +152,12 @@ export class Diagram {
     };
 };
 
+/**
+ * A class to collect statistics about the canvas.
+ * It keeps track of the minimum and maximum x and y coordinates
+ * that have been added to it.
+ * This can be used to fit the canvas to the points added.
+ */
 export class CanvasStats {
     minxy: tsvector.Vector | null;
     maxxy: tsvector.Vector | null;

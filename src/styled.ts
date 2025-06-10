@@ -3,6 +3,9 @@ import * as tsvector from 'tsvector';
 
 var globalCounter = 0;
 
+/**
+ * Base class for styled objects drawn on a canvas.
+ */
 export abstract class Styled {
     objectName: string;
     color: string = "black";
