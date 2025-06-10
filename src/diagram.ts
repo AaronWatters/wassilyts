@@ -23,9 +23,12 @@ export class Diagram {
     ctx: CanvasRenderingContext2D | null;
     // Record of coordinate extremes in cartesian coordinates
     stats: CanvasStats;
+    last_stats: CanvasStats | null = null;
     // The primary frame for the diagram
     mainFrame: frame.Frame;
     nameToImage: Map<string, HTMLImageElement>;
+    redraw_requested: boolean = false;
+    autoRedraw: boolean = true;
 
     constructor(domObject: HTMLElement, width: number, height: number) {
         this.container = domObject;
@@ -43,6 +46,7 @@ export class Diagram {
         // Get the context
         this.ctx = this.canvas.getContext("2d");
         this.stats = new CanvasStats();
+        this.last_stats = this.stats;
         this.mainFrame = new frame.Frame(this, null, null);
     };
     /** set image smoothing */
@@ -73,8 +77,38 @@ export class Diagram {
     draw() {
         this.mainFrame.draw();
     };
+    /** Request a redraw of the diagram */
+    requestRedraw() {
+        if (this.autoRedraw && !this.redraw_requested) {
+            this.redraw_requested = true;
+            requestAnimationFrame(() => {
+                this.redraw_requested = false;
+                this.clear();
+                this.draw();
+            });
+        }
+    };
+    /** Set the auto redraw flag */
+    resumeRedraw() {
+        if (this.autoRedraw) {
+            // already auto redrawing
+            return;
+        }
+        this.autoRedraw = true;
+        if (this.redraw_requested) {
+            // force a redraw
+            this.redraw_requested = false;
+            this.requestRedraw();
+        }
+    };
+    /** Pause the auto redraw (in cases of large diagram updates) */
+    pauseRedraw() {
+        this.autoRedraw = false;
+    }
+    /** Clear the canvas and reset stats */
     clear() {
         this.ctx!.clearRect(0, 0, this.width, this.height);
+        this.last_stats = this.stats;
         this.stats = new CanvasStats();
     };
     /** record a cartesian xy point */

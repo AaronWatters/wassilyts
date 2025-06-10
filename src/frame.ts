@@ -100,6 +100,15 @@ export class Frame extends styled.Styled {
         diagram.addPoint(xy);
         return diagram.toCanvas(xy);
     };
+    requestRedraw() {
+        this.diagram.requestRedraw();
+    };
+    pauseRedraw() {
+        this.diagram.pauseRedraw();
+    };
+    resumeRedraw() {
+        this.diagram.resumeRedraw();
+    };
     /** Add a model point, record its cartesian pixel coords and convert to canvas. */
     addPoint(xy: tsvector.Vector): tsvector.Vector {
         const pixel = this.toPixel(xy);
@@ -154,9 +163,12 @@ export class Frame extends styled.Styled {
         return result;
     };
     /** Record a marking */
-    addElement(styled: styled.Styled) {
+    addElement(styled: styled.Styled, requestRedraw=true) {
         const name = styled.objectName
         this.nameToMarking.set(name, styled);
+        if (requestRedraw) {
+            this.requestRedraw();
+        }
     };
     /** iterate over all markings to draw. */
     draw() {
