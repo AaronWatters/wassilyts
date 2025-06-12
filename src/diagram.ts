@@ -79,8 +79,12 @@ export class Diagram {
     };
     /** Request a redraw of the diagram */
     requestRedraw() {
-        if (this.autoRedraw && !this.redraw_requested) {
+        if (!this.redraw_requested) {
             this.redraw_requested = true;
+            if (!this.autoRedraw) {
+                // if not auto redrawing, just return
+                return;
+            }
             requestAnimationFrame(() => {
                 this.redraw_requested = false;
                 this.clear();
