@@ -18,6 +18,11 @@ export abstract class Marking extends styled.Styled {
         this.lineDash = frame.lineDash;
         this.onFrame = frame;
     };
+    /**
+     * Draw the marking or a container for the marking.
+     * The Path2D object will be used for testing pixels in mouse events.
+     * If the marking doesn't override draw() then the Path2D will draw the marking.
+     */
     abstract drawPath(): Path2D;
     // default draw method
     draw() {
@@ -29,7 +34,7 @@ export abstract class Marking extends styled.Styled {
         } else {
             ctx.fill(path);
         };
-        ctx.restore();
+        ctx.restore(); // undo the prepare() save
     };
     // prepare the context for drawing, return false if no change.
     // save state if changed.
