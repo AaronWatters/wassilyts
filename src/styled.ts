@@ -12,6 +12,7 @@ export abstract class Styled {
     lineWidth: number = 1;
     lineDash: tsvector.Vector | null = null;
     stroke: boolean = false;
+    defunct: boolean = false; // true if the object is no longer used
     constructor() {
         const constructorName = this.constructor.name;
         this.objectName = constructorName + globalCounter;
@@ -51,4 +52,8 @@ export abstract class Styled {
             ctx.setLineDash(this.lineDash);
         }
     };
+    forget() {
+        this.defunct = true;
+        // bookkeeping elsewhere should remove this object.
+    }
 }

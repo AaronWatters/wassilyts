@@ -70,6 +70,8 @@ export class Frame extends styled.Styled {
     parent: Frame | null;
     // record of all markings
     nameToMarking: Map<string, styled.Styled> = new Map();
+    // draw ordered markings
+    drawOrder: styled.Styled[] = [];
 
     constructor(
         inDiagram: diagram.Diagram, 
@@ -84,6 +86,16 @@ export class Frame extends styled.Styled {
             affineMatrix = identity;
         }
         this.setAffine(affineMatrix);
+    };
+    /** clear all elements from frame */
+    clear() {
+        // for safety forget all elements
+        this.nameToMarking.forEach((element) => {
+            element.forget();
+        });
+        this.nameToMarking.clear();
+        this.drawOrder = [];
+        this.diagram.requestRedraw();
     };
     /** Make an image usable in a diagram by name. */
     nameImage(name: string, image: HTMLImageElement) {
@@ -173,9 +185,28 @@ export class Frame extends styled.Styled {
     /** iterate over all markings to draw. */
     draw() {
         this.syncToParent();
-        this.nameToMarking.forEach((element) => {
-            element.draw();
-        });
+        // check for defunct markings
+        let dirty = false;
+        // draw all markings in order
+        for (const element of this.drawOrder) {
+            if (element.defunct) {
+                dirty = true;
+            } else {
+                element.draw();
+            }
+        };
+        // remove defunct markings
+        if (dirty) {
+            let newOrder: styled.Styled[] = [];
+            for (const element of this.drawOrder) {
+                if (!element.defunct) {
+                    newOrder.push(element);
+                } else {
+                    this.nameToMarking.delete(element.objectName);
+                }
+            }
+            this.drawOrder = newOrder;
+        }
     };
     /** line between two end points. */
     line(start: tsvector.Vector, end: tsvector.Vector): line.Line {
