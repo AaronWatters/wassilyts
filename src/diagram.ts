@@ -29,8 +29,10 @@ export class Diagram {
     nameToImage: Map<string, HTMLImageElement>;
     redraw_requested: boolean = false;
     autoRedraw: boolean = true;
+    watchedEvents: Set<string> = new Set<string>();
 
     constructor(domObject: HTMLElement, width: number, height: number) {
+        //.log(`Diagram: creating a new diagram with width ${width} and height ${height}`);
         this.container = domObject;
         this.width = width;
         this.height = height;
@@ -48,6 +50,42 @@ export class Diagram {
         this.stats = new CanvasStats();
         this.last_stats = this.stats;
         this.mainFrame = new frame.Frame(this, null, null);
+    };
+    /** Event handler for any mouse event */
+    mouseEventHandler(event: MouseEvent) {
+        // Convert the mouse event to canvas coordinates
+        debugger;
+        const rect = this.canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const canvasXY = [x, y];
+        // Convert to cartesian coordinates
+        const cartesianXY = this.toCartesian(canvasXY);
+        // Add the point to the stats
+        //this.addPoint(cartesianXY);
+        // Call the frame's mouse event handler
+        this.mainFrame.frameEventHandler(event, canvasXY, cartesianXY);
+    };
+    /** handle an event of a given type */
+    watchEvent(eventType: string) {
+        console.log(this, `Diagram: watching event type ${eventType}`);
+        // If the event type is already watched, do nothing
+        if (this.watchedEvents.has(eventType)) {
+            return this;
+        }
+        if (this.ctx === null) {
+            throw new Error("Canvas context is not available.");
+        }
+        // Add the event listener to the canvas
+        //this.canvas.addEventListener(eventType, (event: MouseEvent) => {
+        //    this.mouseEventHandler(event);
+        //});
+        this.canvas.addEventListener(eventType, (event: Event): void => {
+            // Call the mouse event handler
+            this.mouseEventHandler(event as MouseEvent);
+        });
+        // Return the diagram for chaining
+        return this;
     };
     /** set image smoothing */
     smoothImages(smooth: boolean=true) {

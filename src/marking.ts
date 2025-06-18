@@ -10,6 +10,7 @@ import * as styled from './styled';
 export abstract class Marking extends styled.Styled {
     onFrame: frame.Frame;
     stroke: boolean = false;
+    
     constructor(frame: frame.Frame) {
         super();
         // by default inherit the style of the frame
@@ -35,6 +36,25 @@ export abstract class Marking extends styled.Styled {
             ctx.fill(path);
         };
         ctx.restore(); // undo the prepare() save
+    };
+    watchEvent(eventType: string) {
+        // add an event handler for the marking
+        this.onFrame.watchEvent(eventType);
+    };
+    requestRedraw() {
+        // request a redraw of the frame
+        this.onFrame.requestRedraw();
+    };
+    /** rename the element in the containing frame */
+    rename(newname: string): void {
+        this.onFrame.renameElement(this, newname);
+    };
+    pickObject(canvasXY: tsvector.Vector): boolean {
+        const path = this.drawPath();
+        // test if the pixel is in the path
+        const ctx = this.onFrame.diagram.ctx!;
+        const result = ctx.isPointInPath(path, canvasXY[0], canvasXY[1]);
+        return result;
     };
     // prepare the context for drawing, return false if no change.
     // save state if changed.

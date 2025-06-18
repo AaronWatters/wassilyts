@@ -7,6 +7,24 @@ import * as rect from './rect';
 import * as line from './line';
 import * as poly from './poly';
 
+// Handler returns true if the event was handled completely (no propagation needed).
+export type frameEventHandler = (
+    element: styled.Styled | null, // element can be null in frame with no marking picked
+    eventType: string,
+    canvasXY: tsvector.Vector, 
+    cartesianXY: tsvector.Vector, 
+    frameXY: tsvector.Vector,
+    ) => boolean;
+
+// External handlers always handle the event and do not accept the element (for serialization).
+export type externalEventHandler = (
+    elementName: string | null, // element can be null in frame with no marking picked
+    eventType: string,
+    canvasXY: tsvector.Vector, 
+    cartesianXY: tsvector.Vector, 
+    frameXY: tsvector.Vector,
+    ) => void;  
+
 export function translateScaleMatrix(
     translate: tsvector.Vector | null,
     scale: tsvector.Vector | null): tsvector.Matrix {
@@ -72,6 +90,8 @@ export class Frame extends styled.Styled {
     nameToMarking: Map<string, styled.Styled> = new Map();
     // draw ordered markings
     drawOrder: styled.Styled[] = [];
+    // event handlers for frame events
+    typeToEventHandler: Map<string, frameEventHandler> = new Map();
 
     constructor(
         inDiagram: diagram.Diagram, 
@@ -86,6 +106,52 @@ export class Frame extends styled.Styled {
             affineMatrix = identity;
         }
         this.setAffine(affineMatrix);
+        // by default the frame does not itself handle events
+        this.responsive = false;
+    };
+    /** handle a mouse event */
+    frameEventHandler(
+        event: MouseEvent,
+        canvasXY: tsvector.Vector,
+        cartesianXY: tsvector.Vector,
+    ): boolean {
+        return this.mouseEventHandler(event.type, canvasXY, cartesianXY, [0, 0]);
+    };
+    mouseEventHandler(eventtype: string, canvasXY: tsvector.Vector, cartesianXY: tsvector.Vector, frameXY0: tsvector.Vector): boolean {
+        let handled = false;
+        // convert to model coordinates
+        const frameXY = this.toModel(cartesianXY);
+        // call all event handler for this type
+        //const eventtype = event.type;
+        const handler = this.typeToEventHandler.get(eventtype);
+        if (handler && this.responsive) {
+            // call the event handler
+            handled = handler(this, eventtype, canvasXY, cartesianXY, frameXY);
+        }
+        if (!handled) {
+            // if not handled try to handle in markings
+            for (const element of this.drawOrder) {
+                if (element.mouseEventHandler(eventtype, canvasXY, cartesianXY, frameXY)) {
+                    handled = true;
+                    break; // stop after first handled
+                }
+            }
+        }
+        return handled;
+    };
+    /** rename a styled element in this frame */
+    renameElement(element: styled.Styled, newName: string) {
+        const oldName = element.objectName;
+        if (this.nameToMarking.has(oldName)) {
+            // remove old name
+            this.nameToMarking.delete(oldName);
+            // set new name
+            element.objectName = newName;
+            this.nameToMarking.set(newName, element);
+            this.requestRedraw();
+        } else {
+            console.warn(`Element ${oldName} not found in frame ${this.objectName}`);
+        }
     };
     /** clear all elements from frame */
     clear() {
@@ -97,6 +163,9 @@ export class Frame extends styled.Styled {
         this.drawOrder = [];
         this.diagram.requestRedraw();
     };
+    watchEvent(eventType: string) {
+        this.diagram.watchEvent(eventType);
+    }
     /** Make an image usable in a diagram by name. */
     nameImage(name: string, image: HTMLImageElement) {
         this.diagram.nameImage(name, image);
@@ -178,6 +247,7 @@ export class Frame extends styled.Styled {
     addElement(styled: styled.Styled, requestRedraw=true) {
         const name = styled.objectName
         this.nameToMarking.set(name, styled);
+        this.drawOrder.push(styled);
         if (requestRedraw) {
             this.requestRedraw();
         }
