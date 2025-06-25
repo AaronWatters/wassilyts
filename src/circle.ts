@@ -13,8 +13,20 @@ export class Circle extends marking.Marking {
         this.radius = radius;
         this.scaled = scaled;
     };
+    setFramePoint(position: tsvector.Vector): void {
+        // set the center of the circle in frame coordinates
+        this.center = position;
+        //this.requestRedraw();
+    };
+    getFramePoint(): tsvector.Vector {
+        // get the center of the circle in frame coordinates
+        return this.center;
+    };
     drawPath(): Path2D {
-        const frame = this.onFrame;
+        if (!this.isLive()) {
+            throw new Error("Circle is not attached to a frame.");
+        }
+        const frame = this.onFrame!;
         const path = new Path2D();
         const center = this.center;
         let radius = this.radius;

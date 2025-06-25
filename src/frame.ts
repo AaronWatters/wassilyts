@@ -84,14 +84,12 @@ export class Frame extends styled.Styled {
     pixelToModel: tsvector.Matrix = identity;
     // convert from local model to cartesian pixel
     ModelToPixel: tsvector.Matrix = identity;
-    // parent frame or if null this is the primary frame.
-    parent: Frame | null;
     // record of all markings
     nameToMarking: Map<string, styled.Styled> = new Map();
     // draw ordered markings
     drawOrder: styled.Styled[] = [];
     // event handlers for frame events
-    typeToEventHandler: Map<string, frameEventHandler> = new Map();
+    //typeToEventHandler: Map<string, frameEventHandler> = new Map();
 
     constructor(
         inDiagram: diagram.Diagram, 
@@ -100,14 +98,29 @@ export class Frame extends styled.Styled {
     ) {
         super();
         this.diagram = inDiagram;
-        this.parent = parent;
+        this.onFrame = parent;
         if (affineMatrix === null) {
             // by default don't change coordinates
             affineMatrix = identity;
         }
         this.setAffine(affineMatrix);
-        // by default the frame does not itself handle events
-        this.responsive = false;
+        // by default the frame handles events
+        this.responsive = true;
+    };
+    /** the pixel position is the frame origin in pixel coordinates */
+    getPixel(): tsvector.Vector {
+        return this.toPixel([0, 0]);
+    };
+    /** translate the origin to a new pixel position */
+    setPixel(position: tsvector.Vector): void {
+        // convert to model coordinates
+        const model = this.toModel(position);
+        const shift = tsvector.vScale(-1, model);
+        const translation = translateScaleMatrix(shift, null);
+        // create a new affine matrix with the additional translation
+        const newAffine = tsvector.MMProduct(translation, this.affine);
+        // set the new affine matrix
+        this.setAffine(newAffine);
     };
     /** handle a mouse event */
     frameEventHandler(
@@ -121,23 +134,30 @@ export class Frame extends styled.Styled {
         let handled = false;
         // convert to model coordinates
         const frameXY = this.toModel(cartesianXY);
-        // call all event handler for this type
-        //const eventtype = event.type;
-        const handler = this.typeToEventHandler.get(eventtype);
-        if (handler && this.responsive) {
-            // call the event handler
-            handled = handler(this, eventtype, canvasXY, cartesianXY, frameXY);
-        }
+        // call superclass for frame event handling
+        handled = super.mouseEventHandler(eventtype, canvasXY, cartesianXY, frameXY);
         if (!handled) {
             // if not handled try to handle in markings
-            for (const element of this.drawOrder) {
-                if (element.mouseEventHandler(eventtype, canvasXY, cartesianXY, frameXY)) {
-                    handled = true;
-                    break; // stop after first handled
+            const picked = this.pickedMarkings(canvasXY);
+            // pop the markings until one handles the event or no more markings, reverse draw order
+            while (picked.length > 0 && !handled) {
+                const element = picked.pop();
+                if (element) {
+                    handled = element.mouseEventHandler(eventtype, canvasXY, cartesianXY, frameXY);
                 }
             }
         }
         return handled;
+    };
+    pickedMarkings(canvasXY: tsvector.Vector): styled.Styled[] {
+        // return all responsive markings that are picked by the canvas coordinates, in draw order
+        const result: styled.Styled[] = [];
+        for (const element of this.drawOrder) {
+            if (element.responsive && element.pickObject(canvasXY)) {
+                result.push(element);
+            }
+        }
+        return result;
     };
     /** rename a styled element in this frame */
     renameElement(element: styled.Styled, newName: string) {
@@ -148,7 +168,7 @@ export class Frame extends styled.Styled {
             // set new name
             element.objectName = newName;
             this.nameToMarking.set(newName, element);
-            this.requestRedraw();
+            //this.requestRedraw(); -- rename does not require redraw
         } else {
             console.warn(`Element ${oldName} not found in frame ${this.objectName}`);
         }
@@ -207,13 +227,18 @@ export class Frame extends styled.Styled {
         this.affine = affineMatrix;
         this.inv = tsvector.MInverse(affineMatrix);
         this.syncToParent();
+        this.requestRedraw();
     };
+    /**
+     * Sync the pixel and model coordinate systems with the parent frame.
+     */
     syncToParent() {
         this.pixelToModel = this.affine;
         this.ModelToPixel = this.inv;
-        if (this.parent !== null) {
-            this.pixelToModel = tsvector.MMProduct(this.affine, this.parent.pixelToModel);
-            this.ModelToPixel = tsvector.MMProduct(this.parent.ModelToPixel, this.inv);
+        let parent = this.onFrame;
+        if (parent !== null) {
+            this.pixelToModel = tsvector.MMProduct(this.affine, parent.pixelToModel);
+            this.ModelToPixel = tsvector.MMProduct(parent.ModelToPixel, this.inv);
         }
         // sync all children
         this.nameToMarking.forEach((element) => {
@@ -229,7 +254,7 @@ export class Frame extends styled.Styled {
         return applyAffine(this.pixelToModel, xy);
     };
     /** Create a frame for a subregion and record it. 
-     * fromMinxy..fromMaxxy is the region in the parent frame.
+     * fromMinxy..fromMaxxy is the region in the current frame.
      * toMinxy..toMaxxy is the region in the new frame.
     */
     regionFrame(
@@ -254,7 +279,7 @@ export class Frame extends styled.Styled {
     };
     /** iterate over all markings to draw. */
     draw() {
-        this.syncToParent();
+        this.syncToParent(); // xxx redundant?
         // check for defunct markings
         let dirty = false;
         // draw all markings in order

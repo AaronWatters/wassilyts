@@ -8,7 +8,6 @@ import * as styled from './styled';
  * A visible marking on a frame.
  */
 export abstract class Marking extends styled.Styled {
-    onFrame: frame.Frame;
     stroke: boolean = false;
     
     constructor(frame: frame.Frame) {
@@ -27,9 +26,12 @@ export abstract class Marking extends styled.Styled {
     abstract drawPath(): Path2D;
     // default draw method
     draw() {
+        if (!this.isLive()) {
+            return;
+        }
         const path = this.drawPath();
         const prep = this.prepare();
-        const ctx = this.onFrame.diagram.ctx!;
+        const ctx = this.onFrame!.diagram.ctx!;
         if (this.stroke) {
             ctx.stroke(path);
         } else {
@@ -37,40 +39,44 @@ export abstract class Marking extends styled.Styled {
         };
         ctx.restore(); // undo the prepare() save
     };
-    watchEvent(eventType: string) {
-        // add an event handler for the marking
-        this.onFrame.watchEvent(eventType);
-    };
-    requestRedraw() {
-        // request a redraw of the frame
-        this.onFrame.requestRedraw();
-    };
-    /** rename the element in the containing frame */
-    rename(newname: string): void {
-        this.onFrame.renameElement(this, newname);
-    };
     pickObject(canvasXY: tsvector.Vector): boolean {
+        if (!this.isLive()) {
+            return false;
+        }
         const path = this.drawPath();
         // test if the pixel is in the path
-        const ctx = this.onFrame.diagram.ctx!;
+        const ctx = this.onFrame!.diagram.ctx!;
         const result = ctx.isPointInPath(path, canvasXY[0], canvasXY[1]);
         return result;
     };
     // prepare the context for drawing, return false if no change.
     // save state if changed.
     prepare(): boolean {
-        const ctx = this.onFrame.diagram.ctx!;
+        if (!this.isLive()) {
+            return false;
+        }
+        const ctx = this.onFrame!.diagram.ctx!;
         ctx.save();
         this.applyStyle(ctx);
         return true;
     };
-    /** Test whether pixel lies on the marking. */
-    testPixel(xy: tsvector.Vector): boolean {
-        const prep = this.prepare();
-        const path = this.drawPath();
-        const ctx = this.onFrame.diagram.ctx!;
-        const result = ctx.isPointInPath(path, xy[0], xy[1]);
-        ctx.restore();
-        return result;
+    /** Get the reference point of the marking in frame coordinates. */
+    abstract getFramePoint(): tsvector.Vector;
+    /** Set the reference point of the marking in frame coordinates. */
+    abstract setFramePoint(position: tsvector.Vector): void;
+    /** Get the reference point of the marking in cartesian pixel coordinates. */
+    getPixel(): tsvector.Vector {
+        if (!this.isLive()) {
+            throw new Error("Marking is not attached to a frame.");
+        }
+        return this.onFrame!.toPixel(this.getFramePoint());
+    };
+    /** Set the reference point of the marking in cartesian pixel coordinates. */
+    setPixel(position: tsvector.Vector): void {
+        if (!this.isLive()) {
+            throw new Error("Marking is not attached to a frame.");
+        }
+        this.setFramePoint(this.onFrame!.toModel(position));
+        this.requestRedraw();
     };
 };

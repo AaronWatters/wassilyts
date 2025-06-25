@@ -15,12 +15,25 @@ export class Poly extends marking.Marking {
         this.close = true;
         return this;
     };
+    getFramePoint(): tsvector.Vector {
+        // get the first point of the polygon in frame coordinates
+        return this.points[0];
+    };
+    setFramePoint(position: tsvector.Vector): void {
+        // set the first point of the polygon in frame coordinates
+        // offset the rest of the points by the same amount
+        const offset = tsvector.vSub(position, this.points[0]);
+        this.points = this.points.map((point) => tsvector.vAdd(point, offset));
+    };
     opened(): Poly {
         this.close = false;
         return this;
     };
     drawPath(): Path2D {
-        const frame = this.onFrame;
+        if (!this.isLive()) {
+            throw new Error("Polygon is not attached to a frame.");
+        }
+        const frame = this.onFrame!;
         const path = new Path2D();
         const pixelPoints = this.points.map((xy) => frame.addPoint(xy));
         const [sx, sy] = pixelPoints[0];

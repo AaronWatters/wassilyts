@@ -12,8 +12,23 @@ export class Line extends marking.Marking {
         this.end = end;
         this.stroked();
     };
+    getFramePoint(): tsvector.Vector {
+        // get the start point of the line in frame coordinates
+        return this.start;
+    };
+    setFramePoint(position: tsvector.Vector): void {
+        // set the start point of the line in frame coordinates
+        // offset the end by the same amount
+        const offset = tsvector.vSub(position, this.start);
+        this.start = position;
+        this.end = tsvector.vAdd(this.end, offset);
+        //this.requestRedraw();
+    };
     drawPath(): Path2D {
-        const frame = this.onFrame;
+        if (!this.isLive()) {
+            throw new Error("Line is not attached to a frame.");
+        }
+        const frame = this.onFrame!;
         const path = new Path2D();
         let pixelStart = frame.addPoint(this.start);
         let pixelEnd = frame.addPoint(this.end);

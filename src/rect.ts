@@ -22,8 +22,19 @@ export class Rectangle extends marking.Marking {
         this.offset = offset;
         this.scaled = scaled;
     };
+    setFramePoint(position: tsvector.Vector): void {
+        // set the point of the rectangle in frame coordinates
+        this.point = position;
+    };
+    getFramePoint(): tsvector.Vector {
+        // get the point of the rectangle in frame coordinates
+        return this.point;
+    };
     drawPath(): Path2D {
-        const frame = this.onFrame;
+        if (!this.isLive()) {
+            throw new Error("Rectangle is not attached to a frame.");
+        }
+        const frame = this.onFrame!;
         const path = new Path2D();
         let pixelStart: tsvector.Vector;
         let pixelSize: tsvector.Vector;

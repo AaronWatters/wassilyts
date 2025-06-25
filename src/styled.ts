@@ -9,6 +9,7 @@ var globalCounter = 0;
  */
 export abstract class Styled {
     objectName: string;
+    onFrame: frame.Frame | null = null; // the frame which contains this object
     color: string = "black";
     lineWidth: number = 1;
     lineDash: tsvector.Vector | null = null;
@@ -22,9 +23,44 @@ export abstract class Styled {
         this.objectName = constructorName + globalCounter;
         globalCounter += 1;
     };
+
+    /** Draw the object on the canvas. */
     abstract draw(): void;
-    abstract requestRedraw(): void;
-    abstract watchEvent(eventType: string): void;
+
+    /** Get the reference point of the object in cartesian pixel coordinates. */
+    abstract getPixel(): tsvector.Vector;
+
+    /** Set the reference point of the object in cartesian pixel coordinates. */
+    abstract setPixel(position: tsvector.Vector): void;
+
+    isLive(): boolean {
+        if (!this.onFrame) {
+            throw new Error("Marking is not attached to a frame.");
+        }
+        return !this.defunct;
+    };
+    watchEvent(eventType: string) {
+        // add an event handler for the marking
+        if (!this.onFrame) {
+            throw new Error("Marking is not attached to a frame.");
+        }
+        this.onFrame.watchEvent(eventType);
+    };
+    requestRedraw() {
+        // request a redraw of the frame
+        if (!this.isLive()) {
+            return;
+        }
+        this.onFrame!.requestRedraw();
+    };
+    /** rename the element in the containing frame */
+    rename(newname: string): void {
+        if (!this.onFrame) {
+            this.objectName = newname;
+            return; // no frame to rename in, just change the name
+        }
+        this.onFrame.renameElement(this, newname);
+    };
     /**
      * Determine if the object is picked by a mouse event.
      * @param canvasXY 
@@ -36,6 +72,10 @@ export abstract class Styled {
     };
     // default event handler
     mouseEventHandler(eventType: string, canvasXY: tsvector.Vector, cartesianXY: tsvector.Vector, frameXY: tsvector.Vector): boolean {
+        // If the object is not responsive, do nothing
+        if (!this.responsive) {
+            return false;
+        }
         // Is there a handler for this event type?
         const handler = this.eventTypeToHandler.get(eventType);
         if (handler) {
