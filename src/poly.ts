@@ -11,8 +11,13 @@ export class Poly extends marking.Marking {
         this.points = points;
         this.stroked();
     };
-    closed(): Poly {
-        this.close = true;
+    vertices(points: tsvector.Vector[]): Poly {
+        // set the vertices of the polygon in frame coordinates
+        this.points = points;
+        return this;
+    };
+    closed(value: boolean): Poly {
+        this.close = value;
         return this;
     };
     getFramePoint(): tsvector.Vector {
@@ -24,10 +29,6 @@ export class Poly extends marking.Marking {
         // offset the rest of the points by the same amount
         const offset = tsvector.vSub(position, this.points[0]);
         this.points = this.points.map((point) => tsvector.vAdd(point, offset));
-    };
-    opened(): Poly {
-        this.close = false;
-        return this;
     };
     drawPath(): Path2D {
         if (!this.isLive()) {

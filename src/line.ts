@@ -12,6 +12,16 @@ export class Line extends marking.Marking {
         this.end = end;
         this.stroked();
     };
+    startAt(position: tsvector.Vector): Line {
+        // set the start point of the line in frame coordinates
+        this.start = position;
+        return this;
+    };
+    endAt(position: tsvector.Vector): Line {
+        // set the end point of the line in frame coordinates
+        this.end = position;
+        return this;
+    };
     getFramePoint(): tsvector.Vector {
         // get the start point of the line in frame coordinates
         return this.start;

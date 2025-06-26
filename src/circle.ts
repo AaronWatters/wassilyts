@@ -13,6 +13,21 @@ export class Circle extends marking.Marking {
         this.radius = radius;
         this.scaled = scaled;
     };
+    centerAt(position: tsvector.Vector): Circle {
+        // set the center of the circle in frame coordinates
+        this.center = position;
+        return this;
+    };
+    resize(radius: number): Circle {
+        // set the radius of the circle
+        this.radius = radius;
+        return this;
+    };
+    scaling(scaled: boolean): Circle {
+        // set whether the circle is scaled or not
+        this.scaled = scaled;
+        return this;
+    }
     setFramePoint(position: tsvector.Vector): void {
         // set the center of the circle in frame coordinates
         this.center = position;
