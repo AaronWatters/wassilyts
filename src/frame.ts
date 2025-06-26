@@ -283,6 +283,9 @@ export class Frame extends styled.Styled {
         // check for defunct markings
         let dirty = false;
         // draw all markings in order
+        const ctx = this.diagram.ctx!;
+        ctx.save(); // save the context state
+        this.applyStyle(ctx);
         for (const element of this.drawOrder) {
             if (element.defunct) {
                 dirty = true;
@@ -290,6 +293,7 @@ export class Frame extends styled.Styled {
                 element.draw();
             }
         };
+        ctx.restore(); // restore the context state
         // remove defunct markings
         if (dirty) {
             let newOrder: styled.Styled[] = [];
