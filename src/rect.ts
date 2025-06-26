@@ -25,21 +25,25 @@ export class Rectangle extends marking.Marking {
     resize(size: tsvector.Vector): Rectangle {
         // set the size of the rectangle
         this.size = size;
+        this.requestRedraw();
         return this;
     };
     offsetBy(offset: tsvector.Vector): Rectangle {
         // set the offset of the rectangle
         this.offset = offset;
+        this.requestRedraw();
         return this;
     };
     setScaled(scaled: boolean): Rectangle {
         // set whether the rectangle is scaled or not
         this.scaled = scaled;
+        this.requestRedraw();
         return this;
     };
     locateAt(position: tsvector.Vector): Rectangle {
         // set the point of the rectangle in frame coordinates
         this.point = position;
+        this.requestRedraw();
         return this;
     };
     setFramePoint(position: tsvector.Vector): void {

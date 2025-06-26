@@ -16,16 +16,19 @@ export class Circle extends marking.Marking {
     centerAt(position: tsvector.Vector): Circle {
         // set the center of the circle in frame coordinates
         this.center = position;
+        this.requestRedraw();
         return this;
     };
     resize(radius: number): Circle {
         // set the radius of the circle
         this.radius = radius;
+        this.requestRedraw();
         return this;
     };
     scaling(scaled: boolean): Circle {
         // set whether the circle is scaled or not
         this.scaled = scaled;
+        this.requestRedraw();
         return this;
     }
     setFramePoint(position: tsvector.Vector): void {

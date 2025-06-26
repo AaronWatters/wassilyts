@@ -15,11 +15,13 @@ export class Line extends marking.Marking {
     startAt(position: tsvector.Vector): Line {
         // set the start point of the line in frame coordinates
         this.start = position;
+        this.requestRedraw();
         return this;
     };
     endAt(position: tsvector.Vector): Line {
         // set the end point of the line in frame coordinates
         this.end = position;
+        this.requestRedraw();
         return this;
     };
     getFramePoint(): tsvector.Vector {

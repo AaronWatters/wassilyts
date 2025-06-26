@@ -14,10 +14,12 @@ export class Poly extends marking.Marking {
     vertices(points: tsvector.Vector[]): Poly {
         // set the vertices of the polygon in frame coordinates
         this.points = points;
+        this.requestRedraw();
         return this;
     };
     closed(value: boolean): Poly {
         this.close = value;
+        this.requestRedraw();
         return this;
     };
     getFramePoint(): tsvector.Vector {
