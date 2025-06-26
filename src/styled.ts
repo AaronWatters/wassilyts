@@ -10,10 +10,13 @@ var globalCounter = 0;
 export abstract class Styled {
     objectName: string;
     onFrame: frame.Frame | null = null; // the frame which contains this object
+
     color: string = "black";
     lineWidth: number = 1;
     lineDash: tsvector.Vector | null = null;
     stroke: boolean = false;
+    textFont: string | null = null; // font for text, null means use default
+
     defunct: boolean = false; // true if the object is no longer used
     responsive: boolean = true; // true if the object should respond to events
     eventTypeToHandler: Map<string, frame.frameEventHandler> = new Map();
@@ -131,6 +134,12 @@ export abstract class Styled {
     syncToParent() {
         // do nothing by default
     };
+    font(font: string | null) {
+        // set the font for text, null means use default
+        this.textFont = font;
+        this.requestRedraw();
+        return this;
+    };
     stroked() {
         this.stroke = true;
         this.requestRedraw();
@@ -165,6 +174,9 @@ export abstract class Styled {
         if (this.lineDash) {
             ctx.setLineDash(this.lineDash);
         }
+        if (this.textFont) {
+            ctx.font = this.textFont;
+        } 
     };
     forget() {
         this.defunct = true;
