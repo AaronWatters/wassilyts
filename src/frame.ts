@@ -357,7 +357,7 @@ export class Frame extends styled.Styled {
     /** a polyline is a poly that is stroked and not closed */
     polyline(points: tsvector.Vector[]): poly.Poly {
         const result = new poly.Poly(this, points);
-        result.opened().stroked();
+        result.closed(false).stroked();
         this.addElement(result);
         return result;
     };

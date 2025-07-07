@@ -17,7 +17,7 @@ export class Poly extends marking.Marking {
         this.requestRedraw();
         return this;
     };
-    closed(value: boolean): Poly {
+    closed(value: boolean = true): Poly {
         this.close = value;
         this.requestRedraw();
         return this;

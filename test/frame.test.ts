@@ -44,7 +44,7 @@ describe('frame module', () => {
         const diag = new diagram.Diagram(container, width, height);
         const frm = new frame.Frame(diag);
         expect(frm.diagram).toBe(diag);
-        expect(frm.parent).toBeNull();
+        expect(frm.onFrame).toBeNull();
         expect(frm.addPoint([0, 0])).toEqual([0, height]);
         expect(frm.addPoint([width, height])).toEqual([width, 0]);
         expect(frm.addPixel([0, height])).toEqual([0, 0]);
@@ -62,7 +62,7 @@ describe('frame module', () => {
         const toMaxxy = [110, 100];
         const frm = parent.regionFrame(fromMinxy, fromMaxxy, toMinxy, toMaxxy);
         expect(frm.diagram).toBe(diag);
-        expect(frm.parent).toBe(parent);
+        expect(frm.onFrame).toBe(parent);
         expect(frm.addPoint(toMaxxy)).toEqual(parent.addPoint(fromMaxxy));
         expect(frm.addPixel(parent.addPoint(fromMinxy))).toEqual(toMinxy);
     });
