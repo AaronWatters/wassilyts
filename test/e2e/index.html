@@ -22,7 +22,8 @@
   } from '../../dist/wassilyts.mjs';
   console.log("Hello from wassilyjs Library!");
   console.log("The name of the library is: " + name);
-  const output = document.getElementById('output');const frame0 = drawOn(output, 600, 400);
+  const output = document.getElementById('output');
+  const frame0 = drawOn(output, 600, 400);
   frame0.linedWidth(3);
   const dot1 = frame0.circle([300, 200], 190).colored('#00ff00');
   frame0.draw();
