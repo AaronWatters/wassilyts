@@ -15,5 +15,7 @@ export * as frame from './frame';
 // export the marking module
 export * as marking from './marking';
 
+export * as projection from './projection';
+
 // export the drawOn function
 export { drawOn };
