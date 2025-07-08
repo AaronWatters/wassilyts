@@ -69,12 +69,12 @@ describe('projection module', () => {
         const upVector = [0, 1, 0];
         const projector = new projection.Projector(eyePoint, lookAtPoint, true, upVector);
         const point3d = [2, 3, 1];
-        const projected = projector.projectXY(point3d);
-        const expected = [2, 3];
+        const projected = projector.project(point3d);
+        const expected = [2, 3, 1];
         expect(projected).toEqual(expected);
         const point3d2 = [4, 6, 2];
-        const projected2 = projector.projectXY(point3d2);
-        const expected2 = [2, 3];
+        const projected2 = projector.project(point3d2);
+        const expected2 = [2, 3, 2];
         expect(projected2).toEqual(expected2);
     });
 });
