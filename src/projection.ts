@@ -85,6 +85,21 @@ export class Projector {
         this.lookAtPoint = lookAtPoint;
         this.upVector = upVector;
         this.perspective = perspective;
+        this.getProjectionMatrix();
+    };
+
+    lookAt(lookAtPoint: tsvector.Vector, epsilon = EPSILON): Projector {
+        this.lookAtPoint = lookAtPoint;
+        this.projectionMatrix = null; // reset the projection matrix
+        this.getProjectionMatrix(epsilon);
+        return this;
+    };
+
+    lookFrom(eyePoint: tsvector.Vector, epsilon = EPSILON): Projector {
+        this.eyePoint = eyePoint;
+        this.projectionMatrix = null; // reset the projection matrix
+        this.getProjectionMatrix(epsilon);
+        return this;
     };
 
     getProjectionMatrix(epsilon = EPSILON): tsvector.Matrix {
@@ -92,7 +107,7 @@ export class Projector {
         return this.projectionMatrix;
     };
 
-    projectXY(xyz: tsvector.Vector): tsvector.Vector {
+    project(xyz: tsvector.Vector): tsvector.Vector {
         if (this.projectionMatrix === null) {
             this.getProjectionMatrix();
         }
@@ -101,12 +116,12 @@ export class Projector {
         // Convert back to 3D coordinates
         const P = [projected[0] / projected[3], projected[1] / projected[3], projected[2] / projected[3]];
         if (this.perspective) {
-            // Perspective projection
+            // Perspective projection with z perserved for sorting
             const scale = 1 / P[2]
-            return [P[0] * scale, P[1] * scale];
+            return [P[0] * scale, P[1] * scale, P[2]];
         } else {
             // Orthographic projection
-            return [P[0], P[1]]; // orthographic projection
+            return [P[0], P[1], P[2]]; // orthographic projection
         }
     };
 }
