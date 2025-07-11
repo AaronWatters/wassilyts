@@ -10,18 +10,13 @@ import * as styled from './styled';
 export abstract class Marking extends styled.Styled {
     stroke: boolean = false;
     
-    constructor(frame: frame.Frame) {
-        super();
-        // by default inherit the style of the frame
-        this.color = frame.color;
-        this.lineWidth = frame.lineWidth;
-        this.lineDash = frame.lineDash;
-        this.onFrame = frame;
-    };
     /**
      * Draw the marking or a container for the marking.
      * The Path2D object will be used for testing pixels in mouse events.
      * If the marking doesn't override draw() then the Path2D will draw the marking.
+     * 
+     * Note: This method should not rely on context coordinate transform changes
+     * so that the paths can be combined and tested for pixel hits.
      */
     abstract drawPath(): Path2D;
     // default draw method

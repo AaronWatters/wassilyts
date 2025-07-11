@@ -6,6 +6,8 @@ import * as circle from './circle';
 import * as rect from './rect';
 import * as line from './line';
 import * as poly from './poly';
+import * as frame3d from './frame3d';
+import * as projection from './projection';
 
 // Handler returns true if the event was handled completely (no propagation needed).
 export type frameEventHandler = (
@@ -96,7 +98,7 @@ export class Frame extends styled.Styled {
         affineMatrix: tsvector.Matrix | null = null,
         parent: Frame | null = null,
     ) {
-        super();
+        super(parent);
         this.diagram = inDiagram;
         this.onFrame = parent;
         if (affineMatrix === null) {
@@ -194,6 +196,7 @@ export class Frame extends styled.Styled {
     /** Fit visible elements into canvas */
     fit() {
         this.diagram.fit();
+        this.requestRedraw();
     };
     /** record a cartesian pixel point and convert to canvas coords */
     addPixelPoint(xy: tsvector.Vector): tsvector.Vector {
@@ -226,13 +229,13 @@ export class Frame extends styled.Styled {
     setAffine(affineMatrix: tsvector.Matrix) {
         this.affine = affineMatrix;
         this.inv = tsvector.MInverse(affineMatrix);
-        this.syncToParent();
+        //this.prepareForRedraw();
         this.requestRedraw();
     };
     /**
      * Sync the pixel and model coordinate systems with the parent frame.
      */
-    syncToParent() {
+    prepareForRedraw() {
         this.pixelToModel = this.affine;
         this.ModelToPixel = this.inv;
         let parent = this.onFrame;
@@ -242,7 +245,7 @@ export class Frame extends styled.Styled {
         }
         // sync all children
         this.nameToMarking.forEach((element) => {
-            element.syncToParent();
+            element.prepareForRedraw();
         });
     };
     /** Convert from model space to cartesian pixel space */
@@ -268,6 +271,22 @@ export class Frame extends styled.Styled {
         this.addElement(result);
         return result;
     };
+    projectionFrame(
+        project: projection.Projector
+    ): frame3d.Frame3d {
+        const result = new frame3d.Frame3d(this, project);
+        this.addElement(result);
+        return result;
+    };
+    frame3d(
+        eyePoint: tsvector.Vector, 
+        lookAtPoint: tsvector.Vector,
+        perspective: boolean = true,
+        upVector: tsvector.Vector | null = null
+    ): frame3d.Frame3d {
+        const projector = new projection.Projector(eyePoint, lookAtPoint, perspective, upVector);
+        return this.projectionFrame(projector);
+    };
     /** Record a marking */
     addElement(styled: styled.Styled, requestRedraw=true) {
         const name = styled.objectName
@@ -279,7 +298,7 @@ export class Frame extends styled.Styled {
     };
     /** iterate over all markings to draw. */
     draw() {
-        this.syncToParent(); // xxx redundant?
+        //this.prepareForRedraw(); // xxx redundant?
         // check for defunct markings
         let dirty = false;
         // draw all markings in order

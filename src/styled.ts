@@ -21,10 +21,22 @@ export abstract class Styled {
     responsive: boolean = true; // true if the object should respond to events
     eventTypeToHandler: Map<string, frame.frameEventHandler> = new Map();
 
-    constructor() {
+    constructor(onFrame: frame.Frame | null = null) {
         const constructorName = this.constructor.name;
         this.objectName = constructorName + globalCounter;
         globalCounter += 1;
+        this.onFrame = onFrame;
+        if (onFrame) {
+            // inherit the style from the frame
+            this.styleLike(onFrame);
+        }
+    };
+
+    styleLike(other: Styled) {
+        this.color = other.color;
+        this.lineWidth = other.lineWidth;
+        this.lineDash = other.lineDash;
+        this.textFont = other.textFont;
     };
 
     /** Draw the object on the canvas. */
@@ -131,7 +143,7 @@ export abstract class Styled {
         // Return the styled object for chaining
         return this;
     };
-    syncToParent() {
+    prepareForRedraw() {
         // do nothing by default
     };
     font(font: string | null) {

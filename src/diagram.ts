@@ -113,6 +113,7 @@ export class Diagram {
         return result;
     };
     draw() {
+        this.mainFrame.prepareForRedraw();
         this.mainFrame.draw();
     };
     /** Request a redraw of the diagram */
@@ -124,9 +125,12 @@ export class Diagram {
                 return;
             }
             requestAnimationFrame(() => {
-                this.redraw_requested = false;
-                this.clear();
-                this.draw();
+                try {
+                    this.clear();
+                    this.draw();
+                } finally {  
+                    this.redraw_requested = false;
+                }
             });
         }
     };

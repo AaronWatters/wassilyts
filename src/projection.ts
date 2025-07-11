@@ -18,7 +18,7 @@ export function perpendicularComponent(toVector: tsvector.Vector, fromVector: ts
     const dot = tsvector.vDot(n, D);
     const proj = tsvector.vScale(dot, n);
     const perp = tsvector.vSub(D, proj);
-    return perp;;
+    return perp;
 };
 
 export function affine3d(xyz: tsvector.Vector): tsvector.Vector {
