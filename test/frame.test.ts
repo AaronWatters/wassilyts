@@ -61,6 +61,7 @@ describe('frame module', () => {
         const toMinxy = [100, 200];
         const toMaxxy = [110, 100];
         const frm = parent.regionFrame(fromMinxy, fromMaxxy, toMinxy, toMaxxy);
+        parent.prepareForRedraw();
         expect(frm.diagram).toBe(diag);
         expect(frm.onFrame).toBe(parent);
         expect(frm.addPoint(toMaxxy)).toEqual(parent.addPoint(fromMaxxy));
@@ -95,6 +96,7 @@ describe('frame module', () => {
         const toMin = [10, 20];
         const toMax = [30, 60];
         const frame0 = frm.regionFrame(fromMin, fromMax, toMin, toMax);
+        frm.prepareForRedraw();
         const frommiddle = [(fromMin[0] + fromMax[0]) / 2, (fromMin[1] + fromMax[1]) / 2];
         const tomiddle = [(toMin[0] + toMax[0]) / 2, (toMin[1] + toMax[1]) / 2];
         const canvasmiddle = [frommiddle[0], height - frommiddle[1]];
@@ -112,6 +114,7 @@ describe('frame module', () => {
         const toMin = [10, 20];
         const toMax = [30, 60];
         const frame0 = frm.regionFrame(fromMin, fromMax, toMin, toMax);
+        frm.prepareForRedraw();
         const canvasfrommax = [fromMax[0], height - fromMax[1]];
         const result = frame0.addPixel(canvasfrommax);
         expect(result).toEqual(toMax);
@@ -135,7 +138,7 @@ describe('frame module', () => {
         const frame0 = frm.regionFrame(fromMin, fromMax, toMin, toMax);
         const translateScale = frame.translateScaleMatrix([4, -2], [1, 1]);
         frm.setAffine(translateScale);
-        frm.syncToParent();
+        frm.prepareForRedraw();
         const frmorigin = frm.addPoint([0,0]);
         expect(frmorigin).toEqual([-4, height - 2]);
         const frame0origin = frame0.addPoint(toMin);
