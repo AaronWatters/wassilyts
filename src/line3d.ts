@@ -17,7 +17,6 @@ export class Line3d extends marking3d.Marking3d {
 
     projectTo2D(): marking.Marking {
         // For simplicity, we can just return a line marking in 2D.
-        debugger;
         const onFrame3d = this.onFrame3d;
         const startProj = onFrame3d.projection.project(this.start);
         const endProj = onFrame3d.projection.project(this.end);

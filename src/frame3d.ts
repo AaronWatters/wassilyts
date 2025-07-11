@@ -9,6 +9,8 @@ import * as styled from './styled';
 import * as marking3d from './marking3d';
 import * as marking from './marking';
 import * as line from './line3d';
+import * as poly3d from './poly3d';
+import { poly } from ".";
 
 export class Frame3d extends styled.Styled {
     projection: projection.Projector;
@@ -64,6 +66,13 @@ export class Frame3d extends styled.Styled {
         const line3d = new line.Line3d(start, end, this);
         this.nameToMarking3d.set(line3d.objectName, line3d);
         return line3d;
+    };
+
+    poly(points: tsvector.Vector[]): poly3d.Poly3d {
+        // create a 3D poly marking
+        const poly = new poly3d.Poly3d(points, this);
+        this.nameToMarking3d.set(poly.objectName, poly);
+        return poly;
     };
 };
 

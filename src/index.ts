@@ -18,6 +18,8 @@ export * as frame from './frame';
 export * as projection from './projection';
 export * as circle from './circle';
 export * as rect from './rect';
+export * as poly from './poly';
+export * as poly3d from './poly3d';
 
 // export the drawOn function
 export { drawOn };

@@ -96,6 +96,27 @@
       frame3d.line(v1, v2).colored(color);
     }
   }
+  // draw triangles for the faces of the cube
+  for (let i = 0; i < vertices.length; i++) {
+    for (let j = i + 1; j < vertices.length; j++) {
+      const v1 = vertices[i];
+      const v2 = vertices[j];
+      // skip if the vertices are too far apart (not connected by an edge)
+      const len = tsvector.vLength(tsvector.vSub(v1, v2));
+      if (len > 1.1) continue;
+      // find a third vertex that is connected to both v1 and v2
+      for (let k = j + 1; k < vertices.length; k++) {
+        const v3 = vertices[k];
+        const len1 = tsvector.vLength(tsvector.vSub(v1, v3));
+        const len2 = tsvector.vLength(tsvector.vSub(v2, v3));
+        if (len1 < 1.1 || len2 < 1.1) {
+          // choose a random color from the colors array
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          frame3d.poly([v1, v2, v3]).colored(color).filled();
+        }
+      }
+    }
+  }
   // slider dom objects
   const eyeXSlider = document.getElementById('eyeX');
   const eyeYSlider = document.getElementById('eyeY');

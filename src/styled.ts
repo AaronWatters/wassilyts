@@ -37,6 +37,8 @@ export abstract class Styled {
         this.lineWidth = other.lineWidth;
         this.lineDash = other.lineDash;
         this.textFont = other.textFont;
+        this.stroke = other.stroke;
+        this.responsive = other.responsive;
     };
 
     /** Draw the object on the canvas. */
