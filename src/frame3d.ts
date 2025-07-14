@@ -8,7 +8,7 @@ import * as projection from './projection';
 import * as styled from './styled';
 import * as marking3d from './marking3d';
 import * as marking from './marking';
-import * as line from './line3d';
+import * as line3d from './line3d';
 import * as poly3d from './poly3d';
 import { poly } from ".";
 
@@ -25,6 +25,17 @@ export class Frame3d extends styled.Styled {
          * The dedicated frame for drawing the 3D projection.
          */
         this.onFrame = new frame.Frame(fromFrame.diagram, null, fromFrame);
+    };
+
+    clear(): void {
+        // for safety forget all 3D markings
+        this.nameToMarking3d.forEach((element) => {
+            element.forget()
+        });
+        // clear the 3D markings
+        this.nameToMarking3d.clear();
+        // clear the onFrame
+        this.onFrame.clear();
     };
 
     prepareForRedraw(): void {
@@ -61,7 +72,7 @@ export class Frame3d extends styled.Styled {
         this.onFrame.setPixel(position);
     };
 
-    line(start: tsvector.Vector, end: tsvector.Vector): marking3d.Line3d {
+    line(start: tsvector.Vector, end: tsvector.Vector): line3d.Line3d {
         // create a 3D line marking
         const line3d = new line.Line3d(start, end, this);
         this.nameToMarking3d.set(line3d.objectName, line3d);
