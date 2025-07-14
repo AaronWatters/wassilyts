@@ -74,9 +74,9 @@ export class Frame3d extends styled.Styled {
 
     line(start: tsvector.Vector, end: tsvector.Vector): line3d.Line3d {
         // create a 3D line marking
-        const line3d = new line.Line3d(start, end, this);
-        this.nameToMarking3d.set(line3d.objectName, line3d);
-        return line3d;
+        const line = new line3d.Line3d(start, end, this);
+        this.nameToMarking3d.set(line.objectName, line);
+        return line;
     };
 
     poly(points: tsvector.Vector[]): poly3d.Poly3d {
