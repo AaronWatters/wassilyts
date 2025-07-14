@@ -77,4 +77,25 @@ describe('projection module', () => {
         const expected2 = [2, 3, 2];
         expect(projected2).toEqual(expected2);
     });
+
+    it ('should compute an x orbit rotation matrix', () => {
+        const eyePoint = [0, 0, 0];
+        const lookAtPoint = [0, 0, 1];
+        const upVector = [0, 1, 0];
+        const projector = new projection.Projector(eyePoint, lookAtPoint, true, upVector);
+        const orbitMatrix = projection.OrbitRotation([1,0]);
+        expect(orbitMatrix).toBeDefined();
+        expect(orbitMatrix[1][1]).toBe(1);
+    });
+
+    it ('should compute an y orbit rotation matrix', () => {
+        const eyePoint = [0, 0, 0];
+        const lookAtPoint = [0, 0, 1];
+        const upVector = [0, 1, 0];
+        const projector = new projection.Projector(eyePoint, lookAtPoint, true, upVector);
+        const orbitMatrix = projection.OrbitRotation([0,1]);
+        expect(orbitMatrix).toBeDefined();
+        expect(orbitMatrix[0][0]).toBe(1);
+        //expect(orbitMatrix).toBe(1);
+    });
 });

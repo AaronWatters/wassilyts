@@ -69,6 +69,27 @@ export function ProjectionMatrix(
     return result;
 };
 
+/** Compute the rotation to apply to the 3d model to orbit around the focus point
+ * when the mouse is offset by the given amount.
+ * Assuming the distance from the eye to the focus point is 1 unit,
+ */
+export function OrbitRotation(offset: tsvector.Vector): tsvector.Matrix {
+    const [dx, dy] = offset;
+    const theta = Math.atan2(dy, dx);
+    const length = Math.sqrt(dx * dx + dy * dy);
+    const phi = Math.atan2(length, 1); // assuming distance from eye to focus is 1 unit
+    const Mtheta = tsvector.Mroll(theta);
+    const Mphi = tsvector.Mpitch(phi);
+    // Combine the rotations: first roll, then pitch
+    const rotatedtheta = tsvector.MMProduct(Mphi, Mtheta);
+    // rotate back by theta
+    const MthetaBack = tsvector.Mroll(-theta)
+    const rotated = tsvector.MMProduct(MthetaBack, rotatedtheta);
+    // convert to Affine matrix
+    const affine = tsvector.affine3d(rotated);
+    return affine;
+};
+
 export class Projector {
     eyePoint: tsvector.Vector;
     lookAtPoint: tsvector.Vector;
