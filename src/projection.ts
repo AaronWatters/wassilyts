@@ -54,7 +54,7 @@ export function ProjectionMatrix(
     const At = [
         affine3d(tsvector.vAdd(E, right)),
         affine3d(tsvector.vAdd(E, up)),
-        affine3d(C),
+        affine3d(tsvector.vAdd(E, Vz)),  // don't distort the Z axis
         affine3d(E),
     ];
     const A = tsvector.MTranspose(At);
@@ -95,6 +95,7 @@ export class Projector {
     lookAtPoint: tsvector.Vector;
     upVector: tsvector.Vector | null;
     projectionMatrix: tsvector.Matrix | null = null;
+    zscale: number = 1;
     perspective: boolean = true;
 
     constructor(
@@ -124,6 +125,12 @@ export class Projector {
     };
 
     getProjectionMatrix(epsilon = EPSILON): tsvector.Matrix {
+        const zDirection = tsvector.vSub(this.lookAtPoint, this.eyePoint);
+        const length = tsvector.vLength(zDirection);
+        if (length < epsilon) {
+            throw new Error("Eye point and look at point are too close together.");
+        }
+        this.zscale = length;
         this.projectionMatrix = ProjectionMatrix(this.eyePoint, this.lookAtPoint, this.upVector, epsilon);
         return this.projectionMatrix;
     };
@@ -134,6 +141,8 @@ export class Projector {
         }
         const affine = affine3d(xyz);
         const projected = tsvector.MvProduct(this.projectionMatrix!, affine);
+        // reduce z by scale factor
+        projected[2] /= this.zscale;
         // Convert back to 3D coordinates
         const P = [projected[0] / projected[3], projected[1] / projected[3], projected[2] / projected[3]];
         if (this.perspective) {
