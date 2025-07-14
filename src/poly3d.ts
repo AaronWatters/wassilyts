@@ -19,7 +19,8 @@ export class Poly3d extends marking3d.Marking3d {
         const projectedPoints = this.points.map(point => this.onFrame3d.projection.project(point));
         const points2d = projectedPoints.map(p => this.to2d(p));
         // Create a 2D poly marking
-        const poly2d = new poly.Poly(this.onFrame!, points2d);
+        //const poly2d = new poly.Poly(this.onFrame!, points2d);
+        const poly2d = this.onFrame!.polygon(points2d);
         poly2d.closed(this.close);
         poly2d.styleLike(this);
         // Set the depth based on the average Z value of the projected points
