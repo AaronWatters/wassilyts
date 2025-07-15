@@ -5,6 +5,7 @@
 import * as tsvector from "tsvector";
 import * as frame from './frame';
 import * as projection from './projection';
+import * as orbiter from './orbiter';
 import * as styled from './styled';
 import * as marking3d from './marking3d';
 import * as marking from './marking';
@@ -17,6 +18,7 @@ export class Frame3d extends styled.Styled {
     //fromFrame: frame.Frame;
     onFrame: frame.Frame;
     nameToMarking3d: Map<string, marking3d.Marking3d> = new Map();
+    orbiter: orbiter.Orbiter | null = null;
 
     constructor(fromFrame: frame.Frame, projection: projection.Projector) {
         super(fromFrame);
@@ -25,6 +27,15 @@ export class Frame3d extends styled.Styled {
          * The dedicated frame for drawing the 3D projection.
          */
         this.onFrame = new frame.Frame(fromFrame.diagram, null, fromFrame);
+        fromFrame.addElement(this.onFrame);
+    };
+
+    orbit(): orbiter.Orbiter {
+        // create an orbiter for this frame
+        if (this.orbiter === null) {
+            this.orbiter = new orbiter.Orbiter(this)
+        }
+        return this.orbiter;
     };
 
     clear(): void {

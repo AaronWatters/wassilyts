@@ -54,7 +54,7 @@ export class Diagram {
     /** Event handler for any mouse event */
     mouseEventHandler(event: MouseEvent) {
         // Convert the mouse event to canvas coordinates
-        debugger;
+        //debugger;
         const rect = this.canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
@@ -68,7 +68,7 @@ export class Diagram {
     };
     /** handle an event of a given type */
     watchEvent(eventType: string) {
-        console.log(this, `Diagram: watching event type ${eventType}`);
+        //cl(this, `Diagram: watching event type ${eventType}`);
         // If the event type is already watched, do nothing
         if (this.watchedEvents.has(eventType)) {
             return this;
