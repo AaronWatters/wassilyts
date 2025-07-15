@@ -135,6 +135,19 @@ export class Projector {
         return this.projectionMatrix;
     };
 
+    rotate(affineRotation: tsvector.Matrix): Projector {
+        if (this.projectionMatrix === null) {
+            this.getProjectionMatrix();
+        }
+        // Apply the rotation at the lookAtPoint
+        const translateToLookAt = tsvector.affine3d(null, tsvector.vScale(-1, this.lookAtPoint));
+        const translated = tsvector.MMProduct(translateToLookAt, this.projectionMatrix!);
+        const rotated = tsvector.MMProduct(affineRotation, translated);
+        const translateBack = tsvector.affine3d(null, this.lookAtPoint);
+        this.projectionMatrix = tsvector.MMProduct(translateBack, rotated);
+        return this;
+    };
+
     project(xyz: tsvector.Vector): tsvector.Vector {
         if (this.projectionMatrix === null) {
             this.getProjectionMatrix();
