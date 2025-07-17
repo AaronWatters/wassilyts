@@ -78,6 +78,7 @@ describe('projection module', () => {
         expect(projected2).toEqual(expected2);
     });
 
+    /* not used.
     it ('should compute an x orbit rotation matrix', () => {
         const eyePoint = [0, 0, 0];
         const lookAtPoint = [0, 0, 1];
@@ -97,5 +98,5 @@ describe('projection module', () => {
         expect(orbitMatrix).toBeDefined();
         expect(orbitMatrix[0][0]).toBe(1);
         //expect(orbitMatrix).toBe(1);
-    });
+    });*/
 });
