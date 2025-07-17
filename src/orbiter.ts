@@ -9,11 +9,13 @@ export class Orbiter {
     projection: projection.Projector;
     startXY: tsvector.Vector | null = null;
     endXY: tsvector.Vector | null = null;
-    originalMatrix: tsvector.Matrix | null = null;
+    //originalMatrix: tsvector.Matrix | null = null;
+    originalProjector: projection.Projector;
 
     constructor(frame3d: frame3d.Frame3d) {
         this.frame3d = frame3d;
         this.projection = frame3d.projection;
+        this.originalProjector = frame3d.projection;
         const onFrame = frame3d.onFrame;
         // register pointer event handlers on the onFrame
         onFrame.onEvent('pointerdown', (element, eventType, canvasXY, cartesianXY, frameXY) => {
@@ -38,13 +40,12 @@ export class Orbiter {
         if (this.startXY === null) {
             throw new Error("startXY is null, cannot perform rotation.");
         }
-        // error if originalMatrix is null
-        if (this.originalMatrix === null) {
-            throw new Error("originalMatrix is null, cannot perform rotation.");
-        }
         this.endXY = endXY;
-        // rotate with respect to the original matrix
-        this.projection.rotateXY(this.startXY, this.endXY, this.originalMatrix);
+        const projection = this.projection;
+        const rotation = projection.XYOffsetRotation(
+            this.startXY, this.endXY);
+        const newProjection = projection.rotation(rotation);
+        this.frame3d.projection = newProjection;
         this.frame3d.requestRedraw();
     };
 
@@ -57,7 +58,8 @@ export class Orbiter {
     {
         // save the startXY and originalMatrix
         this.startXY = frameXY;
-        this.originalMatrix = this.projection.projectionMatrix;
+        this.projection = this.frame3d.projection;
+        console.log("Pointer down at:", this.startXY, "Original Matrix:", this.projection.projectionMatrix);
         // return true to indicate the event was handled
         return true;
     };
@@ -74,10 +76,6 @@ export class Orbiter {
         if (this.startXY === null) {
             return false;
         }
-        // error if originalMatrix is null
-        if (this.originalMatrix === null) {
-            throw new Error("originalMatrix is null, cannot perform rotation.");
-        }
         this.endXY = frameXY;
         // rotate with respect to the original matrix
         this.doRotation(this.endXY);
@@ -92,10 +90,12 @@ export class Orbiter {
         frameXY: tsvector.Vector,
     ): boolean 
     {
+        // do a final move
+        this.pointerMoveHandler(element, eventType, canvasXY, cartesianXY, frameXY);
+        console.log("Pointer up at:", frameXY, "Final Matrix:", this.projection.projectionMatrix);
         // reset the start and end points
         this.startXY = null;
         this.endXY = null;
-        this.originalMatrix = null;
         return true;
     }
 }

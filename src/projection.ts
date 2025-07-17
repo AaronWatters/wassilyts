@@ -73,6 +73,7 @@ export function ProjectionMatrix(
  * when the mouse is offset by the given amount.
  * Assuming the distance from the eye to the focus point is 1 unit,
  */
+/* not used
 export function OrbitRotation(offset: tsvector.Vector): tsvector.Matrix {
     const [dx, dy] = offset;
     const theta = Math.atan2(dy, dx);
@@ -88,12 +89,12 @@ export function OrbitRotation(offset: tsvector.Vector): tsvector.Matrix {
     // convert to Affine matrix
     const affine = tsvector.affine3d(rotated);
     return affine;
-};
+};*/
 
 export class Projector {
     eyePoint: tsvector.Vector;
     lookAtPoint: tsvector.Vector;
-    upVector: tsvector.Vector | null;
+    upVector: tsvector.Vector;
     projectionMatrix: tsvector.Matrix | null = null;
     focusLength: number = 1; // distance from eye to focus point
     zscale: number = 1;
@@ -106,6 +107,9 @@ export class Projector {
         upVector: tsvector.Vector | null = null) {
         this.eyePoint = eyePoint;
         this.lookAtPoint = lookAtPoint;
+        if (upVector === null) {
+            upVector = [0, 1, 0]; // default up vector
+        }
         this.upVector = upVector;
         this.perspective = perspective;
         this.getProjectionMatrix();
@@ -131,10 +135,52 @@ export class Projector {
         if (length < epsilon) {
             throw new Error("Eye point and look at point are too close together.");
         }
+        const zNormalized = tsvector.vNormalize(zDirection);
+        // adjust the up vector
+        var upComponent = perpendicularComponent(zNormalized, this.upVector);
+        if (tsvector.vLength(upComponent) < epsilon) {
+            // xxxx this should be smarter, but for now just use a default
+            upComponent = perpendicularComponent(zNormalized, [1, 1, 0]);
+        }
+        this.upVector = tsvector.vNormalize(upComponent);
         this.focusLength = length;
         this.zscale = length;
         this.projectionMatrix = ProjectionMatrix(this.eyePoint, this.lookAtPoint, this.upVector, epsilon);
         return this.projectionMatrix;
+    };
+
+    /** Rotate the projection by moving the eye point around the lookAt point.
+     * @param rotationMatrix3d - The rotation matrix to apply.
+     */
+    rotation(rotationMatrix3d: tsvector.Matrix): Projector {
+        const upVector = this.upVector;
+        const lookAtPoint = this.lookAtPoint;
+        const eyePoint = this.eyePoint;
+        const orientation = this.orientation();
+        const inverseOrientation = tsvector.MInverse(orientation);
+        // adjust the rotation matrix to the orientation
+        const orientProjection = tsvector.MMProduct(rotationMatrix3d, orientation);
+        const oriented = tsvector.MMProduct(inverseOrientation, orientProjection);
+        const newUpVector = tsvector.MvProduct(oriented, upVector);
+        const offset = tsvector.vSub(eyePoint, lookAtPoint);
+        const newoffset = tsvector.MvProduct(oriented, offset);
+        const newEyePoint = tsvector.vAdd(lookAtPoint, newoffset);
+        const result = new Projector(newEyePoint, lookAtPoint, this.perspective, newUpVector);
+        return result;
+    };
+
+    /** 3x3 3d rotation matrix based on xy offset adjusted by focuslength  */
+    XYOffsetRotation(
+        startXY: tsvector.Vector,
+        endXY: tsvector.Vector,
+    ) {
+        // Create a rotation matrix for the XY mouse offset
+        const offset = tsvector.vSub(endXY, startXY);
+        const [dx, dy] = offset;
+        const focusLength = this.focusLength;
+        //("Focus Length:", focusLength, "Offset:", offset);
+        const rotation = this.rotateYawPitch(-dx / focusLength, -dy / focusLength);
+        return rotation;
     };
 
     rotateXY(startXY: tsvector.Vector, endXY: tsvector.Vector, projectionMatrix: tsvector.Matrix | null): Projector {
@@ -144,19 +190,19 @@ export class Projector {
         const focusLength = this.focusLength;
         //("Focus Length:", focusLength, "Offset:", offset);
         //const affineRotation = OrbitRotation([dx / focusLength, dy / focusLength]);
-        const affineRotation = this.rotateYawPitch(dx / focusLength, dy / focusLength);
+        const rotation = this.rotateYawPitch(dx / focusLength, dy / focusLength);
+        const affineRotation = tsvector.affine3d(rotation);
         return this.rotate(affineRotation, projectionMatrix);
     };
 
     rotateYawPitch(pitch: number, yaw: number): tsvector.Matrix {
         // Create rotation matrices for yaw and pitch
-        const Mroll = tsvector.Myaw(-yaw);
+        const Myaw = tsvector.Myaw(-yaw);
         const Mpitch = tsvector.Mpitch(-pitch);
         //("Yaw:", yaw, "Pitch:", pitch);
         // Combine the rotations: first roll, then pitch
-        const rotated = tsvector.MMProduct(Mpitch, Mroll);
-        const affineRotation = tsvector.affine3d(rotated);
-        return affineRotation;
+        const rotated = tsvector.MMProduct(Mpitch, Myaw);
+        return rotated;
     };
 
     /** Rotate the projection matrix by the given affine rotation matrix at the lookAtPoint.
@@ -170,13 +216,33 @@ export class Projector {
             }
             projectionMatrix = this.projectionMatrix;
         }
-        // Apply the rotation at the lookAtPoint
-        const translateToLookAt = tsvector.affine3d(null, tsvector.vScale(-1, this.lookAtPoint));
+        debugger
+        // projectionMatrix is currently at the eyePoint
+        // Apply the rotation at the lookAtPoint and then translate back to the eyePoint
+        const shift = tsvector.vSub(this.eyePoint, this.lookAtPoint);
+        const translateToLookAt = tsvector.affine3d(null, shift);
         const translated = tsvector.MMProduct(translateToLookAt, projectionMatrix!);
         const rotated = tsvector.MMProduct(affineRotation, translated);
-        const translateBack = tsvector.affine3d(null, this.lookAtPoint);
+        const invRotation = tsvector.MInverse(affineRotation);
+        const rotatedShiftAffine = tsvector.MvProduct(invRotation, affine3d(shift));
+        const rotatedShift = rotatedShiftAffine.slice(0, 3); // drop the last element
+        const translateBack = tsvector.affine3d(null, tsvector.vScale(-1, rotatedShift));
         this.projectionMatrix = tsvector.MMProduct(translateBack, rotated);
         return this;
+    };
+
+    orientation(): tsvector.Matrix {
+        // Return the orientation matrix of the projector
+        if (this.projectionMatrix === null) {
+            this.getProjectionMatrix(); 
+        }
+        // The orientation is the 3x3 part of the projection matrix
+        const projection = this.projectionMatrix!;
+        return [
+            projection[0].slice(0, 3),
+            projection[1].slice(0, 3),
+            projection[2].slice(0, 3),
+        ];
     };
 
     project(xyz: tsvector.Vector): tsvector.Vector {
