@@ -69,6 +69,16 @@ export class Frame3d extends styled.Styled {
         this.onFrame.prepareForRedraw();
     };
 
+    fit(border: number = 0): void {
+        // fit the frame to the 3D markings
+        if (this.nameToMarking3d.size === 0) {
+            // if there are no markings, do nothing
+            return;
+        }
+        // fit the onFrame to the 3D markings
+        this.onFrame.fit(border);
+    };
+
     draw() {
         this.onFrame.draw();
     };

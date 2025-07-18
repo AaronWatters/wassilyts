@@ -185,15 +185,18 @@ export class Diagram {
         return Array.from(imageData.data.slice(index, index + 4));
     };
     // use the stats to fit the diagram to the points
-    fit() {
+    fit(border: number = 0) {
+        debugger;
         if (this.stats.minxy === null || this.stats.maxxy === null) {
             return;
         };
-        const minxy = this.stats.minxy;
-        const maxxy = this.stats.maxxy;
+        const expander = [border, border];
+        const minxy = tsvector.vSub(this.stats.minxy, expander);
+        const maxxy = tsvector.vAdd(this.stats.maxxy, expander);
         const width = this.width;
         const height = this.height;
         const diff = tsvector.vSub(maxxy, minxy);
+        //const expandedDiff = tsvector.vAdd(diff, [border, border]);
         const [dw, dh] = diff;
         if (dw === 0 || dh === 0) {
             return;

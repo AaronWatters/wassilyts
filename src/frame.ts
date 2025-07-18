@@ -194,8 +194,8 @@ export class Frame extends styled.Styled {
         return this;
     };
     /** Fit visible elements into canvas */
-    fit() {
-        this.diagram.fit();
+    fit(border: number = 0) {
+        this.diagram.fit(border);
         this.requestRedraw();
     };
     /** record a cartesian pixel point and convert to canvas coords */

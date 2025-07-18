@@ -31,6 +31,11 @@
 
 <div id="output"></div>
 
+<!-- add a fit button -->
+<button id="fitButton">Fit</button>
+
+
+
 <script type="module">
   import { 
       name,
@@ -154,6 +159,12 @@
   eyeYSlider.addEventListener('input', updateFrame);
 
   frame3d.orbit();
+
+  const border = 20;
+
+  document.getElementById('fitButton').addEventListener('click', () => {
+    frame3d.fit(border);
+  });
 </script>
 </body>
 </html>
