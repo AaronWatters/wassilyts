@@ -150,7 +150,7 @@ export class Projector {
     };
 
     /** Rotate the projection by moving the eye point around the lookAt point.
-     * @param rotationMatrix3d - The rotation matrix to apply.
+     * @param rotationMatrix3d - The rotation matrix to apply in projected space.
      */
     rotation(rotationMatrix3d: tsvector.Matrix): Projector {
         const upVector = this.upVector;
@@ -158,7 +158,7 @@ export class Projector {
         const eyePoint = this.eyePoint;
         const orientation = this.orientation();
         const inverseOrientation = tsvector.MInverse(orientation);
-        // adjust the rotation matrix to the orientation
+        // adjust the rotation matrix to the orientation of the model
         const orientProjection = tsvector.MMProduct(rotationMatrix3d, orientation);
         const oriented = tsvector.MMProduct(inverseOrientation, orientProjection);
         const newUpVector = tsvector.MvProduct(oriented, upVector);
