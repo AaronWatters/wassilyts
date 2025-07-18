@@ -44,11 +44,13 @@
   const output = document.getElementById('output');
   const info = document.getElementById('info');
   //const d = new diagram.Diagram(output, 520, 600);
-  const frame0 = drawOn(output, 400, 400);
+  const frame0 = drawOn(output, 800, 800);
+  // thick lines
+  frame0.linedWidth(10);
   debugger;
   // make a subframe
   const fromMin = [0,0];
-  const fromMax = [400,400];
+  const fromMax = [800,800];
   const toMin = [-2,-2];
   const toMax = [2,2];
   const frame1 = frame0.regionFrame(fromMin, fromMax, toMin, toMax);
@@ -56,7 +58,8 @@
   const eye = [-1, -1, 0.3];
   const focus = [0, 0, 2];
   const frame3d = frame1.frame3d(eye, focus);
-  const h = 0.5; // half side length
+  const h = 0.7; // half side length
+  const h2 = h * 2; // full side length
   // the vertices of the cube
   const vertices = [
     [-h, -h, h], [h, -h, h], [h, h, h], [-h, h, h],
@@ -90,12 +93,20 @@
       const v2 = vertices[j];
       // skip if the vertices are too far apart (not connected by an edge)
       const len = tsvector.vLength(tsvector.vSub(v1, v2));
-      if (len > 1.1) continue;
+      if (len > 1.1*h2) continue;
       // choose a random color from the colors array
       const color = colors[Math.floor(Math.random() * colors.length)];
       frame3d.line(v1, v2).colored(color);
     }
   }
+
+  function shrink_to_center(v1, v2, v3) {
+    const center = tsvector.vScale(1/3.0, tsvector.vAdd(v1, tsvector.vAdd(v2, v3)));
+    return [tsvector.vScale(0.5, tsvector.vAdd(v1, center)),
+            tsvector.vScale(0.5, tsvector.vAdd(v2, center)),
+            tsvector.vScale(0.5, tsvector.vAdd(v3, center))];
+  }
+  
   // draw triangles for the faces of the cube
   for (let i = 0; i < vertices.length; i++) {
     for (let j = i + 1; j < vertices.length; j++) {
@@ -103,16 +114,18 @@
       const v2 = vertices[j];
       // skip if the vertices are too far apart (not connected by an edge)
       const len = tsvector.vLength(tsvector.vSub(v1, v2));
-      if (len > 1.1) continue;
+      if (len > 1.1*h2) continue;
       // find a third vertex that is connected to both v1 and v2
       for (let k = j + 1; k < vertices.length; k++) {
         const v3 = vertices[k];
         const len1 = tsvector.vLength(tsvector.vSub(v1, v3));
         const len2 = tsvector.vLength(tsvector.vSub(v2, v3));
-        if (len1 < 1.1 || len2 < 1.1) {
+        if (len1 < 1.1*h2 || len2 < 1.1*h2) {
           // choose a random color from the colors array
           const color = colors[Math.floor(Math.random() * colors.length)];
-          frame3d.poly([v1, v2, v3]).colored(color).filled();
+          const points = shrink_to_center(v1, v2, v3);
+          frame3d.poly(points).colored(color).filled();
+          //frame3d.poly([v1, v2, v3]).colored(color).filled();
         }
       }
     }
@@ -139,6 +152,8 @@
   // add event listeners to sliders
   eyeXSlider.addEventListener('input', updateFrame);
   eyeYSlider.addEventListener('input', updateFrame);
+
+  frame3d.orbit();
 </script>
 </body>
 </html>
