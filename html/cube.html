@@ -42,6 +42,7 @@
       diagram,
       drawOn,
       tsvector,
+      cube
   } from '../src/index.ts';
 
   console.log("Hello from wassilyjs Library!");
@@ -49,6 +50,7 @@
   const output = document.getElementById('output');
   const info = document.getElementById('info');
   //const d = new diagram.Diagram(output, 520, 600);
+  /*
   const frame0 = drawOn(output, 800, 800);
   // thick lines
   frame0.linedWidth(10);
@@ -63,6 +65,13 @@
   const eye = [-1, -1, 0.3];
   const focus = [0, 0, 2];
   const frame3d = frame1.frame3d(eye, focus);
+  */
+  const pixelWidth = 800;
+  const modelWidth = 3;
+  const modelCenter = [0, 0, 2];
+  const frame3d = cube(output, pixelWidth, modelWidth, modelCenter);
+  console.log("frame3d = ", frame3d);
+  frame3d.linedWidth(10);
   const h = 0.7; // half side length
   const h2 = h * 2; // full side length
   // the vertices of the cube
