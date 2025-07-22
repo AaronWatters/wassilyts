@@ -32,6 +32,7 @@
       diagram,
       drawOn,
       tsvector,
+      conveniences
   } from '../src/index.ts';
 
 
@@ -211,34 +212,13 @@ function rotate_project_faces(faces, a, b, c) {
   const focus = [0, 0, 0];
   const frame3d = frame1.frame3d(eye, focus);
   console.log("frame3d: ", frame3d);
-  // a selection of half transparent html5 colors using rgba
-  const colors = [
-    'rgba(255, 0, 0, 0.5)', // red
-    'rgba(0, 255, 0, 0.5)', // green
-    'rgba(0, 0, 255, 0.5)', // blue
-    //'rgba(255, 255, 0, 0.5)', // yellow
-    'rgba(255, 0, 255, 0.5)', // magenta
-    'rgba(0, 255, 255, 0.5)', // cyan
-    'rgba(128, 0, 128, 0.5)', // purple
-    'rgba(128, 128, 0, 0.5)', // olive
-    'rgba(128, 128, 128, 0.5)', // gray
-    'rgba(255, 165, 0, 0.5)', // orange
-    'rgba(255, 192, 203, 0.5)', // pink
-    'rgba(0, 128, 128, 0.5)', // teal
-    'rgba(128, 0, 0, 0.5)', // maroon
-    'rgba(0, 0, 128, 0.5)',]
 
-    function randomColor() {
-      // return a random color from the colors array
-      const index = Math.floor(Math.random() * colors.length);
-      return colors[index];
-    };
-
-    const facecolors = [];
-    for (const points of faces) {
-      // add a color property to each face
-      facecolors.push(randomColor());
-    }
+  function tricolor(a, b, c) {
+    const ab = tsvector.vSub(a, b);
+    const ac = tsvector.vSub(a, c);
+    const normal = tsvector.vCross(ab, ac);
+    return conveniences.rgb(normal);
+  }
 
     function drawFaces(faces, a, b, c) {
       // draw the faces of the 24-cell
@@ -248,8 +228,7 @@ function rotate_project_faces(faces, a, b, c) {
       var count = 0;
       for (var i=0; i < projectedFaces.length; i++) {
         const points = projectedFaces[i];
-        const color = facecolors[i];
-        //const color = randomColor();
+        const color = tricolor(...points);
         frame3d.poly(points).colored(color).filled();
         if (limit && count > limit) {
           break;
