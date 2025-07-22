@@ -1,4 +1,5 @@
 import { drawOn } from './diagram';
+import { panel, swatch, cube } from './conveniences';
 
 // export a name string to test module structure
 export const name = 'wassilyjs';
@@ -20,6 +21,7 @@ export * as circle from './circle';
 export * as rect from './rect';
 export * as poly from './poly';
 export * as poly3d from './poly3d';
+export * as conveniences from './conveniences';
 
-// export the drawOn function
-export { drawOn };
+// export the main constructor functions
+export { drawOn, panel, swatch, cube };
