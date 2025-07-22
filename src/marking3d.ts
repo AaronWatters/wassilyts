@@ -14,6 +14,7 @@ export abstract class Marking3d extends styled.Styled {
     constructor(onFrame3d: frame3d.Frame3d) {
         super(onFrame3d.onFrame);
         this.onFrame3d = onFrame3d;
+        this.styleLike(onFrame3d);
     };
     abstract projectTo2D(): marking.Marking;
     depth(): number {
