@@ -100,6 +100,20 @@ export class Diagram {
         this.nameToImage.set(name, image);
         return this;
     };
+    /** Get a named image from the diagram. */
+    getNamedImage(name: string): HTMLImageElement | null {
+        const image = this.nameToImage.get(name);
+        if (image === undefined) {
+            return null;
+        }
+        return image;
+    }
+    /** Make an image from a URL usable in a diagram by name. */
+    nameImageFromURL(name: string, url: string) {
+        const image = new Image();
+        image.src = url;
+        this.nameImage(name, image);
+    };
     /** Convert cartesian xy to canvas xy (with y inverted) */
     toCanvas(xy: tsvector.Vector): tsvector.Vector {
         const result = [xy[0], this.height - xy[1]];
@@ -186,7 +200,7 @@ export class Diagram {
     };
     // use the stats to fit the diagram to the points
     fit(border: number = 0) {
-        debugger;
+        //debugger;
         if (this.stats.minxy === null || this.stats.maxxy === null) {
             return;
         };
