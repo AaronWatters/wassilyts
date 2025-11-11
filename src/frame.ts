@@ -8,6 +8,7 @@ import * as line from './line';
 import * as poly from './poly';
 import * as frame3d from './frame3d';
 import * as projection from './projection';
+import * as image from './image';
 
 // Handler returns true if the event was handled completely (no propagation needed).
 export type frameEventHandler = (
@@ -193,6 +194,11 @@ export class Frame extends styled.Styled {
         this.diagram.nameImage(name, image);
         return this;
     };
+    /** Make an image from a URL usable in a diagram by name. */
+    nameImageFromURL(name: string, url: string) {
+        this.diagram.nameImageFromURL(name, url);
+        return this;
+    };
     /** Fit visible elements into canvas */
     fit(border: number = 0) {
         this.diagram.fit(border);
@@ -343,6 +349,23 @@ export class Frame extends styled.Styled {
     circle(center: tsvector.Vector, radius: number, scaled=true): circle.Circle {
         return this.dot(center, radius, scaled);
     };
+    /** Place a named image */
+    namedImage(
+        point: tsvector.Vector,
+        name: string,
+        size: tsvector.Vector | null = null,
+        offset: tsvector.Vector = [0, 0],
+        scaled: boolean = false
+    ): image.Image {
+        const source = this.diagram.getNamedImage(name);
+        if (source === null) {
+            throw new Error(`Named image ${name} not found in diagram.`);
+        }
+        const result = new image.Image(source, this, point, size, offset, scaled);
+        this.addElement(result);
+        return result;
+    };
+    /** A rectangle marking. */
     rect(
         point: tsvector.Vector,
         size: tsvector.Vector,
