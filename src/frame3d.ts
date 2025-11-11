@@ -30,6 +30,11 @@ export class Frame3d extends styled.Styled {
         fromFrame.addElement(this.onFrame);
     };
 
+    requestRedraw(): void {
+        // request a redraw of the frame
+        this.onFrame.requestRedraw();
+    };
+
     orbit(): orbiter.Orbiter {
         // create an orbiter for this frame
         if (this.orbiter === null) {
