@@ -22,14 +22,19 @@ export abstract class Styled {
     eventTypeToHandler: Map<string, frame.frameEventHandler> = new Map();
 
     constructor(onFrame: frame.Frame | null = null) {
-        const constructorName = this.constructor.name;
-        this.objectName = constructorName + globalCounter;
-        globalCounter += 1;
+        this.objectName = this.freshName();
         this.onFrame = onFrame;
         if (onFrame) {
             // inherit the style from the frame
             this.styleLike(onFrame);
         }
+    };
+
+    freshName(prefix: string | null = null): string {
+        const base = prefix ? prefix : this.constructor.name;
+        const name = base + globalCounter;
+        globalCounter += 1;
+        return name;
     };
 
     styleLike(other: Styled) {
