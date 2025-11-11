@@ -49,8 +49,8 @@ export class Line extends marking.Marking {
         path.moveTo(sx, sy);
         path.lineTo(ex, ey);
         // add reference points to diagram
-        frame.addPixelPoint(frame.diagram.toCartesian(pixelStart));
-        frame.addPixelPoint(frame.diagram.toCartesian(pixelEnd));
+        //frame.addPixelPoint(frame.diagram.toCartesian(pixelStart));
+        //frame.addPixelPoint(frame.diagram.toCartesian(pixelEnd));
         return path;
     };
 }
