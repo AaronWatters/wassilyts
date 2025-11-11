@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>wassilyjs Library Demo</title>
+</head>
+<body>
+<h1>alignment test page</h1>
+
+<div id="output"></div>
+
+
+<script type="module">
+  import { 
+      name,
+      panel,
+      tsvector,
+  } from '../src/index.ts';
+
+  const output = document.getElementById('output');
+  const frame = panel(output, [1,2], [4,3], 300, 100);
+
+  frame.nameImageFromURL("mandrill", "./mandrill.png");
+  debugger;
+  const point = [2.5, 2.5];
+  const size = [50, 50];
+  const offset = [-25, -25];
+  const scaled = false;
+  const img1 = frame.namedImage(point, "mandrill", size, offset, scaled);
+  const imgbox = frame.box(point, size, offset, scaled).linedWidth(2).stroked().colored("red");
+
+  //const rect1 = frame.rect([1.1, 2.1], [2.8, 0.8]).colored("lightgray").linedWidth(4).stroked();
+  const line1 = frame.line([1,2], [4,3]).colored("red");
+  const line2 = frame.line([4,2], [1,3]).colored("green");
+  
+  const circle1 = frame.circle([2.5,2.5], 0.4).colored("blue").stroked();
+  const box1 = frame.box([2.5,2.5], [30,20], [-15,-10]).colored("salmon").linedWidth(2).stroked();
+
+  for (const cx of [1.1, 3.9]) {
+    for (const cy of [2.1, 2.9]) {
+      const dot = frame.dot([cx, cy], 8).colored("purple").stroked();
+    }
+  }
+
+  //debugger;
+  //frame.prepareForRedraw();
+  //frame.draw();
+  //frame.fit()
+  frame.requestRedraw();
+
+</script>
+</body>
+</html>

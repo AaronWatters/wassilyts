@@ -1,0 +1,46 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>wassilyjs Library Demo</title>
+</head>
+<body>
+<h1>swatch test page</h1>
+
+<div id="output"></div>
+
+
+<script type="module">
+  import { 
+      name,
+      swatch,
+      tsvector,
+  } from '../src/index.ts';
+
+  function rcg() {
+    const r = Math.floor(Math.random() * 255);
+    const g = Math.floor(Math.random() * 255);
+    const b = Math.floor(Math.random() * 255);
+    return `rgb(${r}, ${g}, ${b})`;
+  };
+
+  debugger
+  const output = document.getElementById('output');
+  const frame = swatch(output, 400, 10, [1,2])
+  const radius = 13
+  frame.dot([1,1], radius).colored(rcg());
+  frame.dot([2,1], radius).colored(rcg());
+  console.log("swatch frame = ", frame);
+  for (let i=0; i<27; i++) {
+    const shift = i * 0.25;
+    const x = Math.sin(shift) * shift + 1;
+    const y = Math.cos(shift) * shift + 2;
+    frame.dot([x, y], radius).colored(rcg());
+  }
+  frame.polyline([[-3, -2], [5, -2], [5, 6]]).colored("blue")
+
+</script>
+</body>
+</html>

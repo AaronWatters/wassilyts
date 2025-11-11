@@ -17,6 +17,7 @@
 <p>Red circle at (1,2) with radius 0.5</p>
 <p>Green circle at (2,1) with radius 0.1</p>
 <p>Salmon circle at (2,2) with radius 0.2</p>
+<p>mandrill image at (1.5, 1.5) with size (50, 50) and offset (-25, -25) moveable.</p>
 <p>Fit to frame.</p>
 
 <div id="info">info here...</div>
@@ -104,6 +105,15 @@
   frame1.circle([2,1], 0.1).colored('green');
   // draw a salmon circle
   frame1.circle([2,2], 0.2).colored('salmon');
+
+  // draw a mandrill image
+  frame1.nameImageFromURL("mandrill", "./mandrill.png");
+  const imgpoint = [1.5, 1.5]
+  const imgsize = [50, 50];
+  const imgoffset = [-25, -25];
+  const img1 = frame1.namedImage(imgpoint, "mandrill", imgsize, imgoffset, false).
+    onEvent("pointerdown", pointerDownHandler).
+    rename("mandrill image");
   //frame0.draw()
   frame0.diagram.draw(); // get frame stats for fit below.
   console.log("frame0 = ", frame0);

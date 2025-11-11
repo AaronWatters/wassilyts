@@ -22,7 +22,7 @@
     name,
     diagram,
     drawOn,
-  } from '../dist/wassilyts.mjs';
+  } from '../src/index.ts';
   console.log("Hello from wassilyjs Library!");
   console.log("The name of the library is: " + name);
   const output = document.getElementById('output');
@@ -48,12 +48,17 @@
     //break;
   }
 
-  frame0.draw()
-  console.log("frame0 = ", frame0);
-  console.log("frame1 = ", frame1);
-  frame0.fit();
+  //frame0.prepareForRedraw();
+  //frame0.draw()
+  //console.log("frame0 = ", frame0);
+  //console.log("frame1 = ", frame1);
+  //debugger;
+  //frame1.fit();
   //frame0.diagram.clear();
-  //frame0.draw();
+  // draw the diagram before fitting
+  frame0.diagram.draw();
+  frame1.fit();
+  frame1.requestRedraw();
 </script>
 </body>
 </html>
