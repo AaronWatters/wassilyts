@@ -106,6 +106,9 @@ export class Rectangle extends marking.Marking {
             lowerLeftCartesian = tsvector.vAdd(pointCartesian, offset);
             upperLeftCartesian = tsvector.vAdd(lowerLeftCartesian, size);
         }
+        // record the pixel points in the diagram (for fitting purposes)
+        frame.addPixelPoint(lowerLeftCartesian);
+        frame.addPixelPoint(upperLeftCartesian);
         let [llx, lly] = lowerLeftCartesian;
         let [ulx, uly] = upperLeftCartesian;
         pixelStart = [Math.min(llx, ulx), Math.min(lly, uly)];
