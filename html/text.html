@@ -1,0 +1,92 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>wassilyjs Library Demo</title>
+</head>
+<body>
+<h1>text test page</h1>
+
+<div id="output"></div>
+
+
+<script type="module">
+  import { 
+      name,
+      panel,
+      tsvector,
+  } from '../src/index.ts';
+
+  const output = document.getElementById('output');
+  const frame = panel(output, [-1, -1], [5,4], 1000, 400);
+
+  console.log("text frame = ", frame);
+
+  const alignments = ["right", "center", "left"];
+  const valignments = ["top", "middle", "bottom"];
+  // selection of 9 font styles
+  const fonts = [
+    "16px Arial",
+    "20px Courier New",
+    "18px Times New Roman",
+    "22px Verdana",
+    "24px Georgia",
+    "20px Tahoma",
+    "26px Trebuchet MS",
+    "28px Impact",
+    "30px Comic Sans MS"
+  ];
+  // selection of 9 colors
+  const colors = [
+    "red",
+    "blue",
+    "green", 
+    "purple",
+    "orange",
+    "brown",
+    "pink",
+    "cyan",
+    "magenta"
+  ];
+  let lastcolor = "black";
+  let counter = 0;
+  for (var i=0; i<alignments.length; i++) {
+    for (var j=0; j<valignments.length; j++) {
+      const alignment = alignments[i];
+      const valignment = valignments[j];
+      const font = fonts[counter % fonts.length];
+      const color = colors[counter % colors.length];
+      //lastcolor = color;
+      const textstr = `${alignment}:${valignment}`;
+      const point = [i+0.5, j+0.5];
+      const textbox = frame.textBox([i+0.5, j+0.5], textstr);
+      textbox.aligned(alignment)
+             .valigned(valignment)
+             .font(font)
+             .colored(color)
+             .boxed("lightgray");
+      const refdot = frame.dot(point, 3).colored(lastcolor);
+      lastcolor = color;
+      counter += 1;
+      //if (counter>12) break;
+    }
+    //break;
+  } 
+  /*
+  debugger;
+  const point = [2.5, 2.5];
+  const text1 = frame.textBox(point, "Hello!");
+  text1.colored("blue")
+  .font("20px Courier New")
+  .aligned("left")
+  .valigned("top")
+  .boxed("lightgray");
+
+  const refdot = frame.dot(point, 3).colored("red");
+  //frame.requestRedraw();
+  */
+</script>
+</body>
+</html>
