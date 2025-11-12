@@ -127,6 +127,7 @@ export class Diagram {
         return result;
     };
     draw() {
+        this.clear();
         this.mainFrame.prepareForRedraw();
         this.mainFrame.draw();
     };
@@ -140,7 +141,7 @@ export class Diagram {
             }
             requestAnimationFrame(() => {
                 try {
-                    this.clear();
+                    //this.clear();
                     this.draw();
                 } finally {  
                     this.redraw_requested = false;
