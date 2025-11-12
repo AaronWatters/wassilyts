@@ -98,6 +98,7 @@ export class Frame extends styled.Styled {
         inDiagram: diagram.Diagram, 
         affineMatrix: tsvector.Matrix | null = null,
         parent: Frame | null = null,
+        font: string = "12px Arial",
     ) {
         super(parent);
         this.diagram = inDiagram;
@@ -109,6 +110,7 @@ export class Frame extends styled.Styled {
         this.setAffine(affineMatrix);
         // by default the frame handles events
         this.responsive = true;
+        this.font(font);
     };
     /** the pixel position is the frame origin in pixel coordinates */
     getPixel(): tsvector.Vector {
