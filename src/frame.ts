@@ -9,6 +9,7 @@ import * as poly from './poly';
 import * as frame3d from './frame3d';
 import * as projection from './projection';
 import * as image from './image';
+import * as textBox from './text';
 
 // Handler returns true if the event was handled completely (no propagation needed).
 export type frameEventHandler = (
@@ -375,6 +376,18 @@ export class Frame extends styled.Styled {
         scaled: boolean = true
     ): rect.Rectangle {
         const result = new rect.Rectangle(this, point, size, offset, scaled);
+        this.addElement(result);
+        return result;
+    };
+    /** A text box. */
+    textBox(
+        point: tsvector.Vector,
+        text: string,
+        shift: tsvector.Vector = [0, 0],
+        alignment: CanvasTextAlign = "left",
+        background: string | null = null
+    ): textBox.TextBox {
+        const result = new textBox.TextBox(text, this, point, shift, alignment, background);
         this.addElement(result);
         return result;
     };
