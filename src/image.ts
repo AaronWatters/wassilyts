@@ -79,5 +79,6 @@ export class Image extends rect.Rectangle {
         const [cx, cy] = [px, frame.diagram.canvas.height - py];
         const imagey = cy - ph;
         ctx.drawImage(this.source, cx, imagey, pw, ph);
+        ctx.restore(); // undo the prepare() save
     };
 }
