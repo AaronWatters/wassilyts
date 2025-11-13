@@ -18,6 +18,7 @@
 <p>Green circle at (2,1) with radius 0.1</p>
 <p>Salmon circle at (2,2) with radius 0.2</p>
 <p>mandrill image at (1.5, 1.5) with size (50, 50) and offset (-25, -25) moveable.</p>
+<p>"Stella!" text at (1, 1.5) moveable</p>
 <p>Fit to frame.</p>
 
 <div id="info">info here...</div>
@@ -114,8 +115,13 @@
   const img1 = frame1.namedImage(imgpoint, "mandrill", imgsize, imgoffset, false).
     onEvent("pointerdown", pointerDownHandler).
     rename("mandrill image");
+  const text1 = frame1.textBox([1, 1.5], "Stella!").
+    font("30px Comic Sans MS").
+    colored("navyblue").
+    onEvent("pointerdown", pointerDownHandler).
+    rename("Stella text");
   //frame0.draw()
-  frame0.diagram.draw(); // get frame stats for fit below.
+  //frame0.diagram.draw(); // get frame stats for fit below.
   console.log("frame0 = ", frame0);
   console.log("frame1 = ", frame1);
   frame0.fit();
