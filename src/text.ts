@@ -69,7 +69,6 @@ export class TextBox extends rect.Rectangle {
         if (!this.isLive()) {
             return;
         }
-        debugger;
         const ctx = this.onFrame!.diagram.ctx!;
         const prep = this.prepare();
         // for stats, always compute the background path
@@ -102,7 +101,6 @@ export class TextBox extends rect.Rectangle {
         if (!this.isLive()) {
             throw new Error("TextBox is not attached to a frame.");
         }
-        debugger;
         const {offset, size} = this.getSize();
         // set up parameters for drawPath
         this.point = tsvector.vAdd(this.referencePoint, this.shift);
