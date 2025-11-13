@@ -28,6 +28,7 @@ export class Diagram {
     mainFrame: frame.Frame;
     nameToImage: Map<string, HTMLImageElement>;
     redraw_requested: boolean = false;
+    deferred_fit_border: number | null = null;
     autoRedraw: boolean = true;
     watchedEvents: Set<string> = new Set<string>();
 
@@ -129,6 +130,13 @@ export class Diagram {
         this.clear();
         this.mainFrame.prepareForRedraw();
         this.mainFrame.draw();
+        // if there is a deferred fit, do it now
+        if (this.deferred_fit_border !== null) {
+            const border = this.deferred_fit_border;
+            this.fit(border);
+            this.deferred_fit_border = null;
+            this.requestRedraw()
+        }
     };
     /** Request a redraw of the diagram */
     requestRedraw() {
@@ -140,10 +148,11 @@ export class Diagram {
             }
             requestAnimationFrame(() => {
                 try {
-                    //this.clear();
+                    // note: in case of fit draw may request another redraw
+                    this.redraw_requested = false;
                     this.draw();
                 } finally {  
-                    this.redraw_requested = false;
+                    //this.redraw_requested = false;
                 }
             });
         }
@@ -201,6 +210,7 @@ export class Diagram {
     // use the stats to fit the diagram to the points
     fit(border: number = 0) {
         if (this.stats.minxy === null || this.stats.maxxy === null) {
+            this.deferred_fit_border = border;
             return;
         };
         const expander = [border, border];
