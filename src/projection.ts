@@ -216,7 +216,6 @@ export class Projector {
             }
             projectionMatrix = this.projectionMatrix;
         }
-        debugger
         // projectionMatrix is currently at the eyePoint
         // Apply the rotation at the lookAtPoint and then translate back to the eyePoint
         const shift = tsvector.vSub(this.eyePoint, this.lookAtPoint);

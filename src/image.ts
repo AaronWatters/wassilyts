@@ -17,7 +17,6 @@ export class Image extends rect.Rectangle {
         offset: tsvector.Vector = [0, 0],
         scaled: boolean = false
     ) {
-        debugger;
         super(frame, point, size, offset, scaled);
         this.source = source;
         this.checkCompletion(source);
@@ -66,7 +65,6 @@ export class Image extends rect.Rectangle {
             this.awaitingLoad = true;
             return; // image not loaded yet
         }
-        debugger;
         const prep = this.prepare();
         const frame = this.onFrame!;
         const ctx = frame.diagram.ctx!;

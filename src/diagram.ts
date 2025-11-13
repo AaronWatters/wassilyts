@@ -54,7 +54,6 @@ export class Diagram {
     /** Event handler for any mouse event */
     mouseEventHandler(event: MouseEvent) {
         // Convert the mouse event to canvas coordinates
-        //debugger;
         const rect = this.canvas.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
@@ -201,7 +200,6 @@ export class Diagram {
     };
     // use the stats to fit the diagram to the points
     fit(border: number = 0) {
-        //debugger;
         if (this.stats.minxy === null || this.stats.maxxy === null) {
             return;
         };

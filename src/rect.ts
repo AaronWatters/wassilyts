@@ -79,7 +79,6 @@ export class Rectangle extends marking.Marking {
         return path;
     };
     getPixelStartAndSize(): {pixelStart: tsvector.Vector, pixelSize: tsvector.Vector} {
-        debugger;
         let size = this.size;
         if (size === null) {
             throw new Error("Rectangle size is not defined.");
