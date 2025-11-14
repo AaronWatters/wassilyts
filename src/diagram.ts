@@ -1,6 +1,7 @@
 
 import * as tsvector from 'tsvector';
 import * as frame from './frame';
+import * as styled from './styled';
 
 /** Draw on an HTML element.  Return a frame for the diagram. */
 export function drawOn(container: HTMLElement, width: number, height: number): frame.Frame {
@@ -31,6 +32,8 @@ export class Diagram {
     deferred_fit_border: number | null = null;
     autoRedraw: boolean = true;
     watchedEvents: Set<string> = new Set<string>();
+    // for external named access, keep track of named styled elements
+    nameToStyled: Map<string, styled.Styled> = new Map<string, styled.Styled>();
 
     constructor(domObject: HTMLElement, width: number, height: number) {
         //.log(`Diagram: creating a new diagram with width ${width} and height ${height}`);
@@ -51,6 +54,32 @@ export class Diagram {
         this.stats = new CanvasStats();
         this.last_stats = this.stats;
         this.mainFrame = new frame.Frame(this, null, null);
+    };
+    getStyledByName(name: string): styled.Styled | null {
+        const styled = this.nameToStyled.get(name);
+        if (styled === undefined) {
+            return null;
+        }
+        return styled;
+    };
+    addStyled(styled: styled.Styled) {
+        const n2s = this.nameToStyled;
+        // prevent name clashes
+        const existing = n2s.get(styled.objectName);
+        if (existing !== undefined) {
+            if (existing === styled) {
+                // already added
+                return;
+            }
+            throw new Error(`Styled object name ${styled.objectName} already exists in diagram.`);
+        }
+        n2s.set(styled.objectName, styled);
+    };
+    deleteStyled(styled: styled.Styled) {
+        const n2s = this.nameToStyled;
+        if (n2s.has(styled.objectName)) {
+            n2s.delete(styled.objectName);
+        }
     };
     /** Event handler for any mouse event */
     mouseEventHandler(event: MouseEvent) {

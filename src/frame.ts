@@ -167,13 +167,25 @@ export class Frame extends styled.Styled {
     };
     /** rename a styled element in this frame */
     renameElement(element: styled.Styled, newName: string) {
+        const n2m = this.nameToMarking;
+        // error if the name is already taken
+        if (n2m.has(newName)) {
+            throw new Error(`Element name ${newName} already exists in frame ${this.objectName}`);
+        }
         const oldName = element.objectName;
-        if (this.nameToMarking.has(oldName)) {
+        if (n2m.has(oldName)) {
+            const diagram = this.diagram;
+            // rename in the diagram's named styled map
+            if (diagram.getStyledByName(oldName) === null) {
+                throw new Error(`Element ${oldName} not found in diagram during rename.`);
+            }
+            diagram.deleteStyled(element);
             // remove old name
-            this.nameToMarking.delete(oldName);
+            n2m.delete(oldName);
             // set new name
             element.objectName = newName;
-            this.nameToMarking.set(newName, element);
+            n2m.set(newName, element);
+            diagram.addStyled(element);
             //this.requestRedraw(); -- rename does not require redraw
         } else {
             console.warn(`Element ${oldName} not found in frame ${this.objectName}`);
@@ -300,7 +312,9 @@ export class Frame extends styled.Styled {
     addElement(styled: styled.Styled, requestRedraw=true) {
         const name = styled.objectName;
         // reset the diagram stats for new element
-        this.diagram.resetStats();
+        const diagram = this.diagram;
+        diagram.resetStats();
+        diagram.addStyled(styled);
         this.nameToMarking.set(name, styled);
         this.drawOrder.push(styled);
         if (requestRedraw) {
@@ -326,12 +340,15 @@ export class Frame extends styled.Styled {
         ctx.restore(); // restore the context state
         // remove defunct markings
         if (dirty) {
+            let diagram = this.diagram;
+            let n2m = this.nameToMarking;
             let newOrder: styled.Styled[] = [];
             for (const element of this.drawOrder) {
                 if (!element.defunct) {
                     newOrder.push(element);
                 } else {
-                    this.nameToMarking.delete(element.objectName);
+                    n2m.delete(element.objectName);
+                    diagram.deleteStyled(element);
                 }
             }
             this.drawOrder = newOrder;
