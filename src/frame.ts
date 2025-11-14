@@ -298,7 +298,9 @@ export class Frame extends styled.Styled {
     };
     /** Record a marking */
     addElement(styled: styled.Styled, requestRedraw=true) {
-        const name = styled.objectName
+        const name = styled.objectName;
+        // reset the diagram stats for new element
+        this.diagram.resetStats();
         this.nameToMarking.set(name, styled);
         this.drawOrder.push(styled);
         if (requestRedraw) {

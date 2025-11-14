@@ -178,6 +178,9 @@ export class Diagram {
     clear() {
         this.ctx!.clearRect(0, 0, this.width, this.height);
         this.last_stats = this.stats;
+        this.resetStats();
+    };
+    resetStats() {
         this.stats = new CanvasStats();
     };
     /** record a cartesian xy point */
