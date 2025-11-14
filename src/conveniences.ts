@@ -37,19 +37,29 @@ export function rgb(direction: tsvector.Vector, alpha: number | null = null, eps
  * Create a 2D frame scaled to the given coordinates.
  * @param minxy The minimum x and y coordinates of the model.
  * @param maxxy The maximum x and y coordinates of the model.
- * @param container The HTML container element.
+ * @param container The HTML container element, or its ID.
  * @param width The pixel width of the panel.
  * @param height The pixel height of the panel. If null, it will be match the y extent of the coordinates.
  * @returns The created panel frame.
  */
 export function panel(
-    container: HTMLElement, 
+    container: HTMLElement | string, 
     minxy: number[], 
     maxxy: number[], 
     width: number, 
     height: number | null = null,
     epsilon: number = 1e-6
 ): frame.Frame {
+    let element: HTMLElement;
+    if (typeof container === 'string') {
+        const el = document.getElementById(container);
+        if (el === null) {
+            throw new Error(`Container element with id ${container} not found.`);
+        }
+        element = el;
+    } else {
+        element = container;
+    }
     const extent = tsvector.vSub(maxxy, minxy);
     if (Math.min(...extent) < epsilon) {
         throw new Error('The extent of the coordinates is too small to create a frame.');
@@ -64,7 +74,7 @@ export function panel(
     if (height <= 0) {
         throw new Error('Height must be greater than zero.');
     }
-    const mainFrame = diagram.drawOn(container, width, height);
+    const mainFrame = diagram.drawOn(element, width, height);
     const fromMin = [0, 0];
     const fromMax = [width, height];
     const scaledFrame = mainFrame.regionFrame(
@@ -74,7 +84,7 @@ export function panel(
 
 /**
  * Create a square panel frame with a given pixel width and model width.
- * @param container The HTML container element.
+ * @param container The HTML container element, or its ID.
  * @param pixelWidth The pixel width of the swatch.
  * @param modelWidth The model width of the swatch.
  * @param modelCenter The model center of the swatch. If null, it will be [0, 0].
@@ -82,7 +92,7 @@ export function panel(
  * @returns The created swatch frame.
  */
 export function swatch(
-    container: HTMLElement,
+    container: HTMLElement | string,
     pixelWidth: number, 
     modelWidth: number, 
     modelCenter: tsvector.Vector | null = null  ,
@@ -107,7 +117,7 @@ export function swatch(
 
 /**
  * Create a 3D cube frame.
- * @param container The HTML container element.
+ * @param container The HTML container element, or its ID.
  * @param pixelWidth The pixel width of the cube.
  * @param modelWidth The model width of the cube.
  * @param modelCenter The model center of the cube. If null, it will be [0, 0, 0].
@@ -116,7 +126,7 @@ export function swatch(
  * @returns The created cube frame.
  */
 export function cube(
-    container: HTMLElement,
+    container: HTMLElement | string,
     pixelWidth: number,
     modelWidth: number,
     modelCenter: tsvector.Vector | null = null,
