@@ -2,7 +2,7 @@
 import * as marking3d from './marking3d';
 import * as frame3d from './frame3d';
 import * as marking from './marking';
-import * as line from './line';
+//import * as line from './line';
 import * as tsvector from "tsvector";
 
 export class Line3d extends marking3d.Marking3d {

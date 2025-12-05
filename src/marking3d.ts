@@ -36,6 +36,16 @@ export abstract class Marking3d extends styled.Styled {
         // No-op for 3D markings
     };
     draw(): void {
-        // No-op for 3D markings, as they are drawn in the Frame3d context
+        // No-op for 3D markings, as they are drawn in the Frame2d context
+    };
+    forget(): void {
+        // Forget this marking from the 3D frame and the diagram
+        // This can be done immediately without waiting for redraw
+        // because there is no explicit draw order.
+        this.onFrame3d.nameToMarking3d.delete(this.objectName);
+        this.onFrame3d.onFrame.diagram.nameToStyled.delete(this.objectName);
+        // for safety mark as defunct
+        this.defunct = true;
+        this.requestRedraw();
     };
 };

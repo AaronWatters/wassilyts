@@ -169,6 +169,17 @@ export class Projector {
         return result;
     };
 
+    distanceScale(atPoint: tsvector.Vector): number {
+        // Calculate the scale factor at the given point based on distance from eye
+        const toPoint = tsvector.vSub(atPoint, this.eyePoint);
+        const distance = tsvector.vLength(toPoint);
+        if (distance < EPSILON) {
+            return 1.0;
+        }
+        const scale = this.focusLength / distance;
+        return scale;
+    };
+
     /** 3x3 3d rotation matrix based on xy offset adjusted by focuslength  */
     XYOffsetRotation(
         startXY: tsvector.Vector,

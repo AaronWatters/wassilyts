@@ -200,6 +200,6 @@ export abstract class Styled {
     forget() {
         this.defunct = true;
         this.requestRedraw();
-        // bookkeeping elsewhere should remove this object.
+        // bookkeeping during redraw should remove this object from external structures.
     }
 }

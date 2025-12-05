@@ -11,7 +11,7 @@ import * as marking3d from './marking3d';
 import * as marking from './marking';
 import * as line3d from './line3d';
 import * as poly3d from './poly3d';
-import { poly } from ".";
+import * as circle3d from './circle3d';
 
 export class Frame3d extends styled.Styled {
     projection: projection.Projector;
@@ -111,5 +111,12 @@ export class Frame3d extends styled.Styled {
         this.nameToMarking3d.set(poly.objectName, poly);
         return poly;
     };
+
+    circle(center: tsvector.Vector, radius: number): circle3d.Circle3d {
+        // create a 3D circle marking
+        const circle = new circle3d.Circle3d(center, radius, this);
+        this.nameToMarking3d.set(circle.objectName, circle);
+        return circle;
+    }
 };
 
