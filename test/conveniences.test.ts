@@ -95,4 +95,27 @@ describe('convenience functions', () => {
         expect(() => conveniences.rgb(bogusDir)).toThrow();
     });
 
+    it('should create a cube 3d frame', () => {
+        const container = document.createElement('div');
+        const pixelWidth = 150;
+        const modelWidth = 20;
+        const modelCenter = [0, 0, 100];
+        const frame3d = conveniences.cube(container, pixelWidth, modelWidth, modelCenter);
+        const diag = frame3d.onFrame.diagram;
+        expect(diag).toBeInstanceOf(diagram.Diagram);
+        expect(diag.width).toEqual(pixelWidth);
+        expect(diag.height).toEqual(pixelWidth);
+    });
+
+    it ('should create a cube 3d frame with default center', () => {
+        const container = document.createElement('div');
+        const pixelWidth = 150;
+        const modelWidth = 20;
+        const frame3d = conveniences.cube(container, pixelWidth, modelWidth);
+        const diag = frame3d.onFrame.diagram;
+        expect(diag).toBeInstanceOf(diagram.Diagram);
+        expect(diag.width).toEqual(pixelWidth);
+        expect(diag.height).toEqual(pixelWidth);
+    });
+
 });
