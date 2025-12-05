@@ -92,6 +92,20 @@ describe('projection module', () => {
         const expected2 = [2, 3, 2];
         expect(projected2).toEqual(expected2);
     });
+    it('should project points with default up vector orthographically', () => {
+        const eyePoint = [0, 0, 0];
+        const lookAtPoint = [0, 0, 1];
+        const upVector = null;
+        const projector = new projection.Projector(eyePoint, lookAtPoint, false, upVector);
+        const point3d = [2, 3, 1];
+        const projected = projector.project(point3d);
+        const expected = [2, 3, 1];
+        expect(projected).toEqual(expected);
+        const point3d2 = [4, 6, 2];
+        const projected2 = projector.project(point3d2);
+        const expected2 = [4, 6, 2];
+        expect(projected2).toEqual(expected2);
+    });
 
     it('should change view', () => {
         const eyePoint1 = [1, 0, 1];
@@ -113,6 +127,13 @@ describe('projection module', () => {
         const projected2 = projector.project(point3d2);
         const expected2 = [2, 3, 2];
         expect(projected2).toEqual(expected2);
+    });
+
+    it('should error if eye and lookAt are the same', () => {
+        const eyePoint = [0, 0, 0];
+        const lookAtPoint = [0, 0, 0];
+        const upVector = [0, 1, 0];
+        expect(() => new projection.Projector(eyePoint, lookAtPoint, true, upVector)).toThrow();
     });
 
     /* not used.
