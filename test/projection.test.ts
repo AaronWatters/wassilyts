@@ -91,7 +91,32 @@ describe('projection module', () => {
         const projected2 = projector.project(point3d2);
         const expected2 = [2, 3, 2];
         expect(projected2).toEqual(expected2);
+        // test distance scale
+        const dist = projector.distanceScale([0,0,10]);
+        expect(dist).toEqual(0.1);
+        // test offset rotation
+        const offsetRot = projector.XYOffsetRotation([0,0], [1,0]);
+        expect(offsetRot).toBeDefined();
     });
+
+    it('should rotate', () => {
+        // smoke test for rotation
+        const eyePoint = [0, 0, 0];
+        const lookAtPoint = [0, 0, 1];
+        const upVector = null;
+        const projector1 = new projection.Projector(eyePoint, lookAtPoint, true, upVector);
+        const rotationMatrix = [
+            [0, 0, 1],
+            [0, 1, 0],
+            [1, 0, 0]
+        ];
+        const projector = projector1.rotation(rotationMatrix)   
+        const point3d = [0, 0, 1];
+        const projected = projector.project(point3d);
+        const expected = [0, 0, 1];
+        expect(projected).toEqual(expected);
+    });
+
     it('should project points with default up vector orthographically', () => {
         const eyePoint = [0, 0, 0];
         const lookAtPoint = [0, 0, 1];
