@@ -7,7 +7,7 @@ export class Circle extends marking.Marking {
     center: tsvector.Vector;
     radius: number;
     scaled: boolean;
-    constructor(frame: frame.Frame, center: tsvector.Vector, radius: number, scaled: boolean = true) {
+    constructor(frame: frame.Frame | null, center: tsvector.Vector, radius: number, scaled: boolean = true) {
         super(frame);
         this.center = center;
         this.radius = radius;
