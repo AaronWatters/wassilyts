@@ -197,6 +197,7 @@ export class Projector {
         return rotation;
     };
 
+    /* not used
     rotateXY(startXY: tsvector.Vector, endXY: tsvector.Vector, projectionMatrix: tsvector.Matrix | null): Projector {
         // Create a rotation matrix for the XY mouse offset
         const offset = tsvector.vSub(endXY, startXY);
@@ -208,6 +209,7 @@ export class Projector {
         const affineRotation = tsvector.affine3d(rotation);
         return this.rotate(affineRotation, projectionMatrix);
     };
+    */
 
     rotateYawPitch(pitch: number, yaw: number): tsvector.Matrix {
         // Create rotation matrices for yaw and pitch
@@ -223,6 +225,7 @@ export class Projector {
      * @param affineRotation - The affine rotation matrix to apply.
      * @param projectionMatrix - Optional, if not provided, will use the current projection matrix.
      */
+    /* not used ???
     rotate(affineRotation: tsvector.Matrix, projectionMatrix: tsvector.Matrix | null = null): Projector {
         if (projectionMatrix === null) {
             if (this.projectionMatrix === null) {
@@ -243,6 +246,7 @@ export class Projector {
         this.projectionMatrix = tsvector.MMProduct(translateBack, rotated);
         return this;
     };
+    */
 
     orientation(): tsvector.Matrix {
         // Return the orientation matrix of the projector
