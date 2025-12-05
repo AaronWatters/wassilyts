@@ -78,6 +78,43 @@ describe('projection module', () => {
         expect(projected2).toEqual(expected2);
     });
 
+    it('should project points with default up vector', () => {
+        const eyePoint = [0, 0, 0];
+        const lookAtPoint = [0, 0, 1];
+        const upVector = null;
+        const projector = new projection.Projector(eyePoint, lookAtPoint, true, upVector);
+        const point3d = [2, 3, 1];
+        const projected = projector.project(point3d);
+        const expected = [2, 3, 1];
+        expect(projected).toEqual(expected);
+        const point3d2 = [4, 6, 2];
+        const projected2 = projector.project(point3d2);
+        const expected2 = [2, 3, 2];
+        expect(projected2).toEqual(expected2);
+    });
+
+    it('should change view', () => {
+        const eyePoint1 = [1, 0, 1];
+        const lookAtPoint1 = [0, 0, 1];
+        const upVector1 = [0, 1, 0];
+        const eyePoint = [0, 0, 0];
+        const lookAtPoint = [0, 0, 1];
+        const upVector = null;
+        const projector = new projection.Projector(eyePoint1, lookAtPoint1, true, upVector1);
+        expect(projector.upVector).toEqual(upVector1);
+        projector.lookAt(lookAtPoint);
+        projector.lookFrom(eyePoint, upVector1);
+        expect(projector.upVector).toEqual(upVector1);
+        const point3d = [2, 3, 1];
+        const projected = projector.project(point3d);
+        const expected = [2, 3, 1];
+        expect(projected).toEqual(expected);
+        const point3d2 = [4, 6, 2];
+        const projected2 = projector.project(point3d2);
+        const expected2 = [2, 3, 2];
+        expect(projected2).toEqual(expected2);
+    });
+
     /* not used.
     it ('should compute an x orbit rotation matrix', () => {
         const eyePoint = [0, 0, 0];
