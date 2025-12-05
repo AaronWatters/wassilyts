@@ -122,8 +122,11 @@ export class Projector {
         return this;
     };
 
-    lookFrom(eyePoint: tsvector.Vector, epsilon = EPSILON): Projector {
+    lookFrom(eyePoint: tsvector.Vector, upVector: tsvector.Vector | null = null, epsilon = EPSILON): Projector {
         this.eyePoint = eyePoint;
+        if (upVector !== null) {
+            this.upVector = upVector;
+        }
         this.projectionMatrix = null; // reset the projection matrix
         this.getProjectionMatrix(epsilon);
         return this;
