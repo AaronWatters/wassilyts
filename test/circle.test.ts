@@ -22,6 +22,12 @@ describe('circle shape', () => {
         expect(circ.scaled).toBeTruthy();
         expect(diag.stats.minxy).toEqual([0, 0]);
         expect(diag.stats.maxxy).toEqual([100, 100]);
+        // exercise some diagram methods
+        const name = circ.objectName;
+        const circ2 = diag.getStyledByName(name);
+        expect(circ).toBe(circ2);
+        diag.deleteStyled(circ);
+        expect(diag.getStyledByName(name)).toBeNull();
     });
 
     it('should make an unattached circle', () => {
