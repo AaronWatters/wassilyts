@@ -6,6 +6,12 @@ var globalCounter = 0;
 
 /**
  * Base class for styled objects drawn on a canvas.
+ * Styled objects have properties such as color, line width, and font,
+ * and can respond to events.
+ * 
+ * @abstract
+ * @class Styled
+ * @param {frame.Frame | null} onFrame - The frame which contains this object.
  */
 export abstract class Styled {
     objectName: string;
@@ -30,6 +36,11 @@ export abstract class Styled {
         }
     };
 
+    /**
+     * Create a fresh unique name in this context by appending a global counter to the prefix.
+     * @param prefix prefix for new name. If null, use the class name.
+     * @returns A fresh unique name string.
+     */
     freshName(prefix: string | null = null): string {
         const base = prefix ? prefix : this.constructor.name;
         const name = base + globalCounter;
@@ -37,6 +48,9 @@ export abstract class Styled {
         return name;
     };
 
+    /** Apply the style of another Styled object to this one.
+     * @param other The other Styled object to copy the style from.
+     */
     styleLike(other: Styled) {
         this.color = other.color;
         this.lineWidth = other.lineWidth;
@@ -49,18 +63,30 @@ export abstract class Styled {
     /** Draw the object on the canvas. */
     abstract draw(): void;
 
-    /** Get the reference point of the object in cartesian pixel coordinates. */
+    /** Get the reference point of the object in cartesian pixel coordinates.
+     * @return The reference point in pixel coordinates.
+    */
     abstract getPixel(): tsvector.Vector;
 
-    /** Set the reference point of the object in cartesian pixel coordinates. */
+    /** Set the reference point of the object in cartesian pixel coordinates.
+     * @param position The new reference point in pixel coordinates.
+    */
     abstract setPixel(position: tsvector.Vector): void;
 
+    /** Determine if the object is attached to a live frame.
+     * @return True if the object is live, false otherwise.
+     * @internal
+     */
     isLive(): boolean {
         if (!this.onFrame) {
             throw new Error("Marking is not attached to a frame.");
         }
         return !this.defunct;
     };
+    /** Watch for a specific event type on the containing frame.
+     * @param eventType The string name of event to watch for.
+     * @internal
+     */
     watchEvent(eventType: string) {
         // add an event handler for the marking
         if (!this.onFrame) {
@@ -68,14 +94,16 @@ export abstract class Styled {
         }
         this.onFrame.watchEvent(eventType);
     };
+    /** Request a redraw of the frame containing this object. */
     requestRedraw() {
-        // request a redraw of the frame
         if (!this.isLive()) {
             return;
         }
         this.onFrame!.requestRedraw();
     };
-    /** rename the element in the containing frame */
+    /** Rename this element in the containing frame,
+     * @param newname The new name for this object.
+     */
     rename(newname: string): void {
         if (!this.onFrame) {
             this.objectName = newname;
@@ -85,14 +113,21 @@ export abstract class Styled {
     };
     /**
      * Determine if the object is picked by a mouse event.
-     * @param canvasXY 
-     * @returns boolean
+     * @param canvasXY the canvas coordinates of the mouse event.
+     * @returns True if the object is picked, false otherwise.
      */
     pickObject(canvasXY: tsvector.Vector): boolean {
         // default pickObject returns true if the object is not defunct and responsive
         return this.responsive && !this.defunct;
     };
-    // default event handler
+    /** Default mouse event handler.
+     * @internal
+     * @param eventType The type of mouse event.
+     * @param canvasXY The canvas coordinates of the mouse event.
+     * @param cartesianXY The cartesian pixel coordinates of the mouse event.
+     * @param frameXY The frame model coordinates of the mouse event.
+     * @returns True if the event was handled, false otherwise.
+     */
     mouseEventHandler(eventType: string, canvasXY: tsvector.Vector, cartesianXY: tsvector.Vector, frameXY: tsvector.Vector): boolean {
         // If the object is not responsive, do nothing
         if (!this.responsive) {
@@ -110,7 +145,11 @@ export abstract class Styled {
         // If no handler or not picked, return false
         return false;   
     };
-    // set an event handler for a specific event type
+    /** Set an event handler for a specific event type
+     * @param eventType The string name of the event.
+     * @param handler The event handler function or null to remove.
+     * @returns The styled object for chaining.
+     */
     onEvent(eventType: string, handler: frame.frameEventHandler | null): Styled {
         this.watchEvent(eventType);
         // Store the handler in the map
@@ -123,7 +162,11 @@ export abstract class Styled {
         // Return the styled object for chaining
         return this;
     };
-    // set a "final" event handler which always returns true and does not recieve the this object (for external serialization))
+    /** Set a "final" event handler which always returns true and does not recieve the this object (for external serialization))
+     * @param eventType The string name of the event.
+     * @param handler The external event handler function or null to remove.
+     * @returns The styled object for chaining.
+     */
     handleEvent(eventType: string, handler: frame.externalEventHandler | null): Styled {
         // Convert the external handler to a frame event handler
         if (handler === null) {
@@ -150,40 +193,68 @@ export abstract class Styled {
         // Return the styled object for chaining
         return this;
     };
+    /** Prepare the object for redraw.
+     * @internal
+     */
     prepareForRedraw() {
         // do nothing by default
     };
+    /** Set the font for text, null means use default.
+     * @param font The font string to set.
+     * @returns The styled object for chaining.
+     */
     font(font: string | null) {
-        // set the font for text, null means use default
         this.textFont = font;
         this.requestRedraw();
         return this;
     };
+    /** Set the object to be stroked when drawn.
+     * @returns The styled object for chaining.
+     */
     stroked() {
         this.stroke = true;
         this.requestRedraw();
         return this;
     };
+    /** Set the object to be filled when drawn.
+     * @returns The styled object for chaining.
+     */
     filled() {
         this.stroke = false;
         this.requestRedraw();
         return this;
     };
+    /** Set the color for the object.
+     * @param color The color string to set.
+     * @returns The styled object for chaining.
+     */
     colored(color: string) {
         this.color = color;
         this.requestRedraw();
         return this;
     };
+    /** Set the line width for the object.
+     * @param width The line width to set.
+     * @returns The styled object for chaining.
+     */
     linedWidth(width: number) {
         this.lineWidth = width;
         this.requestRedraw();
         return this;
     };
+    /** Set the line dash pattern for the object.
+     * @param dash The line dash pattern to set, or null for solid line.
+     * @returns The styled object for chaining.
+     */
     dashed(dash: tsvector.Vector | null) {
         this.lineDash = dash;
         this.requestRedraw();
         return this;
     };
+    /** Apply the style to a canvas rendering context.
+     * @internal
+     * @param ctx The canvas rendering context to apply the style to.
+     */
     applyStyle(ctx: CanvasRenderingContext2D) {
         ctx.strokeStyle = this.color;
         ctx.fillStyle = this.color;
@@ -197,6 +268,7 @@ export abstract class Styled {
             ctx.font = this.textFont;
         } 
     };
+    /** Forget this object from the containing frame and diagram. */
     forget() {
         this.defunct = true;
         this.requestRedraw();
