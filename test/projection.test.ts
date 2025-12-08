@@ -50,6 +50,15 @@ describe('projection module', () => {
         ];
         expect(matrix).toEqual(expectedMatrix);
     });
+
+    it('should error if eye and lookAt are the same', () => {
+        const eyePoint = [0, 0, 0];
+        const lookAtPoint = [0, 0, 0];
+        //const upVector = [0, 1, 0];
+        //const test = projection.ProjectionMatrix(eyePoint, lookAtPoint)
+        expect(() => projection.ProjectionMatrix(eyePoint, lookAtPoint)).toThrow();
+    });
+
     it('should compute a projection matrix with offsets', () => {
         const eyePoint = [1, -1, 1];
         const lookAtPoint = [1, -1, 2];
