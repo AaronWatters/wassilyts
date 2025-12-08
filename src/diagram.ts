@@ -12,7 +12,13 @@ export function drawOn(container: HTMLElement, width: number, height: number): f
 /**
  * A diagram is a canvas with a frame.
  * It can be used to draw shapes, lines, and images.
- * The diagram is the main entry point for drawing.
+ * The diagram is the main entry point for drawing
+ * and managing the canvas but the user typically interacts
+ * with the diagram through its main frame or a subframe.
+ * 
+ * @param domObject The HTML container element for the diagram.
+ * @param width The width of the diagram in pixels.
+ * @param height The height of the diagram in pixels.
  */
 export class Diagram {
 
@@ -45,7 +51,7 @@ export class Diagram {
         this.canvas = document.createElement("canvas");
         this.canvas.width = width;
         this.canvas.height = height;
-        this.canvas.style.border = "1px solid black"; // Optional: Add border
+        this.canvas.style.border = "1px solid black"; // Optional: Add border (should be customizable)
         // empty the container and add the canvas
         this.container.innerHTML = "";
         this.container.appendChild(this.canvas);
@@ -55,6 +61,10 @@ export class Diagram {
         this.last_stats = this.stats;
         this.mainFrame = new frame.Frame(this, null, null);
     };
+    /** Get a styled object associated with the diagram by name.
+     * @param name The name of the styled object.
+     * @returns The styled object or null if not found.
+    */
     getStyledByName(name: string): styled.Styled | null {
         const styled = this.nameToStyled.get(name);
         if (styled === undefined) {
@@ -62,6 +72,10 @@ export class Diagram {
         }
         return styled;
     };
+    /** Add a styled object to the diagram's name registry.
+     * @param styled The styled object to add
+     * @internal
+    */
     addStyled(styled: styled.Styled) {
         const n2s = this.nameToStyled;
         // prevent name clashes
@@ -75,13 +89,20 @@ export class Diagram {
         }
         n2s.set(styled.objectName, styled);
     };
+    /** Delete a styled object from the diagram's name registry.
+     * @param styled The styled object to delete
+     * @internal
+    */
     deleteStyled(styled: styled.Styled) {
         const n2s = this.nameToStyled;
         if (n2s.has(styled.objectName)) {
             n2s.delete(styled.objectName);
         }
     };
-    /** Event handler for any mouse event */
+    /** Event handler for any mouse event 
+     * @param event The mouse event to handle.
+     * @internal
+    */
     mouseEventHandler(event: MouseEvent) {
         // Convert the mouse event to canvas coordinates
         const rect = this.canvas.getBoundingClientRect();
@@ -95,7 +116,11 @@ export class Diagram {
         // Call the frame's mouse event handler
         this.mainFrame.frameEventHandler(event, canvasXY, cartesianXY);
     };
-    /** handle an event of a given type */
+    /** handle an event of a given type 
+     * @param eventType The type of the event to watch.
+     * @returns The diagram for chaining.
+     * @internal
+    */
     watchEvent(eventType: string) {
         //cl(this, `Diagram: watching event type ${eventType}`);
         // If the event type is already watched, do nothing
@@ -116,7 +141,10 @@ export class Diagram {
         // Return the diagram for chaining
         return this;
     };
-    /** set image smoothing */
+    /** set image smoothing.
+     * @param smooth - true to enable smoothing, false to disable.
+     * @returns The diagram for chaining.
+    */
     smoothImages(smooth: boolean=true) {
         if (this.ctx === null) {
             return;
@@ -124,12 +152,19 @@ export class Diagram {
         this.ctx.imageSmoothingEnabled = smooth;
         return this;
     };
-    /** Make an image usable in a diagram by name. */
+    /** Make an image usable in a diagram by name. 
+     * @param name The name to assign to the image.
+     * @param image The HTMLImageElement to name.
+     * @returns The diagram for chaining.
+    */
     nameImage(name: string, image: HTMLImageElement) {
         this.nameToImage.set(name, image);
         return this;
     };
-    /** Get a named image from the diagram. */
+    /** Get a named image from the diagram. 
+     * @param name The name of the image.
+     * @returns The HTMLImageElement or null if not found.
+    */
     getNamedImage(name: string): HTMLImageElement | null {
         const image = this.nameToImage.get(name);
         if (image === undefined) {
@@ -137,24 +172,37 @@ export class Diagram {
         }
         return image;
     }
-    /** Make an image from a URL usable in a diagram by name. */
+    /** Make an image from a URL usable in a diagram by name. 
+     * @param name The name to assign to the image.
+     * @param url The URL of the image.
+     * @returns The diagram for chaining.
+    */
     nameImageFromURL(name: string, url: string) {
         const image = new Image();
         image.src = url;
         this.nameImage(name, image);
     };
-    /** Convert cartesian xy to canvas xy (with y inverted) */
+    /** Convert cartesian xy to canvas xy (with y inverted) 
+     * @internal
+     * @param xy The cartesian coordinates to convert.
+     * @returns The corresponding canvas coordinates.
+    */
     toCanvas(xy: tsvector.Vector): tsvector.Vector {
         const result = [xy[0], this.height - xy[1]];
         //console.log(`toCanvas: ${xy} -> ${result}`);
         return result;
     };
-    /** Convert canvas xy to cartesian xy (with y inverted) */
+    /** Convert canvas xy to cartesian xy (with y inverted) 
+     * @internal
+     * @param xy The canvas coordinates to convert.
+     * @returns The corresponding cartesian coordinates.
+    */
     toCartesian(xy: tsvector.Vector): tsvector.Vector {
         const result = [xy[0], this.height - xy[1]];
         //console.log(`toCartesian: ${xy} -> ${result}`);
         return result;
     };
+    /** Draw the diagram */
     draw() {
         this.clear();
         this.mainFrame.prepareForRedraw();
@@ -209,17 +257,28 @@ export class Diagram {
         this.last_stats = this.stats;
         this.resetStats();
     };
+    /** Reset the drawing statistics 
+     * @internal
+    */
     resetStats() {
         this.stats = new CanvasStats();
     };
-    /** record a cartesian xy point */
+    /** record a cartesian xy point 
+     * @internal
+     * @param xy The cartesian coordinates of the point.
+    */
     addPoint(xy: tsvector.Vector) {
         this.stats.addPoint(xy);
     };
     addxy(x: number, y: number) {
         this.stats.addxy(x, y);
     };
-    // get pixels from the canvas
+    /** get pixels from the canvas
+     * @param fromCanvasXY The top-left canvas coordinates of the region to get. If null, it will be [0, 0].
+     * @param toCanvasXY The bottom-right canvas coordinates of the region to get.
+     * If null, it will be [width, height].
+     * @returns The ImageData object for the region.
+     */
     getImageData(fromCanvasXY: tsvector.Vector | null, toCanvasXY: tsvector.Vector | null): ImageData {
         if (fromCanvasXY === null) {
             fromCanvasXY = [0, 0];
@@ -231,7 +290,10 @@ export class Diagram {
         const [width, height] = tsvector.vSub(toCanvasXY, fromCanvasXY);
         return this.ctx!.getImageData(x, y, width, height);
     };
-    // get the rgba values from a pixel on the canvas
+    /** Get the rgba values from a pixel on the canvas primarily for testing.
+    * @param canvasXY The canvas coordinates of the pixel.
+    * @returns The rgba values as an array of four numbers.
+    */
     getPixelData(canvasXY: tsvector.Vector): tsvector.Vector {
         const [x, y] = canvasXY;
         const toCanvasXY = tsvector.vAdd(canvasXY, [1, 1]);
@@ -239,7 +301,9 @@ export class Diagram {
         const index = 0;
         return Array.from(imageData.data.slice(index, index + 4));
     };
-    // use the stats to fit the diagram to the points
+    /** Use the draw statistics to fit the diagram to the visible points 
+    * @param border The border to add around the fitted region in cartesian coordinates.
+    */
     fit(border: number = 0) {
         if (this.stats.minxy === null || this.stats.maxxy === null) {
             this.deferred_fit_border = border;
@@ -295,6 +359,8 @@ export class Diagram {
  * It keeps track of the minimum and maximum x and y coordinates
  * that have been added to it.
  * This can be used to fit the canvas to the points added.
+ * 
+ * @internal
  */
 export class CanvasStats {
     minxy: tsvector.Vector | null;
