@@ -11,7 +11,14 @@ import * as projection from './projection';
 import * as image from './image';
 import * as textBox from './text';
 
-// Handler returns true if the event was handled completely (no propagation needed).
+/** Handler returns true if the event was handled completely (no propagation needed). 
+ * @param element The styled element that received the event, or null if none.
+ * @param eventType The type of the event (e.g., "click", "mousemove").
+ * @param canvasXY The coordinates of the event in canvas pixels.
+ * @param cartesianXY The coordinates of the event in cartesian pixels.
+ * @param frameXY The coordinates of the event in the frame's local coordinate system.
+ * @returns True if the event was handled, false otherwise.
+*/
 export type frameEventHandler = (
     element: styled.Styled | null, // element can be null in frame with no marking picked
     eventType: string,
@@ -20,7 +27,13 @@ export type frameEventHandler = (
     frameXY: tsvector.Vector,
     ) => boolean;
 
-// External handlers always handle the event and do not accept the element (for serialization).
+/** External handlers always handle the event and do not accept the element (for serialization). 
+ * @param elementName The name of the styled element that received the event, or null if none.
+ * @param eventType The type of the event (e.g., "click", "mousemove").
+ * @param canvasXY The coordinates of the event in canvas pixels.
+ * @param cartesianXY The coordinates of the event in cartesian pixels.
+ * @param frameXY The coordinates of the event in the frame's local coordinate system.
+*/
 export type externalEventHandler = (
     elementName: string | null, // element can be null in frame with no marking picked
     eventType: string,
@@ -74,9 +87,18 @@ export function applyAffine(affine: tsvector.Matrix, xy: tsvector.Vector): tsvec
 const identity = tsvector.eye(3);
 
 /**
- * A frame is a coordinate system in which markings are drawn.
+ * A frame is a coordinate system within a diagram in which markings are drawn.
  * It can be nested, with a parent frame and child frames.
  * The affine matrix defines the transformation from the parent frame to this frame.
+ * A frame is usually either the main frame for a diagram or a sub-frame derived
+ * from another frame.
+ * 
+ * @extends styled.Styled
+ * @param diagram The diagram this frame belongs to.
+ * @param affineMatrix The affine transformation matrix from parent frame to this frame.
+ * @param parent The parent frame, or null for the main frame.
+ * @param font The font to use for text in this frame (default: "12px Arial").
+ * 
  */
 export class Frame extends styled.Styled {
     diagram: diagram.Diagram;
@@ -113,11 +135,15 @@ export class Frame extends styled.Styled {
         this.responsive = true;
         this.font(font);
     };
-    /** the pixel position is the frame origin in pixel coordinates */
+    /** The pixel position is the frame origin in pixel coordinates.
+     * @return The pixel position of the frame origin.
+     */
     getPixel(): tsvector.Vector {
         return this.toPixel([0, 0]);
     };
-    /** translate the origin to a new pixel position */
+    /** translate the origin to a new pixel position.
+     * @param position The new pixel position of the frame origin.
+     */
     setPixel(position: tsvector.Vector): void {
         // convert to model coordinates
         const model = this.toModel(position);
@@ -128,7 +154,13 @@ export class Frame extends styled.Styled {
         // set the new affine matrix
         this.setAffine(newAffine);
     };
-    /** handle a mouse event */
+    /** handle a mouse event.
+     * @internal
+     * @param event The mouse event to handle.
+     * @param canvasXY The canvas coordinates of the mouse event.
+     * @param cartesianXY The cartesian pixel coordinates of the mouse event.
+     * @returns True if the event was handled, false otherwise.
+     */
     frameEventHandler(
         event: MouseEvent,
         canvasXY: tsvector.Vector,
@@ -136,7 +168,16 @@ export class Frame extends styled.Styled {
     ): boolean {
         return this.mouseEventHandler(event.type, canvasXY, cartesianXY, [0, 0]);
     };
+    /** handle a mouse event.
+     * @internal
+     * @param eventtype The type of the event (e.g., "click", "mousemove").
+     * @param canvasXY The coordinates of the event in canvas pixels.
+     * @param cartesianXY The coordinates of the event in cartesian pixels.
+     * @param frameXY0 The coordinates of the event in the frame's local coordinate system.
+     * @returns True if the event was handled, false otherwise.
+     */
     mouseEventHandler(eventtype: string, canvasXY: tsvector.Vector, cartesianXY: tsvector.Vector, frameXY0: tsvector.Vector): boolean {
+        // xxxx is this redundant with styled mouseEventHandler?
         let handled = false;
         // convert to model coordinates
         const frameXY = this.toModel(cartesianXY);
@@ -155,6 +196,11 @@ export class Frame extends styled.Styled {
         }
         return handled;
     };
+    /** Return all responsive markings that are picked by the canvas coordinates, in reverse draw order (topmost first)
+     * @internal
+    * @param canvasXY The coordinates in canvas pixels to test for picking.
+    * @returns An array of responsive styled elements that are picked, in reverse draw order (topmost first).
+    */
     pickedMarkings(canvasXY: tsvector.Vector): styled.Styled[] {
         // return all responsive markings that are picked by the canvas coordinates, in draw order
         const result: styled.Styled[] = [];
@@ -165,7 +211,10 @@ export class Frame extends styled.Styled {
         }
         return result;
     };
-    /** rename a styled element in this frame */
+    /** Rename a styled element in this frame and the containing diagram.
+     * @param element The styled element to rename.
+     * @param newName The new name for the element.
+     */
     renameElement(element: styled.Styled, newName: string) {
         const n2m = this.nameToMarking;
         // error if the name is already taken
@@ -191,7 +240,7 @@ export class Frame extends styled.Styled {
             console.warn(`Element ${oldName} not found in frame ${this.objectName}`);
         }
     };
-    /** clear all elements from frame */
+    /** Clear all elements from frame, forgetting them and removing from draw order and name map. */
     clear() {
         // for safety forget all elements
         this.nameToMarking.forEach((element) => {
@@ -201,45 +250,75 @@ export class Frame extends styled.Styled {
         this.drawOrder = [];
         this.diagram.requestRedraw();
     };
+    /** Receive canvas events of this eventType.
+     * @param eventType String name of event to recieve.
+     */
     watchEvent(eventType: string) {
         this.diagram.watchEvent(eventType);
     }
-    /** Make an image usable in a diagram by name. */
+    /** Make an image usable in a diagram by name.
+     * @param name The name to associate with the image.
+     * @param image The HTMLImageElement to name.
+     * @returns The current frame for chaining.
+     */
     nameImage(name: string, image: HTMLImageElement) {
         this.diagram.nameImage(name, image);
         return this;
     };
-    /** Make an image from a URL usable in a diagram by name. */
+    /** Make an image from a URL usable in a diagram by name.
+     * @param name The name to associate with the image.
+     * @param url The URL of the image to load and name.
+     * @returns The current frame for chaining.
+     */
     nameImageFromURL(name: string, url: string) {
         this.diagram.nameImageFromURL(name, url);
         return this;
     };
-    /** Fit visible elements into canvas */
+    /** Fit visible elements into canvas.
+     * @param border Optional border in cartesian units to leave around fitted elements.  Default is 0.
+     */
     fit(border: number = 0) {
         this.diagram.fit(border);
         this.requestRedraw();
     };
-    /** record a cartesian pixel point and convert to canvas coords */
+    /** Record a cartesian pixel point and convert to canvas coords.
+     * @internal
+     * @param xy The cartesian pixel coordinates of the point to add.
+     * @returns The canvas coordinates of the added point.
+    */
     addPixelPoint(xy: tsvector.Vector): tsvector.Vector {
         const diagram = this.diagram;
         diagram.addPoint(xy);
         return diagram.toCanvas(xy);
     };
+    /**
+     * Request a redraw of the diagram.
+     */
     requestRedraw() {
         this.diagram.requestRedraw();
     };
+    /** Pause automatic redraws of the diagram (in case of extensive updates) */
     pauseRedraw() {
         this.diagram.pauseRedraw();
     };
+    /** Resume automatic redraws of the diagram, possibly after a pause */
     resumeRedraw() {
         this.diagram.resumeRedraw();
     };
-    /** Add a model point, record its cartesian pixel coords and convert to canvas. */
+    /** Add a model point, record its cartesian pixel coords and convert to canvas.
+     * @internal
+     * @param xy The model coordinates of the point to add.
+     * @returns The canvas coordinates of the added point.
+     */
     addPoint(xy: tsvector.Vector): tsvector.Vector {
         const pixel = this.toPixel(xy);
         return this.addPixelPoint(pixel);
     };
-    /** Add a canvas pixel point, record its cartesian pixel coords and return frame model point */
+    /** Add a canvas pixel point, record its cartesian pixel coords and return frame model point.
+     * @param xy The canvas coordinates of the point to add.
+     * @return The model coordinates of the added point.
+     * @internal
+    */
     addPixel(xy: tsvector.Vector): tsvector.Vector {
         const diagram = this.diagram;
         const cartesian = diagram.toCartesian(xy);
@@ -247,6 +326,9 @@ export class Frame extends styled.Styled {
         diagram.addPoint(cartesian);
         return model;
     }
+    /** Set the affine transformation matrix from parent frame to this frame.
+     * @param affineMatrix The affine transformation matrix to set.
+     */
     setAffine(affineMatrix: tsvector.Matrix) {
         this.affine = affineMatrix;
         this.inv = tsvector.MInverse(affineMatrix);
@@ -255,6 +337,7 @@ export class Frame extends styled.Styled {
     };
     /**
      * Sync the pixel and model coordinate systems with the parent frame.
+     * @internal
      */
     prepareForRedraw() {
         this.pixelToModel = this.affine;
@@ -269,17 +352,30 @@ export class Frame extends styled.Styled {
             element.prepareForRedraw();
         });
     };
-    /** Convert from model space to cartesian pixel space */
+    /** Convert from model space to cartesian pixel space.
+     * @param xy The model coordinates to convert.
+     * @returns The cartesian pixel coordinates.
+     * @internal
+     */
     toPixel(xy: tsvector.Vector): tsvector.Vector {
         return applyAffine(this.ModelToPixel, xy);
     };
-    /** Convert from cartesian pixel space to model space */
+    /** Convert from cartesian pixel space to model space
+     * @param xy The cartesian pixel coordinates to convert.
+     * @returns The model coordinates.
+     * @internal
+     */
     toModel(xy: tsvector.Vector): tsvector.Vector {
         return applyAffine(this.pixelToModel, xy);
     };
     /** Create a frame for a subregion and record it. 
      * fromMinxy..fromMaxxy is the region in the current frame.
      * toMinxy..toMaxxy is the region in the new frame.
+     * @param fromMinxy The minimum xy coordinates in the parent frame.
+     * @param fromMaxxy The maximum xy coordinates in the parent frame.
+     * @param toMinxy The minimum xy coordinates in the new frame.
+     * @param toMaxxy The maximum xy coordinates in the new frame.
+     * @return The new frame.
     */
     regionFrame(
         fromMinxy: tsvector.Vector,
@@ -292,6 +388,12 @@ export class Frame extends styled.Styled {
         this.addElement(result);
         return result;
     };
+    /**
+     * Create a 3d frame from a projection.
+     * @internal
+     * @param project The projection for the 3d frame.
+     * @returns A new 3d frame attached to this 2d frame.
+     */
     projectionFrame(
         project: projection.Projector
     ): frame3d.Frame3d {
@@ -299,6 +401,14 @@ export class Frame extends styled.Styled {
         this.addElement(result);
         return result;
     };
+    /**
+     * Create a 3d frame attached to this 2d frame.
+     * @param eyePoint The "view origin" of the 3d projection.
+     * @param lookAtPoint The "focus" of the 3d projection view.
+     * @param perspective Whether to use perspective (true) or orthographic viewing (false)
+     * @param upVector The "up" direction of the 3d projection view. Defaults to (0, 0, 1)
+     * @returns A new 3d frame attached to this 2d frame.
+     */
     frame3d(
         eyePoint: tsvector.Vector, 
         lookAtPoint: tsvector.Vector,
@@ -308,7 +418,11 @@ export class Frame extends styled.Styled {
         const projector = new projection.Projector(eyePoint, lookAtPoint, perspective, upVector);
         return this.projectionFrame(projector);
     };
-    /** Record a marking */
+    /** Record a marking.
+     * @internal
+     * @param styled The styled marking to add.
+     * @param requestRedraw Whether to request a redraw after adding the element (default: true).   
+     */
     addElement(styled: styled.Styled, requestRedraw=true) {
         const name = styled.objectName;
         // reset the diagram stats for new element
@@ -321,7 +435,9 @@ export class Frame extends styled.Styled {
             this.requestRedraw();
         }
     };
-    /** iterate over all markings to draw. */
+    /** iterate over all markings to draw.
+     * @internal
+     */
     draw() {
         //this.prepareForRedraw(); // xxx redundant?
         // check for defunct markings
@@ -354,24 +470,45 @@ export class Frame extends styled.Styled {
             this.drawOrder = newOrder;
         }
     };
-    /** line between two end points. */
+    /** line between two end points.
+     * @param start The starting point of the line in model coordinates.
+     * @param end The ending point of the line in model coordinates.
+     * @returns The created line marking.   
+     */
     line(start: tsvector.Vector, end: tsvector.Vector): line.Line {
         const result = new line.Line(this, start, end);
         this.addElement(result);
         return result;
     };
-    /** A dot is a circle with an unscaled radius. */
+    /** A dot is a circle with an unscaled radius.
+     * @param center The center of the dot in model coordinates.
+     * @param radius The radius of the dot in model units.
+     * @param scaled Whether the radius is scaled (default: false).
+     * @returns The created circle marking.
+    */
     dot(center: tsvector.Vector, radius: number, scaled=false): circle.Circle {
         const result = new circle.Circle(this, center, radius, scaled);
         //result.draw();
         this.addElement(result);
         return result;
     };
-    /** A circle is a circle with a scaled radius. */
+    /** A circle is a circle with a scaled radius.
+     * @param center The center of the circle in model coordinates.
+     * @param radius The radius of the circle in model units.
+     * @param scaled Whether the radius is scaled (default: true).
+     * @returns The created circle marking.
+    */
     circle(center: tsvector.Vector, radius: number, scaled=true): circle.Circle {
         return this.dot(center, radius, scaled);
     };
-    /** Place a named image */
+    /** Place a named image.
+     * @param point The location of the image in model coordinates.
+     * @param name The name of the image to place.
+     * @param size The size of the image in model units or pixels if not scaled(default: null for natural size).
+     * @param offset The offset of the image from the point in model units (default: [0,0]).
+     * @param scaled Whether the size is scaled (default: false).
+     * @returns The created image marking.
+    */
     namedImage(
         point: tsvector.Vector,
         name: string,
@@ -387,7 +524,13 @@ export class Frame extends styled.Styled {
         this.addElement(result);
         return result;
     };
-    /** A rectangle marking. */
+    /** A rectangle marking.
+     * @param point The location of the rectangle in model coordinates.
+     * @param size The size of the rectangle in model units (or pixels if not scaled).
+     * @param offset The offset of the rectangle from the point in model units (default: [0,0]).
+     * @param scaled Whether the size is scaled (default: true).
+     * @returns The created rectangle marking.
+    */
     rect(
         point: tsvector.Vector,
         size: tsvector.Vector,
@@ -410,7 +553,13 @@ export class Frame extends styled.Styled {
         this.addElement(result);
         return result;
     };
-    /** A box is an unscaled rectangle. */
+    /** A box is an unscaled rectangle.
+     * @param point The location of the box in model coordinates.
+     * @param size The size of the box in pixels.
+     * @param offset The offset of the box from the point in pixels (default: [0,0]).
+     * @param scaled Whether the size is scaled (default: false).
+     * @returns The created rectangle marking.
+     */
     box(
         point: tsvector.Vector,
         size: tsvector.Vector,
@@ -419,7 +568,13 @@ export class Frame extends styled.Styled {
     ): rect.Rectangle {
         return this.rect(point, size, offset, scaled);
     };
-    /** A square is a centered unscaled rectangle with equal sides */
+    /** A square is a centered unscaled rectangle with equal sides.
+     * @param point The location of the square in model coordinates.
+     * @param size The size of the square sides in pixels.
+     * @param offset The offset of the square from the point in pixels (default: null for centered).
+     * @param scaled Whether the size is scaled (default: false).
+     * @returns The created rectangle marking.
+     */
     square(
         point: tsvector.Vector,
         size: number,
@@ -430,14 +585,20 @@ export class Frame extends styled.Styled {
         this.addElement(result);
         return result;
     };
-    /** a polyline is a poly that is stroked and not closed */
+    /** a polyline is a poly that is stroked and not closed,
+     * @param points The points of the polyline in model coordinates.
+     * @returns The created polyline marking.
+     */
     polyline(points: tsvector.Vector[]): poly.Poly {
         const result = new poly.Poly(this, points);
         result.closed(false).stroked();
         this.addElement(result);
         return result;
     };
-    /** a polygon is a poly that is filled and closed */
+    /** a polygon is a poly that is filled and closed,
+     * @param points The points of the polygon in model coordinates.
+     * @returns The created polygon marking.
+     */
     polygon(points: tsvector.Vector[]): poly.Poly {
         const result = new poly.Poly(this, points);
         result.closed().filled();
