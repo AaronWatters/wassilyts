@@ -17,6 +17,9 @@ export abstract class Marking extends styled.Styled {
      * 
      * Note: This method should not rely on context coordinate transform changes
      * so that the paths can be combined and tested for pixel hits.
+     * 
+     * @returns {Path2D} The Path2D object representing the marking.
+     * @internal
      */
     abstract drawPath(): Path2D;
     // default draw method
