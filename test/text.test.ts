@@ -20,5 +20,18 @@ describe('text marking', () => {
         //expect(diag.stats.minxy).toEqual([10, 20]); // xxxx this is failing because of text size
         expect(diag.stats.maxxy![0]).toBeGreaterThan(10);
         expect(diag.stats.maxxy![1]).toBeGreaterThan(20);
+        // exercise setters
+        text.setFramePoint([30, 40]);
+        expect(text.getFramePoint()).toEqual([30, 40]);
+        text.setText("Goodbye!");
+        expect(text.text).toEqual("Goodbye!");  
+        text.setShift([5, 5]);
+        expect(text.shift).toEqual([5, 5]);
+        text.aligned("center");
+        expect(text.alignment).toEqual("center");
+        text.valigned("middle");
+        expect(text.valignment).toEqual("middle");
+        text.boxed("yellow");
+        expect(text.background).toEqual("yellow");
     });
 });
