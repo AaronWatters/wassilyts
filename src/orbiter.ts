@@ -59,7 +59,7 @@ export class Orbiter {
         // save the startXY and originalMatrix
         this.startXY = frameXY;
         this.projection = this.frame3d.projection;
-        console.log("Pointer down at:", this.startXY, "Original Matrix:", this.projection.projectionMatrix);
+        //console.log("Pointer down at:", this.startXY, "Original Matrix:", this.projection.projectionMatrix);
         // return true to indicate the event was handled
         return true;
     };
@@ -92,7 +92,7 @@ export class Orbiter {
     {
         // do a final move
         this.pointerMoveHandler(element, eventType, canvasXY, cartesianXY, frameXY);
-        console.log("Pointer up at:", frameXY, "Final Matrix:", this.projection.projectionMatrix);
+        //console.log("Pointer up at:", frameXY, "Final Matrix:", this.projection.projectionMatrix);
         // reset the start and end points
         this.startXY = null;
         this.endXY = null;
