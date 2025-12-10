@@ -288,7 +288,8 @@ export class Frame extends styled.Styled {
     */
     addPixelPoint(xy: tsvector.Vector): tsvector.Vector {
         const diagram = this.diagram;
-        diagram.addPoint(xy);
+        const [x, y] = xy;
+        diagram.addxy(x, y);
         return diagram.toCanvas(xy);
     };
     /**
