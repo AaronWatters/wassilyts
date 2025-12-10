@@ -1,5 +1,13 @@
 import { vi } from "vitest";
 
+const fakeMeasureText = {
+  width: 100,
+  actualBoundingBoxAscent: 80,
+  actualBoundingBoxDescent: 10,
+  actualBoundingBoxLeft: 5,
+  actualBoundingBoxRight: 100,
+};
+
 global.HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   fillRect: vi.fn(),
   clearRect: vi.fn(),
@@ -19,6 +27,7 @@ global.HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   arc: vi.fn(),
   fillText: vi.fn(),
   strokeText: vi.fn(),
+  measureText: vi.fn(() => (fakeMeasureText)),
 }) as unknown as CanvasRenderingContext2D);
 
 
