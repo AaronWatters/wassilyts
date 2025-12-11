@@ -6,7 +6,10 @@ import * as rect from './rect';
 import ts from 'typescript';
 import * as conveniences from './conveniences';
 
-// A simple unrotated text box with optional offset and background.
+/**
+ * A text box marking.
+ * Can be rotated, aligned, and optionally have a background box.
+ */
 export class TextBox extends rect.Rectangle {
     text: string;
     background: string | null;

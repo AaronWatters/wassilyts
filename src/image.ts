@@ -5,8 +5,10 @@ import * as frame from './frame';
 import * as rect from './rect';
 import * as conveniences from './conveniences';
 
-// A simple unrotated rectangle with optional offset.
-// Always draws the whole image, scaling to fit the rectangle.
+/**
+ * An image marking.
+ * Can be rotated, scaled or unscaled.
+ */
 export class Image extends rect.Rectangle {
     source: HTMLImageElement;
     awaitingLoad: boolean = false;

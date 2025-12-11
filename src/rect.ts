@@ -4,7 +4,10 @@ import * as frame from './frame';
 import * as marking from './marking';
 import * as conveniences from './conveniences';
 
-// A simple unrotated rectangle with optional offset.
+/**
+ * A simple rectangle marking.
+ * Can be rotated, scaled or unscaled.
+ */
 export class Rectangle extends marking.Marking {
     point: tsvector.Vector;
     size: tsvector.Vector | null;
@@ -103,8 +106,8 @@ export class Rectangle extends marking.Marking {
         // get the point of the rectangle in canvas coordinates
         const pixelPoint = frame.toPixel(this.point);
         const canvasPoint = frame.diagram.toCanvas(pixelPoint);
-        console.log("Pixel point: ", canvasPoint, "from frame point: ", this.point);
-        console.log("start and size: ", pixelStart, pixelSize);
+        //console.log("Pixel point: ", canvasPoint, "from frame point: ", this.point);
+        //console.log("start and size: ", pixelStart, pixelSize);
         const [sx, sy] = pixelSize;
         // get the four corners of the rectangle in pixel coordinates
         const rotation = new conveniences.Rotation2d(-this.rotationDegrees, canvasPoint);
