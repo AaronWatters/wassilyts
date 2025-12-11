@@ -4,6 +4,7 @@ import * as frame from './frame';
 //import * as marking from './marking';
 import * as rect from './rect';
 import ts from 'typescript';
+import * as conveniences from './conveniences';
 
 // A simple unrotated text box with optional offset and background.
 export class TextBox extends rect.Rectangle {
@@ -69,7 +70,8 @@ export class TextBox extends rect.Rectangle {
         if (!this.isLive()) {
             return;
         }
-        const ctx = this.onFrame!.diagram.ctx!;
+        const frame = this.onFrame!;
+        const ctx = frame.diagram.ctx!;
         const prep = this.prepare();
         // for stats, always compute the background path
         const bgPath = this.drawPath();
@@ -91,6 +93,9 @@ export class TextBox extends rect.Rectangle {
         const pixelPos = this.onFrame!.toPixel(shiftedPoint);
         const canvasPos = this.onFrame!.diagram.toCanvas(pixelPos);
         const [x, y] = canvasPos;
+        // apply the rotation to the context
+        const rotation = new conveniences.Rotation2d(-this.rotationDegrees, canvasPos);
+        rotation.applyToCanvas(ctx);
         // draw the text at the position
         ctx.fillStyle = this.color;
         ctx.fillText(this.text, x, y);

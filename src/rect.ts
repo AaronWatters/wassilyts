@@ -2,6 +2,7 @@ import * as tsvector from 'tsvector';
 //import * as diagram from './diagram';
 import * as frame from './frame';
 import * as marking from './marking';
+import * as conveniences from './conveniences';
 
 // A simple unrotated rectangle with optional offset.
 export class Rectangle extends marking.Marking {
@@ -9,18 +10,27 @@ export class Rectangle extends marking.Marking {
     size: tsvector.Vector | null;
     offset: tsvector.Vector;
     scaled: boolean;
+    rotationDegrees: number = 0;
     constructor(
         frame: frame.Frame, 
         point: tsvector.Vector, 
         size: tsvector.Vector | null = null,
         offset: tsvector.Vector = [0, 0],
-        scaled: boolean = true
+        scaled: boolean = true,
+        rotationDegrees: number = 0,
     ) {
         super(frame);
         this.point = point;
         this.size = size;
         this.offset = offset;
         this.scaled = scaled;
+        this.rotationDegrees = rotationDegrees;
+    };
+    degrees(rotationDegrees: number): Rectangle {
+        // set the rotation of the rectangle in degrees
+        this.rotationDegrees = rotationDegrees;
+        this.requestRedraw();
+        return this;
     };
     resize(size: tsvector.Vector): Rectangle {
         // set the size of the rectangle
@@ -54,6 +64,7 @@ export class Rectangle extends marking.Marking {
         // get the point of the rectangle in frame coordinates
         return this.point;
     };
+    /* unrotated rectangle path
     drawPath(): Path2D {
         if (!this.isLive()) {
             throw new Error("Rectangle is not attached to a frame.");
@@ -76,6 +87,53 @@ export class Rectangle extends marking.Marking {
         frame.addPixelPoint(tsvector.vAdd(pixelStart, [sx, 0]));
         frame.addPixelPoint(tsvector.vAdd(pixelStart, [0, sy]));
         frame.addPixelPoint(tsvector.vAdd(pixelStart, pixelSize));
+        return path;
+    };
+    */
+    // rotated rectangle path
+    drawPath(): Path2D {
+        if (!this.isLive()) {
+            throw new Error("Rectangle is not attached to a frame.");
+        }
+        const frame = this.onFrame!;
+        const path = new Path2D();
+        let pixelStart: tsvector.Vector;
+        let pixelSize: tsvector.Vector;
+        ({pixelStart, pixelSize} = this.getPixelStartAndSize());
+        // get the point of the rectangle in canvas coordinates
+        const pixelPoint = frame.toPixel(this.point);
+        const canvasPoint = frame.diagram.toCanvas(pixelPoint);
+        console.log("Pixel point: ", canvasPoint, "from frame point: ", this.point);
+        console.log("start and size: ", pixelStart, pixelSize);
+        const [sx, sy] = pixelSize;
+        // get the four corners of the rectangle in pixel coordinates
+        const rotation = new conveniences.Rotation2d(-this.rotationDegrees, canvasPoint);
+        const canvasStart = frame.diagram.toCanvas(pixelStart);
+        //console.log("Canvas start: ", canvasStart, "from pixel start: ", pixelStart);
+        const unrotatedCorners: tsvector.Vector[] = [
+            canvasStart,
+            tsvector.vAdd(canvasStart, [sx, 0]),
+            tsvector.vAdd(canvasStart, [sx, -sy]),
+            tsvector.vAdd(canvasStart, [0, -sy]),
+        ];
+        //console.log("Unrotated rectangle corners: ", unrotatedCorners);
+        const rotatedCorners: tsvector.Vector[] = unrotatedCorners.map((pix) => {
+            return rotation.transformPoint(pix);
+        });
+        // move to first corner
+        const [fx, fy] = rotatedCorners[0];
+        path.moveTo(fx, fy);
+        //console.log("Rotated rectangle corners: ", rotatedCorners);
+        // line to remaining corners
+        rotatedCorners.slice(1).forEach((corner) => {
+            const [x, y] = corner;
+            path.lineTo(x, y);
+        });
+        path.closePath();
+        // add reference points to diagram
+        rotatedCorners.forEach((corner) => {
+            frame.addPixelPoint(frame.diagram.toCartesian(corner));
+        });
         return path;
     };
     getPixelStartAndSize(): {pixelStart: tsvector.Vector, pixelSize: tsvector.Vector} {
@@ -106,8 +164,8 @@ export class Rectangle extends marking.Marking {
             upperLeftCartesian = tsvector.vAdd(lowerLeftCartesian, size);
         }
         // record the pixel points in the diagram (for fitting purposes)
-        frame.addPixelPoint(lowerLeftCartesian);
-        frame.addPixelPoint(upperLeftCartesian);
+        //frame.addPixelPoint(lowerLeftCartesian);
+        //frame.addPixelPoint(upperLeftCartesian);
         let [llx, lly] = lowerLeftCartesian;
         let [ulx, uly] = upperLeftCartesian;
         pixelStart = [Math.min(llx, ulx), Math.min(lly, uly)];

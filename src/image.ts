@@ -3,6 +3,7 @@ import * as tsvector from 'tsvector';
 import * as frame from './frame';
 //import * as marking from './marking';
 import * as rect from './rect';
+import * as conveniences from './conveniences';
 
 // A simple unrotated rectangle with optional offset.
 // Always draws the whole image, scaling to fit the rectangle.
@@ -65,9 +66,17 @@ export class Image extends rect.Rectangle {
             this.awaitingLoad = true;
             return; // image not loaded yet
         }
+        // for stats, always compute the background path
+        const bgPath = this.drawPath();
         const prep = this.prepare();
         const frame = this.onFrame!;
         const ctx = frame.diagram.ctx!;
+        const pixelPoint = frame.toPixel(this.point);
+        const canvasPoint = frame.diagram.toCanvas(pixelPoint);
+        const rotation = new conveniences.Rotation2d(-this.rotationDegrees, canvasPoint);
+        //console.log(`drawing image at ${this.point} with rotation ${this.rotationDegrees} degrees`);
+        //console.log('rotation', rotation);
+        rotation.applyToCanvas(ctx);
         // get the rectangle pixel coordinates
         let pixelStart: tsvector.Vector;
         let pixelSize: tsvector.Vector;
