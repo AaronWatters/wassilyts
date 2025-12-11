@@ -154,3 +154,53 @@ export function cube(
         eye, lookAt, perspective, up);
     return cubeFrame;
 };
+
+export class Rotation2d {
+    degrees: number;
+    about: tsvector.Vector;
+    matrix: tsvector.Matrix;
+    constructor(degrees: number, about: tsvector.Vector = [0, 0]) {
+        this.degrees = degrees;
+        this.about = about;
+        // generate the affine 2d rotation matrix
+        const tx = this.about[0];
+        const ty = this.about[1];
+        const radians = (degrees * Math.PI) / 180.0;
+        const cosTheta = Math.cos(radians);
+        const sinTheta = Math.sin(radians);
+        const affineShiftMatrix = [
+            [1, 0, -tx],
+            [0, 1, -ty],
+            [0, 0, 1]
+        ];
+        const rotationMatrix = [
+            [cosTheta, -sinTheta, 0],
+            [sinTheta, cosTheta, 0],
+            [0, 0, 1]
+        ];
+        const affineUnshiftMatrix = [
+            [1, 0, tx],
+            [0, 1, ty],
+            [0, 0, 1]
+        ];
+        let tempMatrix = tsvector.MMProduct(rotationMatrix, affineShiftMatrix);
+        this.matrix = tsvector.MMProduct(affineUnshiftMatrix, tempMatrix); 
+    };
+    transformPoint(xy: tsvector.Vector): tsvector.Vector {
+        if (xy.length !== 2) {
+            throw new Error('Point must be a 2D vector.');
+        }
+        const pointHomogeneous = [xy[0], xy[1], 1];
+        const transformedHomogeneous = tsvector.MvProduct(this.matrix, pointHomogeneous);
+        return [transformedHomogeneous[0], transformedHomogeneous[1]];
+    };
+    applyToCanvas(ctx: CanvasRenderingContext2D): void {
+        const m = this.matrix;
+        const [a, c, e] = m[0];
+        const [b, d, f] = m[1];
+        // setTransform(a, c, b, d, e, f)
+        ctx.transform(
+            a, b, c, d, e, f, 
+        );
+    };
+};
