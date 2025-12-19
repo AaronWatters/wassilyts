@@ -1,3 +1,4 @@
+import { transform } from "typescript";
 import { vi } from "vitest";
 
 const fakeMeasureText = {
@@ -28,6 +29,7 @@ global.HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   fillText: vi.fn(),
   strokeText: vi.fn(),
   measureText: vi.fn(() => (fakeMeasureText)),
+  transform: vi.fn(),
 }) as unknown as CanvasRenderingContext2D);
 
 
