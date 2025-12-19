@@ -4,6 +4,7 @@ import {
   diagram,
   conveniences,
 } from '../src/index';
+import ts from 'typescript';
 
 describe('convenience functions', () => {
 
@@ -116,6 +117,32 @@ describe('convenience functions', () => {
         expect(diag).toBeInstanceOf(diagram.Diagram);
         expect(diag.width).toEqual(pixelWidth);
         expect(diag.height).toEqual(pixelWidth);
+    });
+    it('should rotate points', () => {
+        const R = new conveniences.Rotation2d(90, [3, 4])
+        const start = [2, 4];
+        const startT = R.transformPoint(start);
+        const end = [3, 3];
+        function close2d(a: tsvector.Vector, b: tsvector.Vector, tol: number=1e-6): boolean {
+            expect(a.length).toEqual(2);
+            expect(b.length).toEqual(2);
+            const [x1, y1] = a;
+            const [x2, y2] = b;
+            expect(x1).toBeCloseTo(x2, 6);
+            expect(y1).toBeCloseTo(y2, 6);
+            return true;
+        };
+        close2d(startT, end);
+        const endT = R.transformPoint(end);
+        close2d(endT, [4,4]);
+        // smoke test for canvas transform
+        const container = document.createElement('div');
+        const pixelWidth = 100;
+        const modelWidth = 10;
+        const frame = conveniences.swatch(container, pixelWidth, modelWidth);
+        const ctx = frame.diagram.ctx;
+        //const R = new conveniences.Rotation2d(45);
+        R.applyToCanvas(ctx!);
     });
 
 });
