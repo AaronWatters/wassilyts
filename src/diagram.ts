@@ -384,5 +384,17 @@ export class CanvasStats {
             this.minxy = tsvector.vMin(this.minxy, point);
             this.maxxy = tsvector.vMax(this.maxxy!, point);
         }
-    }
+    };
+    overlaps(other: CanvasStats) {
+        if (this.minxy === null || this.maxxy === null) {
+            return false;
+        }
+        if (other.minxy === null || other.maxxy === null) {
+            return false;
+        }
+        const overlapMax = tsvector.vMin(this.maxxy, other.maxxy!);
+        const overlapMin = tsvector.vMax(this.minxy, other.minxy!);
+        const diff = tsvector.vSub(overlapMax, overlapMin);
+        return Math.min(...diff) > 0;
+    };
 }
