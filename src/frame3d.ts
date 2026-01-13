@@ -12,6 +12,8 @@ import * as marking from './marking';
 import * as line3d from './line3d';
 import * as poly3d from './poly3d';
 import * as circle3d from './circle3d';
+import * as rect3d from './rect3d';
+import { rect } from ".";
 
 export class Frame3d extends styled.Styled {
     projection: projection.Projector;
@@ -118,5 +120,19 @@ export class Frame3d extends styled.Styled {
         this.nameToMarking3d.set(circle.objectName, circle);
         return circle;
     }
+
+    rect(
+        point: tsvector.Vector,
+        size: tsvector.Vector,
+        offset: tsvector.Vector = [0, 0],
+        scaled: boolean = true,
+        rotationDegrees: number = 0,
+    ): rect3d.Rect3d {
+        // create a 3D rectangle marking
+        const rectangle = new rect3d.Rect3d(point, size, offset, this, scaled, rotationDegrees);
+        this.nameToMarking3d.set(rectangle.objectName, rectangle);
+        return rectangle;
+    };
+    
 };
 
