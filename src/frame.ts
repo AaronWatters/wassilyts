@@ -530,15 +530,17 @@ export class Frame extends styled.Styled {
      * @param size The size of the rectangle in model units (or pixels if not scaled).
      * @param offset The offset of the rectangle from the point in model units (default: [0,0]).
      * @param scaled Whether the size is scaled (default: true).
+     * @param rotationDegrees The rotation of the rectangle in degrees (default: 0).
      * @returns The created rectangle marking.
     */
     rect(
         point: tsvector.Vector,
         size: tsvector.Vector,
         offset: tsvector.Vector = [0, 0],
-        scaled: boolean = true
+        scaled: boolean = true,
+        rotationDegrees: number = 0,
     ): rect.Rectangle {
-        const result = new rect.Rectangle(this, point, size, offset, scaled);
+        const result = new rect.Rectangle(this, point, size, offset, scaled, rotationDegrees);
         this.addElement(result);
         return result;
     };
