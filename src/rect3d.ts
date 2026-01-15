@@ -1,9 +1,7 @@
 import * as marking3d from './marking3d';
 import * as frame3d from './frame3d';
 import * as marking from './marking';
-//import * as line from './line';
 import * as tsvector from "tsvector";
-import ts from 'typescript';
 
 export class Rect3d extends marking3d.Marking3d {
 
@@ -15,7 +13,7 @@ export class Rect3d extends marking3d.Marking3d {
 
     constructor(
         point: tsvector.Vector,
-        size: tsvector.Vector,
+        size: tsvector.Vector | null = null,
         offset: tsvector.Vector = [0, 0],
         onFrame3d: frame3d.Frame3d,
         scaled: boolean = true,
@@ -30,7 +28,14 @@ export class Rect3d extends marking3d.Marking3d {
     };
     
     projectTo2D(): marking.Marking {
-        if (this.size === null) {
+        const { point2d, size, offset } = this.geometry2d();
+        const rect2d = this.onFrame!.rect(point2d, size, offset, this.scaled, this.rotationDegrees);
+        rect2d.styleLike(this);
+        return rect2d;
+    };
+
+    geometry2d(): { point2d: tsvector.Vector; size: tsvector.Vector; offset: tsvector.Vector } {
+        if (this.scaled && (this.size === null)) {
             throw new Error("Rect3d size is null, cannot project to 2D.");
         }
         // xxx fragment cut/paste from circle3d
@@ -46,10 +51,8 @@ export class Rect3d extends marking3d.Marking3d {
             size = tsvector.vScale(scale, size);
             offset = tsvector.vScale(scale, offset);
         }
-        const rect2d = this.onFrame!.rect(point2d, size, offset, this.scaled, this.rotationDegrees);
-        rect2d.styleLike(this);
-        return rect2d;
-    };
+        return { point2d: point2d, size: size, offset: offset };
+    }
 
     // xxx this should use mixin like tricks...
     degrees(rotationDegrees: number): Rect3d {

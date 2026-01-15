@@ -13,6 +13,7 @@ import * as line3d from './line3d';
 import * as poly3d from './poly3d';
 import * as circle3d from './circle3d';
 import * as rect3d from './rect3d';
+import * as image3d from './image3d';
 import { rect } from ".";
 
 export class Frame3d extends styled.Styled {
@@ -99,6 +100,27 @@ export class Frame3d extends styled.Styled {
         // set the pixel position of the frame in the diagram
         this.onFrame.setPixel(position);
     };
+    
+    nameImage(name: string, image: HTMLImageElement) {
+        this.onFrame.nameImage(name, image);
+        return this;
+    };
+
+    nameImageFromURL(name: string, url: string) {
+        this.onFrame.nameImageFromURL(name, url);
+        return this;
+    };
+
+    namedImage(
+        point: tsvector.Vector, 
+        imagename: string, 
+        size: tsvector.Vector | null = null, 
+        offset: tsvector.Vector = [0, 0], 
+        scaled: boolean = false): image3d.Image3d {
+        const image = new image3d.Image3d(imagename, point, size, offset, this, scaled);
+        this.nameToMarking3d.set(image.objectName, image);
+        return image;
+    };
 
     line(start: tsvector.Vector, end: tsvector.Vector): line3d.Line3d {
         // create a 3D line marking
@@ -133,6 +155,6 @@ export class Frame3d extends styled.Styled {
         this.nameToMarking3d.set(rectangle.objectName, rectangle);
         return rectangle;
     };
-    
+
 };
 
