@@ -48,10 +48,10 @@ export class Rect3d extends marking3d.Marking3d {
         if (this.scaled) {
             // Adjust size and offset based on distance from camera
             const scale = this.onFrame3d.projection.distanceScale(this.point);
-            size = tsvector.vScale(scale, size);
+            size = tsvector.vScale(scale, size!);
             offset = tsvector.vScale(scale, offset);
         }
-        return { point2d: point2d, size: size, offset: offset };
+        return { point2d: point2d, size: size!, offset: offset };
     }
 
     // xxx this should use mixin like tricks...
