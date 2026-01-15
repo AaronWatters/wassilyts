@@ -14,6 +14,12 @@ export class Poly3d extends marking3d.Marking3d {
         this.points = points;
     };
 
+    closed(value: boolean = true): Poly3d {
+        this.close = value;
+        this.requestRedraw();
+        return this;
+    };
+
     projectTo2D(): marking.Marking {
         // Project the 3D points to 2D using the projection matrix
         const projectedPoints = this.points.map(point => this.onFrame3d.projection.project(point));
