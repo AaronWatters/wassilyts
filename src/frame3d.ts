@@ -16,6 +16,13 @@ import * as rect3d from './rect3d';
 import * as image3d from './image3d';
 import * as text3d from './text3d';
 
+
+/**
+ * 3D Frame which projects to a 2D Frame.
+ * Markings added to this frame are 3D markings
+ * which are projected to 2D for drawing, sorted by depth (approximate)
+ * so that near objects are drawn over far objects.
+ */
 export class Frame3d extends styled.Styled {
     projection: projection.Projector;
     //fromFrame: frame.Frame;
@@ -38,6 +45,10 @@ export class Frame3d extends styled.Styled {
         this.onFrame.requestRedraw();
     };
 
+    /**
+     * Set up an orbiter to control this frame to allow interactive rotation via mouse dragging.
+     * @returns orbiter.Orbiter
+     */
     orbit(): orbiter.Orbiter {
         // create an orbiter for this frame
         if (this.orbiter === null) {
@@ -46,6 +57,9 @@ export class Frame3d extends styled.Styled {
         return this.orbiter;
     };
 
+    /**
+     * Clear all 3D markings from this frame.
+     */
     clear(): void {
         // for safety forget all 3D markings
         this.nameToMarking3d.forEach((element) => {
@@ -57,6 +71,10 @@ export class Frame3d extends styled.Styled {
         this.onFrame.clear();
     };
 
+    /**
+     * Prepare the 3D frame for redraw by projecting all 3D markings to 2D and drawing them in depth order.
+     * @internal
+     */
     prepareForRedraw(): void {
         // draw the 3D markings onto the onFrame
         this.onFrame.clear();
@@ -77,6 +95,10 @@ export class Frame3d extends styled.Styled {
         this.onFrame.prepareForRedraw();
     };
 
+    /**
+     * Fit the frame to enclose all 3D markings.
+     * @param border Number of pixels of border to leave around the fitted markings.
+     */
     fit(border: number = 0): void {
         // fit the frame to the 3D markings
         if (this.nameToMarking3d.size === 0) {
@@ -87,30 +109,63 @@ export class Frame3d extends styled.Styled {
         this.onFrame.fit(border);
     };
 
+    /**
+     * Draw the frame by drawing the onFrame.
+     * @internal
+     */
     draw() {
         this.onFrame.draw();
     };
 
+    /**
+     * Return the pixel position of the frame in the diagram.
+     * @returns [number, number] pixel position
+     */
     getPixel(): tsvector.Vector {
         // return the pixel position of the frame in the diagram
         return this.onFrame.getPixel();
     };
 
+    /**
+     * set the pixel position of the frame in the diagram.  
+     * @param position 
+     */
     setPixel(position: tsvector.Vector): void {
         // set the pixel position of the frame in the diagram
         this.onFrame.setPixel(position);
     };
     
+    /**
+     * Register an image with a name in the frame's image cache.
+     * @param name 
+     * @param image 
+     * @returns frame3d.Frame3d for chaining
+     */
     nameImage(name: string, image: HTMLImageElement) {
         this.onFrame.nameImage(name, image);
         return this;
     };
 
+    /**
+     * Register an image from a URL with a name in the frame's image cache.
+     * @param name 
+     * @param url 
+     * @returns frame3d.Frame3d for chaining
+     */
     nameImageFromURL(name: string, url: string) {
         this.onFrame.nameImageFromURL(name, url);
         return this;
     };
 
+    /**
+     * Position a named image in 3D space.
+     * @param point 
+     * @param imagename 
+     * @param size 
+     * @param offset 
+     * @param scaled 
+     * @returns 
+     */
     namedImage(
         point: tsvector.Vector, 
         imagename: string, 
@@ -122,6 +177,15 @@ export class Frame3d extends styled.Styled {
         return image;
     };
 
+    /**
+     * Position a text box in 3D space.
+     * @param point the position of the text box in 3D space
+     * @param text the text string
+     * @param shift 
+     * @param alignment the text alignment like "left", "center, "right"
+     * @param background background color string or null for no background
+     * @returns text3d.TextBox3d
+     */
     textBox(
         point: tsvector.Vector, 
         text: string, 
@@ -134,6 +198,12 @@ export class Frame3d extends styled.Styled {
         return textbox;
     };
 
+    /**
+     * Position a 3D line marking between two points.
+     * @param start 
+     * @param end 
+     * @returns line3d.Line3d
+     */
     line(start: tsvector.Vector, end: tsvector.Vector): line3d.Line3d {
         // create a 3D line marking
         const line = new line3d.Line3d(start, end, this);
@@ -141,6 +211,13 @@ export class Frame3d extends styled.Styled {
         return line;
     };
 
+    /**
+     * Add a polygon of polyline marking in 3D space.
+     * Use poly.closed(false) to make it a polyline.
+     * Use poly.stroked(), .filled(), .colored(), etc to style it.
+     * @param points 
+     * @returns 
+     */
     poly(points: tsvector.Vector[]): poly3d.Poly3d {
         // create a 3D poly marking
         const poly = new poly3d.Poly3d(points, this);
@@ -148,6 +225,12 @@ export class Frame3d extends styled.Styled {
         return poly;
     };
 
+    /**
+     * Add a circle marking in 3D space.
+     * @param center the center of the circle in 3D space
+     * @param radius the radius of the circle
+     * @returns circle3d.Circle3d
+     */
     circle(center: tsvector.Vector, radius: number): circle3d.Circle3d {
         // create a 3D circle marking
         const circle = new circle3d.Circle3d(center, radius, this);
@@ -155,6 +238,15 @@ export class Frame3d extends styled.Styled {
         return circle;
     }
 
+    /**
+     * Add a rectangle marking in 3D space.
+     * @param point the position of the rectangle in 3D space
+     * @param size the size of the rectangle in 3D space
+     * @param offset the offset of the rectangle in 3D space
+     * @param scaled whether to scale the rectangle
+     * @param rotationDegrees the rotation of the rectangle in degrees
+     * @returns rect3d.Rect3d
+     */
     rect(
         point: tsvector.Vector,
         size: tsvector.Vector,
