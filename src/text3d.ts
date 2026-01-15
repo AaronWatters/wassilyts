@@ -36,6 +36,7 @@ export class TextBox3d extends rect3d.Rect3d {
             this.alignment,
             this.background,
         );
+        textbox2d.degrees(this.rotationDegrees);
         textbox2d.styleLike(this);
         return textbox2d;
     };
