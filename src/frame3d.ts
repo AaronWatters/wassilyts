@@ -14,7 +14,7 @@ import * as poly3d from './poly3d';
 import * as circle3d from './circle3d';
 import * as rect3d from './rect3d';
 import * as image3d from './image3d';
-import { rect } from ".";
+import * as text3d from './text3d';
 
 export class Frame3d extends styled.Styled {
     projection: projection.Projector;
@@ -120,6 +120,18 @@ export class Frame3d extends styled.Styled {
         const image = new image3d.Image3d(imagename, point, size, offset, this, scaled);
         this.nameToMarking3d.set(image.objectName, image);
         return image;
+    };
+
+    textBox(
+        point: tsvector.Vector, 
+        text: string, 
+        shift: tsvector.Vector = [0, 0], 
+        alignment: CanvasTextAlign = "left", 
+        background: string | null = null): text3d.TextBox3d 
+    {
+        const textbox = new text3d.TextBox3d(text, point, shift, alignment, background, this);
+        this.nameToMarking3d.set(textbox.objectName, textbox);
+        return textbox;
     };
 
     line(start: tsvector.Vector, end: tsvector.Vector): line3d.Line3d {
