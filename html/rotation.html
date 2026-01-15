@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>wassilyjs Library Demo</title>
+</head>
+<body>
+<h1>rotation test page</h1>
+
+<p>Please look at the console.</p>
+
+<p>Canvas with width 500 and height 300 scaled to range (1,1)...(6,4).</p>
+
+<p>Rectangle centered at (3.5, 2.5) with width 2 and height 1 unrotated initially.</p>
+
+<p>Slider that adjusts the rotation angle of the rectangle.</p>
+
+<div id="info">info here...</div>
+
+<div id="output"></div>
+
+<input type="range" id="rotationSlider" min="-180" max="180" value="0" step="1">
+<label for="rotationSlider">Rotation Angle (degrees)</label>
+
+<script type="module">
+  import { 
+      name,
+      diagram,
+      drawOn,
+  } from '../src/index.ts';
+  console.log("Hello from wassilyjs Library!");
+  console.log("The name of the library is: " + name);
+  const output = document.getElementById('output');
+  const info = document.getElementById('info');
+  //const d = new diagram.Diagram(output, 520, 600);
+  const frame0 = drawOn(output, 500, 300);
+  debugger;
+  // make a subframe
+  const fromMin = [0,0];
+  const fromMax = [500,300];
+  const toMin = [1,1]; //fromMin;
+  const toMax = [6,4]; //fromMax;;
+  const frame1 = frame0.regionFrame(fromMin, fromMax, toMin, toMax);
+  // rotating rectangle
+  const point = [3.5, 2.5];
+  const hw = [2, 1];
+  const offset = [-1,-0.5]; //[-1, -0.5];
+  const rotatingRect = frame1.rect(point, hw, offset);
+  rotatingRect.colored('orange').
+    rename("rotating rectangle");
+  const rotatingText = frame1.textBox(point, "Rotating Rectangle");
+  rotatingText.boxed("lightgray");
+  rotatingText.
+    font("20px Arial").
+    colored("green").
+    aligned("center").
+    valigned("middle");
+  // slider to control rotation
+  const rotationSlider = document.getElementById('rotationSlider');
+  rotationSlider.addEventListener('input', (event) => {
+    const angle = parseFloat(rotationSlider.value);
+    rotatingRect.degrees(angle);
+    rotatingText.degrees(angle);
+    info.innerHTML = `Rotation angle: ${angle} degrees`;
+  });
+</script>
+</body>
+</html>

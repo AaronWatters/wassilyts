@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>wassilyjs Library Demo</title>
+</head>
+<body>
+<h1>3d stuff test page</h1>
+
+<p>Please look at the console.</p>
+
+<p>400 x 400 canvas scaled to range (-2,-2)..(2,2)</p>
+<p>3d frame with eye at (0,0,0) focus at (0,0,2)</p>
+<p>Various markings centered at (0,0,2) with side length 1</P>
+
+<div id="info">info here...</div>
+
+<!-- add two sliders with range -7..7 for eye and focus -->
+<div>
+  <label for="eyeX">Eye X:</label>
+  <input type="range" id="eyeX" name="eyeX" min="-7" max="7" value="-1" step="0.1">
+  <span id="eyeXValue">-1</span>
+</div>
+<div>
+  <label for="eyeY">Eye Y:</label>
+  <input type="range" id="eyeY" name="eyeY" min="-7" max="7" value="-1" step="0.1">
+  <span id="eyeYValue">-1</span>
+</div>
+
+<div id="output"></div>
+
+<!-- add a fit button -->
+<button id="fitButton">Fit</button>
+
+
+
+<script type="module">
+  import { 
+      name,
+      diagram,
+      drawOn,
+      tsvector,
+      cube
+  } from '../src/index.ts';
+
+  console.log("Hello from wassilyjs Library!");
+  console.log("The name of the library is: " + name);
+  const output = document.getElementById('output');
+  const info = document.getElementById('info');
+
+  const pixelWidth = 800;
+  const modelWidth = 3;
+  const modelCenter = [0, 0, 2];
+  const frame3d = cube(output, pixelWidth, modelWidth, modelCenter);
+  console.log("frame3d = ", frame3d);
+  frame3d.linedWidth(10);
+  const h = 0.7; // half side length
+  const h2 = h * 2; // full side length
+  // the vertices of the cube
+  const vertices = [
+    [-h, -h, h], [h, -h, h], [h, h, h], [-h, h, h],
+    [-h, -h, -h], [h, -h, -h], [h, h, -h], [-h, h, -h]
+  ];
+  // a selection of half transparent html5 colors using rgba
+  const colors = [
+    'rgba(255, 0, 0, 0.5)', // red
+    'rgba(0, 255, 0, 0.5)', // green
+    'rgba(0, 0, 255, 0.5)', // blue
+    //'rgba(255, 255, 0, 0.5)', // yellow
+    'rgba(255, 0, 255, 0.5)', // magenta
+    'rgba(0, 255, 255, 0.5)', // cyan
+    'rgba(128, 0, 128, 0.5)', // purple
+    'rgba(128, 128, 0, 0.5)', // olive
+    'rgba(128, 128, 128, 0.5)', // gray
+    'rgba(255, 165, 0, 0.5)', // orange
+    'rgba(255, 192, 203, 0.5)', // pink
+    'rgba(0, 128, 128, 0.5)', // teal
+    'rgba(128, 0, 0, 0.5)', // maroon
+    'rgba(0, 0, 128, 0.5)',]
+
+  let colorindex = 0;
+  function nextColor() {
+    const color = colors[colorindex];
+    colorindex = (colorindex + 1) % colors.length;
+    return color;
+  };
+
+  // draw some rectangles.
+  frame3d.rect(vertices[0], [h/2,h/2], [-h/4, -h/4]).colored(nextColor()).degrees(15);
+  frame3d.rect(vertices[3], [h/2,h/3], [-h/4, -h/4]).colored(nextColor()).degrees(30);
+  frame3d.rect(vertices[5], [h/3,h/2], [-h/4, -h/4]).colored(nextColor());
+
+  // draw the same image several times.
+  frame3d.nameImageFromURL("mandrill", "./mandrill.png");
+  frame3d.namedImage(vertices[1], "mandrill").degrees(50);
+  frame3d.namedImage(vertices[4], "mandrill").degrees(99).setScaled(true).resize([h/2, h]);
+
+  // add 2 to all the z-coordinates to move the cube up
+  for (let i = 0; i < vertices.length; i++) {
+    vertices[i][2] += 2;
+  }
+
+  // slider dom objects
+  const eyeXSlider = document.getElementById('eyeX');
+  const eyeYSlider = document.getElementById('eyeY');
+  const eyeXValue = document.getElementById('eyeXValue');
+  const eyeYValue = document.getElementById('eyeYValue');
+  // update the frame when sliders change
+  function updateFrame() {
+    const eyeX = parseFloat(eyeXSlider.value);
+    const eyeY = parseFloat(eyeYSlider.value);
+    eyeXValue.textContent = eyeX;
+    eyeYValue.textContent = eyeY;
+    const roll = tsvector.Mroll(eyeX);
+    const pitch = tsvector.Mpitch(eyeY);
+    const rotation = tsvector.MMProduct(roll, pitch);
+    const normal = tsvector.MvProduct(rotation, [0, 0, 1]);
+    const eye = tsvector.vScale(3, normal);
+    frame3d.projection.lookFrom(eye);
+    frame3d.requestRedraw();
+  };
+  // add event listeners to sliders
+  eyeXSlider.addEventListener('input', updateFrame);
+  eyeYSlider.addEventListener('input', updateFrame);
+
+  frame3d.orbit();
+
+  const border = 20;
+
+  document.getElementById('fitButton').addEventListener('click', () => {
+    frame3d.fit(border);
+  });
+</script>
+</body>
+</html>
