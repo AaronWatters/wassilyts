@@ -23,14 +23,14 @@ export class Circle3d extends marking3d.Marking3d {
         // depth as the projected z value
         this.depthValue = centerProj[2];
         // Create a 2D circle marking
-        const radius = this.radius;
+        let radius = this.radius;
         if (this.scaled) {
             // Adjust radius based on distance from camera
             const scale = this.onFrame3d.projection.distanceScale(this.center);
-            const radius = this.radius * scale;
+            radius = this.radius * scale;
         }
         //const circle2d = new circle.Circle(this.onFrame!, center2d, this.radius, this.scaled);
-        const circle2d = this.onFrame!.circle(center2d, this.radius, this.scaled);
+        const circle2d = this.onFrame!.circle(center2d, radius, this.scaled);
         circle2d.styleLike(this);
         return circle2d;
     };
