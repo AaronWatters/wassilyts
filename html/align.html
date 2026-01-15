@@ -19,8 +19,7 @@
       tsvector,
   } from '../src/index.ts';
 
-  const output = document.getElementById('output');
-  const frame = panel(output, [1,2], [4,3], 300, 100);
+  const frame = panel("output", [1,2], [4,3], 300, 100);
 
   frame.nameImageFromURL("mandrill", "./mandrill.png");
   debugger;

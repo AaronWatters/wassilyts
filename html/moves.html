@@ -94,6 +94,7 @@
   // background rectangle
   frame1.rect([1,1], [1,1]).colored('#aaa').
     onEvent("pointerdown", pointerDownHandler).
+    degrees(-15).
     rename("background rectangle");
 
   // draw a blue circle
@@ -110,16 +111,20 @@
   // draw a mandrill image
   frame1.nameImageFromURL("mandrill", "./mandrill.png");
   const imgpoint = [1.5, 1.5]
-  const imgsize = [50, 50];
+  const imgsize = [150, 150];
   const imgoffset = [-25, -25];
-  const img1 = frame1.namedImage(imgpoint, "mandrill", imgsize, imgoffset, false).
+  const img1 = frame1.namedImage(imgpoint, "mandrill", imgsize, imgoffset, false);
+  img1.degrees(100);
+  img1.
     onEvent("pointerdown", pointerDownHandler).
     rename("mandrill image");
-  const text1 = frame1.textBox([1, 1.5], "Stella!").
+  const text1 = frame1.textBox([1, 1.5], "Stella!");
+  text1.
     font("30px Comic Sans MS").
     colored("navyblue").
     onEvent("pointerdown", pointerDownHandler).
     rename("Stella text");
+  text1.degrees(30);
   //frame0.draw()
   //frame0.diagram.draw(); // get frame stats for fit below.
   console.log("frame0 = ", frame0);
@@ -127,6 +132,13 @@
   frame0.fit();
   //frame0.diagram.clear();
   //frame0.draw();
+  // append a "fit" button
+  const fitButton = document.createElement("button");
+  fitButton.innerText = "Fit to frame";
+  fitButton.onclick = () => {
+    frame0.fit();
+  };
+  document.body.appendChild(fitButton);
 </script>
 </body>
 </html>

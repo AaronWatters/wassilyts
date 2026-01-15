@@ -87,15 +87,44 @@
     return color;
   };
 
+  var trace = [];
+
   // draw some rectangles.
   frame3d.rect(vertices[0], [h/2,h/2], [-h/4, -h/4]).colored(nextColor()).degrees(15);
   frame3d.rect(vertices[3], [h/2,h/3], [-h/4, -h/4]).colored(nextColor()).degrees(30);
   frame3d.rect(vertices[5], [h/3,h/2], [-h/4, -h/4]).colored(nextColor());
 
+  trace.push(vertices[0]);
+  trace.push(vertices[3]);
+  trace.push(vertices[5]);
+
   // draw the same image several times.
   frame3d.nameImageFromURL("mandrill", "./mandrill.png");
   frame3d.namedImage(vertices[1], "mandrill").degrees(50);
-  frame3d.namedImage(vertices[4], "mandrill").degrees(99).setScaled(true).resize([h/2, h]);
+  frame3d.namedImage(vertices[4], "mandrill")
+  .degrees(77)
+  .setScaled(true)
+  .resize([h/2, h])
+  .offsetBy([-h/4, -h/2]);
+
+  trace.push(vertices[1]);
+  trace.push(vertices[4]);
+
+  // add some text
+  frame3d.textBox(vertices[2], "Hello 3D World!")
+    .degrees(25)
+    .font("20px Courier New")
+    .colored("blue")
+    .offsetBy([-h/2, 0]);
+
+  frame3d.textBox(vertices[6], "wassilyjs 3D")
+    .degrees(-30)
+    .font("18px Arial")
+    .colored("green")
+    .offsetBy([-h/2, 0]);
+
+  trace.push(vertices[2]);
+  trace.push(vertices[6]);
 
   // add 2 to all the z-coordinates to move the cube up
   for (let i = 0; i < vertices.length; i++) {
@@ -124,6 +153,8 @@
   // add event listeners to sliders
   eyeXSlider.addEventListener('input', updateFrame);
   eyeYSlider.addEventListener('input', updateFrame);
+
+  frame3d.poly(trace).colored('cornsilk').linedWidth(5).stroked().closed(false);
 
   frame3d.orbit();
 

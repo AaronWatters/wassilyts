@@ -52,6 +52,7 @@
   ];
   let lastcolor = "black";
   let counter = 0;
+  let degrees = 5;
   for (var i=0; i<alignments.length; i++) {
     for (var j=0; j<valignments.length; j++) {
       const alignment = alignments[i];
@@ -68,10 +69,12 @@
              .valigned(valignment)
              .font(font)
              .colored(color)
-             .boxed("lightgray");
+             .boxed("lightgray")
+             .degrees(degrees);
       
       const refdot = frame.dot(point, 3).colored(lastcolor);
       lastcolor = color;
+      degrees += 7;
       counter += 1;
       //break;
     }
