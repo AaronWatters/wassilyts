@@ -419,6 +419,14 @@ export class Frame extends styled.Styled {
         const projector = new projection.Projector(eyePoint, lookAtPoint, perspective, upVector);
         return this.projectionFrame(projector);
     };
+    /**
+     * Get a styled object from this diagram by name (convenience)
+     * @param name 
+     * @returns styled.Styled
+     */
+    getStyledByName(name: string): styled.Styled | null {
+        return this.diagram.getStyledByName(name);
+    };
     /** Record a marking.
      * @internal
      * @param styled The styled marking to add.
