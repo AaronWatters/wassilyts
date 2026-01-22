@@ -10,6 +10,7 @@ import * as frame3d from './frame3d';
 import * as projection from './projection';
 import * as image from './image';
 import * as textBox from './text';
+import * as assembly from './assembly';
 
 /** Handler returns true if the event was handled completely (no propagation needed). 
  * @param element The styled element that received the event, or null if none.
@@ -616,4 +617,22 @@ export class Frame extends styled.Styled {
         this.addElement(result);
         return result;
     };
+    /** A star shape.
+     * @param innerRadius The inner radius of the star.
+     * @param numPoints The number of points of the star (default: 5).
+     * @param pointFactor The factor by which the outer radius exceeds the inner radius (default: 1.4).
+     * @param degrees The rotation of the star in degrees (default: 0).
+     * @returns The created star marking.
+     */
+    star(
+        center: tsvector.Vector,
+        innerRadius: number,
+        numPoints: number = 5,
+        pointFactor: number = 2,
+        degrees: number = 0
+    ): assembly.Star {
+        const result = new assembly.Star(this, center, innerRadius, numPoints, pointFactor, degrees);
+        this.addElement(result);
+        return result;
+    }
 };
