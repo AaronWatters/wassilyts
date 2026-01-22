@@ -22,6 +22,7 @@ export abstract class Styled {
     lineDash: tsvector.Vector | null = null;
     stroke: boolean = false;
     textFont: string | null = null; // font for text, null means use default
+    lineJoin: CanvasLineJoin | null = null;
 
     defunct: boolean = false; // true if the object is no longer used
     responsive: boolean = true; // true if the object should respond to events
@@ -54,8 +55,15 @@ export abstract class Styled {
     styleLike(other: Styled) {
         this.color = other.color;
         this.lineWidth = other.lineWidth;
-        this.lineDash = other.lineDash;
-        this.textFont = other.textFont;
+        if (other.lineDash !== null) {
+            this.lineDash = other.lineDash;
+        }
+        if (other.textFont !== null) {
+            this.textFont = other.textFont;
+        }
+        if (other.lineJoin !== null) {
+            this.lineJoin = other.lineJoin;
+        }
         this.stroke = other.stroke;
         this.responsive = other.responsive;
     };
@@ -199,6 +207,11 @@ export abstract class Styled {
     prepareForRedraw() {
         // do nothing by default
     };
+    join(join: CanvasLineJoin) {
+        this.lineJoin = join;
+        this.requestRedraw();
+        return this;
+    };
     /** Set the font for text, null means use default.
      * @param font The font string to set.
      * @returns The styled object for chaining.
@@ -267,6 +280,9 @@ export abstract class Styled {
         if (this.textFont) {
             ctx.font = this.textFont;
         } 
+        if (this.lineJoin) {
+            ctx.lineJoin = this.lineJoin;
+        }
     };
     /** Forget this object from the containing frame and diagram. */
     forget() {
