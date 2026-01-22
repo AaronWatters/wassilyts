@@ -93,3 +93,65 @@ export class Star extends Assembly {
         poly.filled();
     };
 };
+
+export class Arrow extends Assembly {
+    back: tsvector.Vector;
+    tip: tsvector.Vector;
+    vector: tsvector.Vector;
+    tipDegrees: number = 20;
+    tipLength: number | null = 10;
+    tipFactor: number = 0.1; // fraction of length if tipLength is null
+    constructor(
+        onFrame: frame.Frame,
+        back: tsvector.Vector,
+        tip: tsvector.Vector,
+        tipLength: number | null = null,
+        tipDegrees: number = 20,
+        tipFactor: number = 0.1,
+    ) {
+        super(onFrame);
+        this.back = back;
+        this.tip = tip;
+        this.vector = tsvector.vSub(tip, back);
+        this.tipDegrees = tipDegrees;
+        this.tipLength = tipLength;
+        this.tipFactor = tipFactor;
+        this.setTranslation(back);
+    };
+    assemble(onFrame: frame.Frame, epsilon=10e-6): void {
+        // geometry
+        const vecLength = tsvector.vLength(this.vector);
+        let tipLength = this.tipLength;
+        if (vecLength < epsilon) {
+            return; // no mark ???
+        }
+        if (tipLength === null) {
+            tipLength = this.tipFactor * vecLength;
+        }
+        const unitVector = tsvector.vScale(1 / vecLength, this.vector);
+        const perpVector = [-unitVector[1], unitVector[0]];
+        const radians = (this.tipDegrees * Math.PI) / 180
+        const c = Math.cos(radians);
+        const s = Math.sin(radians);
+        //const tipLength = this.tipLength;
+        const orthComponent = tsvector.vScale(s * tipLength, perpVector)
+        const negComponent = tsvector.vScale(-c * tipLength, unitVector);
+        const offsetA = tsvector.vAdd(negComponent, orthComponent)
+        const tipA = tsvector.vAdd(offsetA, this.vector)
+        const offsetB = tsvector.vSub(negComponent, orthComponent)
+        const tipB = tsvector.vAdd(offsetB, this.vector)
+
+        const points = [];
+        points.push([0, 0]); // back point
+        points.push(this.vector);  // shaft end
+        // pointer...
+        points.push(tipA)
+        points.push(this.vector)
+        points.push(tipB);
+        const poly = onFrame.polygon(points);
+        poly.styleLike(this);
+        poly.stroked();
+        poly.closed(false);
+        poly.join("round")
+    }
+};

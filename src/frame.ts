@@ -634,5 +634,16 @@ export class Frame extends styled.Styled {
         const result = new assembly.Star(this, center, innerRadius, numPoints, pointFactor, degrees);
         this.addElement(result);
         return result;
-    }
+    };
+    arrow(
+        back: tsvector.Vector,
+        tip: tsvector.Vector,
+        tipDegrees: number = 30,
+        tipLength: number | null = null,
+        tipFactor: number = 0.1
+    ): assembly.Arrow {
+        const result = new assembly.Arrow(this, back, tip, tipLength, tipDegrees, tipFactor);
+        this.addElement(result);
+        return result;
+    };
 };
