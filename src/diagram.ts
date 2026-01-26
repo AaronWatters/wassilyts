@@ -175,9 +175,17 @@ export class Diagram {
     /** Make an image from a URL usable in a diagram by name. 
      * @param name The name to assign to the image.
      * @param url The URL of the image.
+     * @param replace Whether to replace an existing image with the same name (default: true).
      * @returns The diagram for chaining.
     */
-    nameImageFromURL(name: string, url: string) {
+    nameImageFromURL(name: string, url: string, replace: boolean = true) {
+        if (!replace) {
+            const existing = this.nameToImage.get(name);
+            if (existing !== undefined) {
+                // do not replace existing image
+                return this;
+            }
+        }
         const image = new Image();
         image.src = url;
         this.nameImage(name, image);

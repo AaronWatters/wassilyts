@@ -178,6 +178,25 @@ export class Frame3d extends styled.Styled {
     };
 
     /**
+     * place an image from a URL in 3D space.
+     * @param point 
+     * @param url 
+     * @param size 
+     * @param offset 
+     * @param scaled 
+     * @returns 
+     */
+    imageFromURL(
+        point: tsvector.Vector, 
+        url: string, 
+        size: tsvector.Vector | null = null, 
+        offset: tsvector.Vector = [0, 0], 
+        scaled: boolean = false): image3d.Image3d 
+    {
+        this.onFrame.diagram.nameImageFromURL(url, url, false);
+        return this.namedImage(point, url, size, offset, scaled);
+    };
+    /**
      * Position a text box in 3D space.
      * @param point the position of the text box in 3D space
      * @param text the text string

@@ -534,6 +534,25 @@ export class Frame extends styled.Styled {
         this.addElement(result);
         return result;
     };
+    /** place an image using a URL (convenience)
+     * @param point The location of the image in model coordinates.
+     * @param url The URL of the image to place.
+     * @param size The size of the image in model units or pixels if not scaled(default: null for natural size).
+     * @param offset The offset of the image from the point in model units (default: [0,0]).
+     * @param scaled Whether the size is scaled (default: false).
+     * @returns The created image marking.
+    */
+    imageFromURL(
+        point: tsvector.Vector,
+        url: string,
+        size: tsvector.Vector | null = null,
+        offset: tsvector.Vector = [0, 0],
+        scaled: boolean = false
+    ): image.Image {
+        // load the image if not already loaded, named by its URL
+        this.diagram.nameImageFromURL(url, url, false);
+        return this.namedImage(point, url, size, offset, scaled);
+    };
     /** A rectangle marking.
      * @param point The location of the rectangle in model coordinates.
      * @param size The size of the rectangle in model units (or pixels if not scaled).
