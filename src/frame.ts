@@ -242,14 +242,16 @@ export class Frame extends styled.Styled {
         }
     };
     /** Clear all elements from frame, forgetting them and removing from draw order and name map. */
-    clear() {
+    clear(redraw: boolean = true) {
         // for safety forget all elements
         this.nameToMarking.forEach((element) => {
             element.forget();
         });
         this.nameToMarking.clear();
         this.drawOrder = [];
-        this.diagram.requestRedraw();
+        if (redraw) {
+            this.requestRedraw();
+        }
     };
     /** Receive canvas events of this eventType.
      * @param eventType String name of event to recieve.
@@ -275,6 +277,34 @@ export class Frame extends styled.Styled {
         this.diagram.nameImageFromURL(name, url);
         return this;
     };
+    /** Make an image from PNG binary data usable in a diagram by name.
+     * @param name The name to associate with the image.
+     * @param pngdata The PNG binary data as a Uint8Array.
+     * @returns The current frame for chaining.
+     */
+    nameImageFromPNGData(name: string, pngdata: Uint8Array) {
+        this.diagram.nameImageFromPNGData(name, pngdata);
+        return this;
+    };
+    /** place an image using a PNG data (convenience, may leak memory if used too much)
+     * @param point The location of the image in model coordinates.
+     * @param pngdata The image data in PNG format.
+     * @param size The size of the image in model units or pixels if not scaled(default: null for natural size).
+     * @param offset The offset of the image from the point in model units (default: [0,0]).
+     * @param scaled Whether the size is scaled (default: false).
+     * @returns The created image marking.
+    */
+    pngImage(
+        point: tsvector.Vector,
+        pngdata: Uint8Array,
+        size: tsvector.Vector | null = null,
+        offset: tsvector.Vector = [0, 0],
+        scaled: boolean = false
+    ) {
+        const name = this.freshName("png");
+        this.nameImageFromPNGData(name, pngdata);
+        return this.namedImage(point, name, size, offset, scaled);
+    }
     /** Fit visible elements into canvas.
      * @param border Optional border in cartesian units to leave around fitted elements.  Default is 0.
      */
@@ -621,7 +651,8 @@ export class Frame extends styled.Styled {
      * @returns The created polyline marking.
      */
     polyline(points: tsvector.Vector[]): poly.Poly {
-        const result = new poly.Poly(this, points);
+        const result =
+         new poly.Poly(this, points);
         result.closed(false).stroked();
         this.addElement(result);
         return result;
