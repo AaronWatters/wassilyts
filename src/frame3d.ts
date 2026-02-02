@@ -35,6 +35,7 @@ export class Frame3d extends styled.Styled {
         this.projection = projection;
         /**
          * The dedicated frame for drawing the 3D projection.
+         * This must come after self in draw order for fromFrame for redraw preparation.
          */
         this.onFrame = new frame.Frame(fromFrame.diagram, null, fromFrame);
         fromFrame.addElement(this.onFrame);
@@ -77,22 +78,29 @@ export class Frame3d extends styled.Styled {
      */
     prepareForRedraw(): void {
         // draw the 3D markings onto the onFrame
-        this.onFrame.clear();
-        this.onFrame.styleLike(this);
-        // project 3d markings to 2d.
-        const depthsAndMarkings: [number, marking.Marking][] = [];
-        this.nameToMarking3d.forEach((marking3d) => {
-            const marking2d = marking3d.projectTo2D();
-            const depth = marking3d.depth();
-            depthsAndMarkings.push([depth, marking2d]);
-        });
-        // sort by depth, so that the furthest away is drawn first
-        depthsAndMarkings.sort((a, b) => b[0] - a[0]);
-        // draw the markings in order of largest depth to smallest depth
-        depthsAndMarkings.forEach(([, marking2d]) => {
-            this.onFrame.addElement(marking2d);
-        });
-        this.onFrame.prepareForRedraw();
+        // clear the onFrame without requesting redraw
+        const diagram = this.onFrame.diagram;
+        try {
+            diagram.disableRedraws();
+            this.onFrame.clear(false);
+            this.onFrame.styleLike(this);
+            // project 3d markings to 2d.
+            const depthsAndMarkings: [number, marking.Marking][] = [];
+            this.nameToMarking3d.forEach((marking3d) => {
+                const marking2d = marking3d.projectTo2D();
+                const depth = marking3d.depth();
+                depthsAndMarkings.push([depth, marking2d]);
+            });
+            // sort by depth, so that the furthest away is drawn first
+            depthsAndMarkings.sort((a, b) => b[0] - a[0]);
+            // draw the markings in order of largest depth to smallest depth
+            depthsAndMarkings.forEach(([, marking2d]) => {
+                this.onFrame.addElement(marking2d);
+            });
+            // prepare is automatic in containing frame.
+        } finally {
+            diagram.enableRedraws();
+        }   
     };
 
     /**
