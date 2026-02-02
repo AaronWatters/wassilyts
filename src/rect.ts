@@ -47,7 +47,7 @@ export class Rectangle extends marking.Marking {
         this.requestRedraw();
         return this;
     };
-    setScaled(scaled: boolean): Rectangle {
+    scaling(scaled: boolean): Rectangle {
         // set whether the rectangle is scaled or not
         this.scaled = scaled;
         this.requestRedraw();
