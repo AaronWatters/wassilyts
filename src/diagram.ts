@@ -10,6 +10,21 @@ export function drawOn(container: HTMLElement, width: number, height: number): f
 };
 
 /**
+ * Create an HTMLImageElement from PNG byte data.
+ */
+export function imageFromPNGBytes(pngBytes: Uint8Array): HTMLImageElement {
+    const copy = new Uint8Array(pngBytes); // create a copy to avoid issues with Blob
+    const blob = new Blob([copy], { type: 'image/png' });
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+    image.src = url;
+    image.onload = () => {
+        URL.revokeObjectURL(url); // Clean up the object URL after the image is loaded
+    };
+    return image;
+};
+
+/**
  * A diagram is a canvas with a frame.
  * It can be used to draw shapes, lines, and images.
  * The diagram is the main entry point for drawing
@@ -35,6 +50,7 @@ export class Diagram {
     mainFrame: frame.Frame;
     nameToImage: Map<string, HTMLImageElement>;
     redraw_requested: boolean = false;
+    disable_redraw: boolean = false;
     deferred_fit_border: number | null = null;
     autoRedraw: boolean = true;
     watchedEvents: Set<string> = new Set<string>();
@@ -190,6 +206,17 @@ export class Diagram {
         image.src = url;
         this.nameImage(name, image);
     };
+    /**
+     * Name an image from PNG binary data.
+     * @param name The name to assign to the image.
+     * @param pngdata The PNG binary data as a Uint8Array.
+     * @returns The diagram for chaining.
+     */
+    nameImageFromPNGData(name: string, pngdata: Uint8Array) {
+        const imageElement = imageFromPNGBytes(pngdata);
+        this.nameImage(name, imageElement);
+        return this;
+    };
     /** Convert cartesian xy to canvas xy (with y inverted) 
      * @internal
      * @param xy The cartesian coordinates to convert.
@@ -223,8 +250,17 @@ export class Diagram {
             this.requestRedraw()
         }
     };
+    disableRedraws() {
+        this.disable_redraw = true;
+    };
+    enableRedraws() {
+        this.disable_redraw = false;
+    };
     /** Request a redraw of the diagram */
     requestRedraw() {
+        if (this.disable_redraw) {
+            return;
+        }
         if (!this.redraw_requested) {
             this.redraw_requested = true;
             if (!this.autoRedraw) {
