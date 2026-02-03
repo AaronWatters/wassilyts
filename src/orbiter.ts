@@ -16,7 +16,10 @@ export class Orbiter {
         this.frame3d = frame3d;
         this.projection = frame3d.projection;
         this.originalProjector = frame3d.projection;
-        const onFrame = frame3d.onFrame;
+        if (this.frame3d.onFrame === null) {
+            throw new Error("frame3d.onFrame is null, cannot create Orbiter.");
+        }
+        const onFrame = frame3d.onFrame!;
         // register pointer event handlers on the onFrame
         onFrame.onEvent('pointerdown', (element, eventType, canvasXY, cartesianXY, frameXY) => {
             return this.pointerDownHandler(element, eventType, canvasXY, cartesianXY, frameXY);
