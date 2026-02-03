@@ -94,8 +94,16 @@
     const ab = tsvector.vSub(b, a);
     const ac = tsvector.vSub(c, a);
     const normal = tsvector.vCross(ab, ac);
-    const color = conveniences.rgb(normal);
-    frame.poly(points).colored(color).filled();
+    //const color = conveniences.rgb(normal);
+    //frame.poly(points).colored(color).filled();
+    //const poly = frame.poly(points).filled();
+    const poly = frame.polygon(points);
+    try {
+      poly.normalColored([0,0,1]);
+    } catch (e) {
+      console.log("Error in normalColored: ", e, poly);
+      poly.colored('#ff00ff');
+    }
   };
   
   const numSegments = 32;
