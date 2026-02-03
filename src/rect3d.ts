@@ -73,7 +73,7 @@ export class Rect3d extends marking3d.Marking3d {
         this.requestRedraw();
         return this;
     };
-    setScaled(scaled: boolean): Rect3d {
+    scaling(scaled: boolean): Rect3d {
         // set whether the rectangle is scaled or not
         this.scaled = scaled;
         this.requestRedraw();
