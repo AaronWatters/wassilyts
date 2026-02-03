@@ -81,7 +81,7 @@ export class Frame3d extends styled.Styled {
         // clear the onFrame without requesting redraw
         const diagram = this.onFrame.diagram;
         try {
-            diagram.disableRedraws();
+            //diagram.disableRedraws();
             this.onFrame.clear(false);
             this.onFrame.styleLike(this);
             // project 3d markings to 2d.
@@ -99,7 +99,7 @@ export class Frame3d extends styled.Styled {
             });
             // prepare is automatic in containing frame.
         } finally {
-            diagram.enableRedraws();
+            //diagram.enableRedraws();
         }   
     };
 
@@ -250,6 +250,18 @@ export class Frame3d extends styled.Styled {
         const poly = new poly3d.Poly3d(points, this);
         this.nameToMarking3d.set(poly.objectName, poly);
         return poly;
+    };
+
+    polygon(points: tsvector.Vector[]): poly3d.Poly3d {
+        const result = this.poly(points);
+        result.closed(true).filled();
+        return result;
+    };
+
+    polyline(points: tsvector.Vector[]): poly3d.Poly3d {
+        const result = this.poly(points);
+        result.closed(false).stroked();
+        return result;
     };
 
     /**

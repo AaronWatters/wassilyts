@@ -239,9 +239,14 @@ export class Diagram {
     };
     /** Draw the diagram */
     draw() {
-        this.clear();
-        this.mainFrame.prepareForRedraw();
-        this.mainFrame.draw();
+        try {
+            this.disableRedraws();
+            this.clear();
+            this.mainFrame.prepareForRedraw();
+            this.mainFrame.draw();
+        } finally {
+            this.enableRedraws();
+        }
         // if there is a deferred fit, do it now
         if (this.deferred_fit_border !== null) {
             const border = this.deferred_fit_border;
