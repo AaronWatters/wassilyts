@@ -26,7 +26,7 @@ import * as text3d from './text3d';
 export class Frame3d extends styled.Styled {
     projection: projection.Projector;
     //fromFrame: frame.Frame;
-    onFrame: frame.Frame;
+    toFrame: frame.Frame;
     nameToMarking3d: Map<string, marking3d.Marking3d> = new Map();
     orbiter: orbiter.Orbiter | null = null;
 
@@ -35,15 +35,10 @@ export class Frame3d extends styled.Styled {
         this.projection = projection;
         /**
          * The dedicated frame for drawing the 3D projection.
-         * This must come after self in draw order for fromFrame for redraw preparation.
+         * This must come after self in draw order for toFrame for redraw preparation.
          */
-        this.onFrame = new frame.Frame(fromFrame.diagram, null, fromFrame);
-        fromFrame.addElement(this.onFrame);
-    };
-
-    requestRedraw(): void {
-        // request a redraw of the frame
-        this.onFrame.requestRedraw();
+        this.toFrame = new frame.Frame(fromFrame.diagram, null, fromFrame);
+        fromFrame.addElement(this.toFrame);
     };
 
     /**
@@ -69,7 +64,7 @@ export class Frame3d extends styled.Styled {
         // clear the 3D markings
         this.nameToMarking3d.clear();
         // clear the onFrame
-        this.onFrame.clear();
+        this.toFrame.clear();
     };
 
     /**
@@ -79,11 +74,12 @@ export class Frame3d extends styled.Styled {
     prepareForRedraw(): void {
         // draw the 3D markings onto the onFrame
         // clear the onFrame without requesting redraw
-        const diagram = this.onFrame.diagram;
+        const toFrame = this.toFrame;
+        const diagram = toFrame.diagram;
         try {
             //diagram.disableRedraws();
-            this.onFrame.clear(false);
-            this.onFrame.styleLike(this);
+            toFrame.clear(false);
+            toFrame.styleLike(this);
             // project 3d markings to 2d.
             const depthsAndMarkings: [number, marking.Marking][] = [];
             this.nameToMarking3d.forEach((marking3d) => {
@@ -95,7 +91,7 @@ export class Frame3d extends styled.Styled {
             depthsAndMarkings.sort((a, b) => b[0] - a[0]);
             // draw the markings in order of largest depth to smallest depth
             depthsAndMarkings.forEach(([, marking2d]) => {
-                this.onFrame.addElement(marking2d);
+                toFrame.addElement(marking2d);
             });
             // prepare is automatic in containing frame.
         } finally {
@@ -114,7 +110,7 @@ export class Frame3d extends styled.Styled {
             return;
         }
         // fit the onFrame to the 3D markings
-        this.onFrame.fit(border);
+        this.toFrame.fit(border);
     };
 
     /**
@@ -122,7 +118,7 @@ export class Frame3d extends styled.Styled {
      * @internal
      */
     draw() {
-        this.onFrame.draw();
+        this.toFrame.draw();
     };
 
     /**
@@ -131,7 +127,7 @@ export class Frame3d extends styled.Styled {
      */
     getPixel(): tsvector.Vector {
         // return the pixel position of the frame in the diagram
-        return this.onFrame.getPixel();
+        return this.toFrame.getPixel();
     };
 
     /**
@@ -140,7 +136,7 @@ export class Frame3d extends styled.Styled {
      */
     setPixel(position: tsvector.Vector): void {
         // set the pixel position of the frame in the diagram
-        this.onFrame.setPixel(position);
+        this.toFrame.setPixel(position);
     };
     
     /**
@@ -150,7 +146,7 @@ export class Frame3d extends styled.Styled {
      * @returns frame3d.Frame3d for chaining
      */
     nameImage(name: string, image: HTMLImageElement) {
-        this.onFrame.nameImage(name, image);
+        this.toFrame.nameImage(name, image);
         return this;
     };
 
@@ -161,7 +157,7 @@ export class Frame3d extends styled.Styled {
      * @returns frame3d.Frame3d for chaining
      */
     nameImageFromURL(name: string, url: string) {
-        this.onFrame.nameImageFromURL(name, url);
+        this.toFrame.nameImageFromURL(name, url);
         return this;
     };
 
@@ -201,7 +197,7 @@ export class Frame3d extends styled.Styled {
         offset: tsvector.Vector = [0, 0], 
         scaled: boolean = false): image3d.Image3d 
     {
-        this.onFrame.diagram.nameImageFromURL(url, url, false);
+        this.toFrame.diagram.nameImageFromURL(url, url, false);
         return this.namedImage(point, url, size, offset, scaled);
     };
     /**
