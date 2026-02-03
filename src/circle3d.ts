@@ -34,4 +34,25 @@ export class Circle3d extends marking3d.Marking3d {
         circle2d.styleLike(this);
         return circle2d;
     };
+
+    centered(center: tsvector.Vector): Circle3d {
+        // set the center of the circle in frame coordinates
+        this.center = center;
+        this.requestRedraw();
+        return this;
+    };
+    
+    resized(radius: number): Circle3d {
+        // set the radius of the circle
+        this.radius = radius;
+        this.requestRedraw();
+        return this;
+    }
+
+    scaling(scaled: boolean): Circle3d {
+        // set whether the circle is scaled or not
+        this.scaled = scaled;
+        this.requestRedraw();
+        return this;
+    }
 };
