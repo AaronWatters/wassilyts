@@ -100,8 +100,9 @@
 
   // draw the same image several times.
   frame3d.nameImageFromURL("mandrill", "./mandrill.png");
-  frame3d.namedImage(vertices[1], "mandrill").degrees(50);
-  frame3d.namedImage(vertices[4], "mandrill")
+  frame3d.namedImage(vertices[1], "mandrill").degrees(-50);
+  //frame3d.namedImage(vertices[4], "mandrill")
+  frame3d.imageFromURL(vertices[4], "./mandrill.png")
   .degrees(77)
   .setScaled(true)
   .resize([h/2, h])
@@ -118,7 +119,7 @@
     .offsetBy([-h/2, 0]);
 
   frame3d.textBox(vertices[6], "wassilyjs 3D")
-    .degrees(-30)
+    .degrees(-90)
     .font("18px Arial")
     .colored("green")
     .offsetBy([-h/2, 0]);
