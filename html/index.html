@@ -47,11 +47,12 @@
   const dot3 = frame0.circle([50,30], 10).colored('green');
   const dot4 = frame0.circle([50,50], 10).colored('salmon');
   const dot5 = frame0.circle([-70, 3], 10).colored('purple');
-  frame0.nameImageFromURL("mandrill", "./mandrill.png");
+  //frame0.nameImageFromURL("mandrill", "./mandrill.png");
   const imgpoint = [-20,110]
   const imgsize = [150, 150];
   const imgoffset = [-75, -75];
-  const img1 = frame0.namedImage(imgpoint, "mandrill", imgsize, imgoffset, false);
+  //const img1 = frame0.namedImage(imgpoint, "mandrill", imgsize, imgoffset, false);
+  const img1 = frame0.imageFromURL(imgpoint, "./mandrill.png", imgsize, imgoffset, false);
   const imgdot = frame0.circle(imgpoint, 25).colored('rgba(0,0,0,0.5)').stroked();
   const imgbox = frame0.box(imgpoint, imgsize, imgoffset, false).linedWidth(10).stroked().colored("red");
   const star = frame0.star([0,50], 15).colored('rgba(255,165,0,0.5)');
