@@ -270,9 +270,9 @@ export class Frame3d extends styled.Styled {
      * @param radius the radius of the circle
      * @returns circle3d.Circle3d
      */
-    circle(center: tsvector.Vector, radius: number): circle3d.Circle3d {
+    circle(center: tsvector.Vector, radius: number, scaled: boolean = true): circle3d.Circle3d {
         // create a 3D circle marking
-        const circle = new circle3d.Circle3d(center, radius, this);
+        const circle = new circle3d.Circle3d(center, radius, this, scaled);
         this.nameToMarking3d.set(circle.objectName, circle);
         return circle;
     }
