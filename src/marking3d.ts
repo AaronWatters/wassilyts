@@ -12,7 +12,8 @@ export abstract class Marking3d extends styled.Styled {
     depthValue: number | null = null; // depth can be calculated or set
 
     constructor(onFrame3d: frame3d.Frame3d) {
-        super(onFrame3d.onFrame);
+        // the 3d marking draws on the toFrame of the Frame3d
+        super(onFrame3d.toFrame);
         this.onFrame3d = onFrame3d;
         this.styleLike(onFrame3d);
     };
@@ -38,13 +39,13 @@ export abstract class Marking3d extends styled.Styled {
     draw(): void {
         // No-op for 3D markings, as they are drawn in the Frame2d context
     };
+    rename(newname: string): void {
+        this.onFrame3d.deleteElement(this);
+        this.objectName = newname;
+        this.onFrame3d.addElement(this);
+    };
     forget(): void {
-        // Forget this marking from the 3D frame and the diagram
-        // This can be done immediately without waiting for redraw
-        // because there is no explicit draw order.
-        this.onFrame3d.nameToMarking3d.delete(this.objectName);
-        this.onFrame3d.onFrame.diagram.nameToStyled.delete(this.objectName);
-        // for safety mark as defunct
+        this.onFrame3d.deleteElement(this);
         this.defunct = true;
         this.requestRedraw();
     };
