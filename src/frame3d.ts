@@ -41,6 +41,21 @@ export class Frame3d extends styled.Styled {
         fromFrame.addElement(this.toFrame);
     };
 
+    addElement(element: marking3d.Marking3d): void {
+        // add a 3D marking to this frame
+        if (!this.isLive()) {
+            throw new Error("Cannot add element to detached Frame3d.");
+        };
+        this.nameToMarking3d.set(element.objectName, element);
+        this.onFrame!.diagram!.addStyled(element);
+    };
+
+    deleteElement(element: marking3d.Marking3d): void {
+        // delete a 3D marking from this frame
+        this.nameToMarking3d.delete(element.objectName);
+        this.onFrame!.diagram!.deleteStyled(element);
+    };
+
     /**
      * Set up an orbiter to control this frame to allow interactive rotation via mouse dragging.
      * @returns orbiter.Orbiter
