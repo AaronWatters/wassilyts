@@ -54,6 +54,7 @@
   const modelWidth = 3;
   const modelCenter = [0, 0, 2];
   const frame3d = cube(output, pixelWidth, modelWidth, modelCenter);
+  frame3d.rename("Main 3D Frame");
   console.log("frame3d = ", frame3d);
   frame3d.linedWidth(10);
   const h = 0.7; // half side length
@@ -61,7 +62,7 @@
   // the vertices of the cube
   const vertices = [
     [-h, -h, h], [h, -h, h], [h, h, h], [-h, h, h],
-    [-h, -h, -h], [h, -h, -h], [h, h, -h], [-h, h, -h]
+    [-h, -h, -h], [h, -h, -h], [h, h, -h], [-h, h, -h], [-h, 0, 0], [h, 0, 0],
   ];
   // a selection of half transparent html5 colors using rgba
   const colors = [
@@ -92,7 +93,9 @@
   // draw some rectangles.
   frame3d.rect(vertices[0], [h/2,h/2], [-h/4, -h/4]).colored(nextColor()).degrees(15);
   frame3d.rect(vertices[3], [h/2,h/3], [-h/4, -h/4]).colored(nextColor()).degrees(30);
-  frame3d.rect(vertices[5], [h/3,h/2], [-h/4, -h/4]).colored(nextColor());
+  const r = frame3d.rect(vertices[5], [h/3,h/2], [-h/4, -h/4]).colored(nextColor());
+
+  r.rename("My Rectangle");
 
   trace.push(vertices[0]);
   trace.push(vertices[3]);
@@ -104,7 +107,7 @@
   //frame3d.namedImage(vertices[4], "mandrill")
   frame3d.imageFromURL(vertices[4], "./mandrill.png")
   .degrees(77)
-  .setScaled(true)
+  .scaling(true)
   .resize([h/2, h])
   .offsetBy([-h/4, -h/2]);
 
@@ -126,6 +129,9 @@
 
   trace.push(vertices[2]);
   trace.push(vertices[6]);
+
+  frame3d.circle(vertices[7], h/4).colored("purple").linedWidth(5).scaling(true);
+  frame3d.circle(vertices[8], 30).colored("red").linedWidth(5).scaling(false);
 
   // add 2 to all the z-coordinates to move the cube up
   for (let i = 0; i < vertices.length; i++) {

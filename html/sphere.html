@@ -99,7 +99,7 @@
     //const poly = frame.poly(points).filled();
     const poly = frame.polygon(points);
     try {
-      poly.normalColored([0,0,1]);
+      poly.normalColored([0,0,1], 0.7);
     } catch (e) {
       console.log("Error in normalColored: ", e, poly);
       poly.colored('#ff00ff');
