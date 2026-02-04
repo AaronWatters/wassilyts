@@ -67,9 +67,12 @@ export class Poly3d extends marking3d.Marking3d {
         throw new Error("Points are collinear; cannot define a unique normal vector.");
     };
 
-    normalColored(defaultV: tsvector.Vector | null = null, epsilon: number=1e-6): Poly3d {
+    normalColored(
+        defaultV: tsvector.Vector | null = null, 
+        alpha: number | null = null,
+        epsilon: number=1e-6): Poly3d {
         const normal = this.normalVector(defaultV, epsilon);
-        const colorString = conveniences.rgb(normal, null, epsilon);
+        const colorString = conveniences.rgb(normal, alpha, epsilon);
         this.colored(colorString);
         return this;
     };
