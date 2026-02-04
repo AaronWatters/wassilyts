@@ -464,6 +464,10 @@ export class Frame extends styled.Styled {
      * @param requestRedraw Whether to request a redraw after adding the element (default: true).   
      */
     addElement(styled: styled.Styled, requestRedraw=true) {
+        // don't move the element if in another frame
+        if ((styled.onFrame!==null) && (styled.onFrame !== this)) {
+            throw new Error(`Cannot add element ${styled.objectName} to frame ${this.objectName} because it belongs to another frame ${styled.onFrame?.objectName}.`);
+        }
         const name = styled.objectName;
         // reset the diagram stats for new element
         const diagram = this.diagram;
