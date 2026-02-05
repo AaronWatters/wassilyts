@@ -7,7 +7,7 @@
   <title>wassilyjs Library Demo</title>
 </head>
 <body>
-<h1>3d stuff test page</h1>
+<h1>3d simple test page</h1>
 
 <p>Please look at the console.</p>
 
@@ -54,91 +54,20 @@
   const modelWidth = 3;
   const modelCenter = [0, 0, 2];
   const frame3d = cube(output, pixelWidth, modelWidth, modelCenter);
-  frame3d.rename("Main 3D Frame");
   frame3d.lookFrom([-1,-1,0]);
+  frame3d.lookAt([0,0,2.5])
+  frame3d.rename("Main 3D Frame");
   console.log("frame3d = ", frame3d);
   frame3d.linedWidth(10);
-  const h = 0.7; // half side length
-  const h2 = h * 2; // full side length
-  // the vertices of the cube
-  const vertices = [
-    [-h, -h, h], [h, -h, h], [h, h, h], [-h, h, h],
-    [-h, -h, -h], [h, -h, -h], [h, h, -h], [-h, h, -h], [-h, 0, 0], [h, 0, 0],
-  ];
-  // a selection of half transparent html5 colors using rgba
-  const colors = [
-    'rgba(255, 0, 0, 0.5)', // red
-    'rgba(0, 255, 0, 0.5)', // green
-    'rgba(0, 0, 255, 0.5)', // blue
-    //'rgba(255, 255, 0, 0.5)', // yellow
-    'rgba(255, 0, 255, 0.5)', // magenta
-    'rgba(0, 255, 255, 0.5)', // cyan
-    'rgba(128, 0, 128, 0.5)', // purple
-    'rgba(128, 128, 0, 0.5)', // olive
-    'rgba(128, 128, 128, 0.5)', // gray
-    'rgba(255, 165, 0, 0.5)', // orange
-    'rgba(255, 192, 203, 0.5)', // pink
-    'rgba(0, 128, 128, 0.5)', // teal
-    'rgba(128, 0, 0, 0.5)', // maroon
-    'rgba(0, 0, 128, 0.5)',]
-
-  let colorindex = 0;
-  function nextColor() {
-    const color = colors[colorindex];
-    colorindex = (colorindex + 1) % colors.length;
-    return color;
-  };
-
-  var trace = [];
+  var trace = [[1,0,3],[0,1,3],[ -1,0,3],[0,-1,3],[1,0,3]];
+  var p = frame3d.polygon(trace).colored('rgba(255, 0, 0, 0.1)');
+  p.rename("My Polygon 1");
+  var trace = [[1,0,2],[0,1,2],[ -1,0,2],[0,-1,2],[1,0,2]];
+  var p = frame3d.polygon(trace).colored('rgba(0, 255, 0, 0.1)');
+  p.rename("My Polygon");
 
   // draw some rectangles.
-  frame3d.rect(vertices[0], [h/2,h/2], [-h/4, -h/4]).colored(nextColor()).degrees(15);
-  frame3d.rect(vertices[3], [h/2,h/3], [-h/4, -h/4]).colored(nextColor()).degrees(30);
-  const r = frame3d.rect(vertices[5], [h/3,h/2], [-h/4, -h/4]).colored(nextColor());
-
-  r.rename("My Rectangle");
-
-  trace.push(vertices[0]);
-  trace.push(vertices[3]);
-  trace.push(vertices[5]);
-
-  // draw the same image several times.
-  frame3d.nameImageFromURL("mandrill", "./mandrill.png");
-  frame3d.namedImage(vertices[1], "mandrill").degrees(-50);
-  //frame3d.namedImage(vertices[4], "mandrill")
-  frame3d.imageFromURL(vertices[4], "./mandrill.png")
-  .degrees(77)
-  .scaling(true)
-  .resize([h/2, h])
-  .offsetBy([-h/4, -h/2]);
-
-  trace.push(vertices[1]);
-  trace.push(vertices[4]);
-
-  // add some text
-  frame3d.textBox(vertices[2], "Hello 3D World!")
-    .degrees(25)
-    .font("20px Courier New")
-    .colored("blue")
-    .offsetBy([-h/2, 0]);
-
-  frame3d.textBox(vertices[6], "wassilyjs 3D")
-    .degrees(-90)
-    .font("18px Arial")
-    .colored("green")
-    .offsetBy([-h/2, 0]);
-
-  trace.push(vertices[2]);
-  trace.push(vertices[6]);
-
-  frame3d.circle(vertices[7], h/4).colored("purple").linedWidth(5).scaling(true);
-  frame3d.circle(vertices[8], 30).colored("red").linedWidth(5).scaling(false);
-
-  // add 2 to all the z-coordinates to move the cube up
-  for (let i = 0; i < vertices.length; i++) {
-    vertices[i][2] += 2;
-  }
-
+  //frame3d.rect(vertices[0], [h/2,h/2], [-h/4, -h/4]).colored(nextColor()).degrees(15);
   // slider dom objects
   const eyeXSlider = document.getElementById('eyeX');
   const eyeYSlider = document.getElementById('eyeY');
@@ -161,8 +90,6 @@
   // add event listeners to sliders
   eyeXSlider.addEventListener('input', updateFrame);
   eyeYSlider.addEventListener('input', updateFrame);
-
-  frame3d.poly(trace).colored('cornsilk').linedWidth(5).stroked().closed(false);
 
   frame3d.orbit();
 
