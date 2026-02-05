@@ -4,7 +4,7 @@
 
 import * as tsvector from "tsvector";
 
-const EPSILON = 1e-6;
+export const EPSILON = 1e-6;
 
 /**
  * Calculate the perpendicular component of one vector relative to another.

@@ -41,6 +41,16 @@ export class Frame3d extends styled.Styled {
         fromFrame.addElement(this.toFrame);
     };
 
+    lookAt(lookAtPoint: tsvector.Vector, epsilon = projection.EPSILON): Frame3d {
+        this.projection.lookAt(lookAtPoint, epsilon);
+        return this;
+    };
+
+    lookFrom(eyePoint: tsvector.Vector, upVector: tsvector.Vector | null = null, epsilon = projection.EPSILON): Frame3d {
+        this.projection.lookFrom(eyePoint, upVector, epsilon);
+        return this;
+    };
+
     addElement(element: marking3d.Marking3d): void {
         // add a 3D marking to this frame
         if (!this.isLive()) {
