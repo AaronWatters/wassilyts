@@ -14,7 +14,9 @@ export class Line3d extends marking3d.Marking3d {
         this.start = start;
         this.end = end;
         this.stroked();
-    }
+    };
+
+    // xxxx add methods to set start/end...
 
     projectTo2D(): marking.Marking {
         // For simplicity, we can just return a line marking in 2D.
