@@ -4,6 +4,8 @@ import * as marking from "./marking";
 import * as frame from "./frame";
 import * as tsvector from "tsvector";
 
+// xxxx add methods to set members for subclasses...
+
 export abstract class Assembly extends marking.Marking {
     // the dedicated frame for drawing this assembly.
     assemblyFrame: frame.Frame;
