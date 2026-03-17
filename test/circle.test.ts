@@ -40,6 +40,19 @@ describe('circle shape', () => {
         // cannot draw unattached circle
         expect(() => circ.drawPath()).toThrow();
     });
+
+    it('should throw for a defunct attached circle path draw', () => {
+        const container = document.createElement('div');
+        const width = 100;
+        const height = 100;
+        const diag = new diagram.Diagram(container, width, height);
+        const frm = diag.mainFrame;
+        const circ = frm.circle([50, 50], 10);
+
+        circ.forget();
+
+        expect(() => circ.drawPath()).toThrow('Circle is not attached to a frame.');
+    });
     
     it('should make an offcenter circle', () => {
         const container = document.createElement('div');
