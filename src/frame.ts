@@ -2,6 +2,7 @@
 import * as tsvector from 'tsvector';
 import * as diagram from './diagram';
 import * as styled from './styled';
+import * as marking from './marking';
 import * as circle from './circle';
 import * as rect from './rect';
 import * as line from './line';
@@ -196,6 +197,29 @@ export class Frame extends styled.Styled {
             }
         }
         return handled;
+    };
+    /** Return all responsive markings where the frame point for the marking
+    * lies in the path of any of the selecting markings.
+    * 
+    * @param selecting An array of markings to test for selection.
+    * @returns An array of markings that are selected by the selecting markings.
+    */
+    selected(selecting: marking.Marking[]): marking.Marking[] {
+        if (!this.isLive()) {
+            throw new Error("Frame is not attached to a diagram.");
+        }
+        const ctx = this.diagram.ctx!;
+        const selectingPaths = selecting.map((s) => s.drawPath());
+        const result = [];
+        for (const element of this.drawOrder) {
+            if ((element instanceof marking.Marking) && element.responsive) {
+                const [x,y] = element.getFramePoint();
+                if (selectingPaths.some((path) => ctx.isPointInPath(path, x, y))) {
+                    result.push(element);
+                }
+            }
+        }
+        return result;
     };
     /** Return all responsive markings that are picked by the canvas coordinates, in reverse draw order (topmost first)
      * @internal
