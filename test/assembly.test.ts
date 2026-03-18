@@ -105,3 +105,125 @@ describe('star assembly', () => {
     });
 
 });
+
+describe('arrow assembly', () => {
+
+    it('should make an arrow with default parameters', () => {
+        const container = document.createElement('div');
+        const width = 100;
+        const height = 100;
+        const diag = new diagram.Diagram(container, width, height);
+        const frm = diag.mainFrame;
+        const back = [10, 10];
+        const tip = [90, 10];
+        const arrow = frm.arrow(back, tip);
+        diag.draw();
+        expect(arrow.back).toEqual(back);
+        expect(arrow.tip).toEqual(tip);
+        expect(arrow.tipDegrees).toEqual(30);
+        expect(arrow.tipLength).toEqual(null);
+        expect(arrow.tipFactor).toEqual(0.1);
+        expect(arrow.getFramePoint()).toEqual(back);
+    });
+
+    it('should make an arrow with custom tipDegrees', () => {
+        const container = document.createElement('div');
+        const width = 100;
+        const height = 100;
+        const diag = new diagram.Diagram(container, width, height);
+        const frm = diag.mainFrame;
+        const back = [10, 10];
+        const tip = [90, 10];
+        const tipDegrees = 45;
+        const arrow = frm.arrow(back, tip, tipDegrees);
+        diag.draw();
+        expect(arrow.tipDegrees).toEqual(tipDegrees);
+    });
+
+    it('should make an arrow with a fixed tipLength', () => {
+        const container = document.createElement('div');
+        const width = 100;
+        const height = 100;
+        const diag = new diagram.Diagram(container, width, height);
+        const frm = diag.mainFrame;
+        const back = [10, 10];
+        const tip = [90, 10];
+        const tipLength = 20;
+        const arrow = frm.arrow(back, tip, 30, tipLength);
+        diag.draw();
+        expect(arrow.tipLength).toEqual(tipLength);
+    });
+
+    it('should make an arrow with a custom tipFactor when tipLength is null', () => {
+        const container = document.createElement('div');
+        const width = 100;
+        const height = 100;
+        const diag = new diagram.Diagram(container, width, height);
+        const frm = diag.mainFrame;
+        const back = [10, 10];
+        const tip = [90, 10];
+        const tipFactor = 0.2;
+        const arrow = frm.arrow(back, tip, 30, null, tipFactor);
+        diag.draw();
+        expect(arrow.tipLength).toEqual(null);
+        expect(arrow.tipFactor).toEqual(tipFactor);
+    });
+
+    it('should use the back point as the frame point', () => {
+        const container = document.createElement('div');
+        const width = 100;
+        const height = 100;
+        const diag = new diagram.Diagram(container, width, height);
+        const frm = diag.mainFrame;
+        const back = [20, 30];
+        const tip = [80, 70];
+        const arrow = frm.arrow(back, tip);
+        expect(arrow.getFramePoint()).toEqual(back);
+    });
+
+    it('should update frame point on an arrow', () => {
+        const container = document.createElement('div');
+        const width = 100;
+        const height = 100;
+        const diag = new diagram.Diagram(container, width, height);
+        const frm = diag.mainFrame;
+        const arrow = frm.arrow([10, 10], [90, 10]);
+        const newBack = [30, 40];
+        arrow.setFramePoint(newBack);
+        expect(arrow.getFramePoint()).toEqual(newBack);
+    });
+
+    it('should create an arrow directly via the Arrow constructor', () => {
+        const container = document.createElement('div');
+        const width = 100;
+        const height = 100;
+        const diag = new diagram.Diagram(container, width, height);
+        const frm = diag.mainFrame;
+        const back = [5, 5];
+        const tip = [95, 5];
+        const tipLength = 15;
+        const tipDegrees = 25;
+        const tipFactor = 0.15;
+        const arrow = new assembly.Arrow(frm, back, tip, tipLength, tipDegrees, tipFactor);
+        frm.addElement(arrow);
+        diag.draw();
+        expect(arrow.back).toEqual(back);
+        expect(arrow.tip).toEqual(tip);
+        expect(arrow.tipLength).toEqual(tipLength);
+        expect(arrow.tipDegrees).toEqual(tipDegrees);
+        expect(arrow.tipFactor).toEqual(tipFactor);
+        expect(arrow.getFramePoint()).toEqual(back);
+    });
+
+    it('should not throw when the arrow has zero length', () => {
+        const container = document.createElement('div');
+        const width = 100;
+        const height = 100;
+        const diag = new diagram.Diagram(container, width, height);
+        const frm = diag.mainFrame;
+        const point = [50, 50];
+        const arrow = frm.arrow(point, point);
+        expect(() => diag.draw()).not.toThrow();
+    });
+
+});
