@@ -22,6 +22,7 @@ export * as rect from './rect';
 export * as poly from './poly';
 export * as poly3d from './poly3d';
 export * as conveniences from './conveniences';
+export * as calculations from './calculations';
 
 // export the main constructor functions
 export { drawOn, panel, swatch, cube };
