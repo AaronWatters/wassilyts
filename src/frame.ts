@@ -221,6 +221,16 @@ export class Frame extends styled.Styled {
         }
         return result;
     };
+    /** Return names of responsive markings where the frame point for the marking 
+     * lies in the path of any of the selecting markings.
+     * This is a convenience method for external event handlers that cannot access the marking objects.
+     * 
+     * @param selecting An array of markings to test for selection.
+     * @returns An array of names of selected markings.
+     */
+    selectedNames(selecting: marking.Marking[]): string[] {
+        return this.selected(selecting).map((m) => m.objectName);
+    }
     /** Return all responsive markings that are picked by the canvas coordinates, in reverse draw order (topmost first)
      * @internal
     * @param canvasXY The coordinates in canvas pixels to test for picking.
