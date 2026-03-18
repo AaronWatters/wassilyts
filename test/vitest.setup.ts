@@ -30,6 +30,8 @@ global.HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
   strokeText: vi.fn(),
   measureText: vi.fn(() => (fakeMeasureText)),
   transform: vi.fn(),
+  isPointInPath: vi.fn(() => false),
+  isPointInStroke: vi.fn(() => false),
 }) as unknown as CanvasRenderingContext2D);
 
 

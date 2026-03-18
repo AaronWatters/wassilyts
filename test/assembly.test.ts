@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
     frame,
     diagram,
@@ -102,6 +102,56 @@ describe('star assembly', () => {
         expect(star.outerRadius).toEqual(innerRadius * pointFactor);
         expect(star.rotationDegrees).toEqual(degrees);
         expect(star.getFramePoint()).toEqual(center);
+    });
+
+});
+
+describe('Star.pickObject', () => {
+
+    it('should return false before the diagram is drawn (empty assembly frame)', () => {
+        const container = document.createElement('div');
+        const diag = new diagram.Diagram(container, 100, 100);
+        const frm = diag.mainFrame;
+        const star = frm.star([50, 50], 20);
+        // pickObject is called without drawing, so assemblyFrame has no elements yet
+        expect(star.pickObject([50, 50])).toBe(false);
+    });
+
+    it('should return false when the canvas point is not inside the star', () => {
+        const container = document.createElement('div');
+        const diag = new diagram.Diagram(container, 100, 100);
+        const frm = diag.mainFrame;
+        const star = frm.star([50, 50], 20);
+        diag.draw();
+        // isPointInPath is mocked to return false by default
+        expect(star.pickObject([0, 0])).toBe(false);
+    });
+
+    it('should return true when the canvas point is inside the star', () => {
+        const container = document.createElement('div');
+        const diag = new diagram.Diagram(container, 100, 100);
+        const frm = diag.mainFrame;
+        const star = frm.star([50, 50], 20);
+        diag.draw();
+        // Override isPointInPath so it reports a hit for the center coordinate
+        const ctx = diag.ctx!;
+        vi.spyOn(ctx, 'isPointInPath').mockReturnValue(true);
+        expect(star.pickObject([50, 50])).toBe(true);
+    });
+
+    it('should still delegate to assemblyFrame when star responsive flag is false', () => {
+        const container = document.createElement('div');
+        const diag = new diagram.Diagram(container, 100, 100);
+        const frm = diag.mainFrame;
+        const star = frm.star([50, 50], 20);
+        diag.draw();
+        star.responsive = false;
+        const ctx = diag.ctx!;
+        vi.spyOn(ctx, 'isPointInPath').mockReturnValue(true);
+        // Assembly.pickObject always delegates to assemblyFrame.pickedMarkings;
+        // the star's own responsive flag does not short-circuit that delegation,
+        // so the result is still driven by the inner polygon's hit-test.
+        expect(star.pickObject([50, 50])).toBe(true);
     });
 
 });
