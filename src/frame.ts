@@ -208,12 +208,14 @@ export class Frame extends styled.Styled {
         if (!this.isLive()) {
             throw new Error("Frame is not attached to a diagram.");
         }
-        const ctx = this.diagram.ctx!;
+        const diagram = this.diagram;
+        const ctx = diagram.ctx!;
         const selectingPaths = selecting.map((s) => s.drawPath());
         const result = [];
         for (const element of this.drawOrder) {
             if ((element instanceof marking.Marking) && element.responsive) {
-                const [x,y] = element.getFramePoint();
+                const pixel = element.getPixel();
+                const [x, y] = diagram.toCanvas(pixel);
                 if (selectingPaths.some((path) => ctx.isPointInPath(path, x, y))) {
                     result.push(element);
                 }
@@ -230,7 +232,7 @@ export class Frame extends styled.Styled {
      */
     selectedNames(selecting: marking.Marking[]): string[] {
         return this.selected(selecting).map((m) => m.objectName);
-    }
+    };
     /** Return all responsive markings that are picked by the canvas coordinates, in reverse draw order (topmost first)
      * @internal
     * @param canvasXY The coordinates in canvas pixels to test for picking.
@@ -434,6 +436,14 @@ export class Frame extends styled.Styled {
     toModel(xy: tsvector.Vector): tsvector.Vector {
         return applyAffine(this.pixelToModel, xy);
     };
+    /** Convert from canvas coordinates to model coordinates. */
+    /* commented for now -- unused.
+    canvasToModel(canvasxy: tsvector.Vector): tsvector.Vector {
+        const pixel = this.diagram.toCartesian(canvasxy);
+        return this.toModel(pixel);
+    };
+    */
+
     /** Create a frame for a subregion and record it. 
      * fromMinxy..fromMaxxy is the region in the current frame.
      * toMinxy..toMaxxy is the region in the new frame.
@@ -451,6 +461,13 @@ export class Frame extends styled.Styled {
     ): Frame {
         const affine = regionMap(fromMinxy, fromMaxxy, toMinxy, toMaxxy);
         const result = new Frame(this.diagram, affine, this);
+        this.addElement(result);
+        return result;
+    };
+    /** Create an overlay frame with same geometry (used by lasso demo) */
+    overlayFrame(): Frame {
+        const identity = tsvector.eye(3);
+        const result = new Frame(this.diagram, identity, this);
         this.addElement(result);
         return result;
     };
