@@ -289,5 +289,69 @@ export abstract class Styled {
         this.defunct = true;
         this.requestRedraw();
         // bookkeeping during redraw should remove this object from external structures.
-    }
-}
+    };
+    clone(): this {
+        // by default, throw an error.  Subclasses should override this method to return a copy of the object.
+        throw new Error("clone() not implemented for " + this.constructor.name);
+    };
+    interpolate(starting: this, ending: this, fraction: number): this {
+        // for now, just switch at the halfway point
+        if (fraction < 0.5) {
+            this.styleLike(starting);
+        } else {
+            this.styleLike(ending);
+        }
+        return this;
+    };
+    interpolate_number(starting: number, ending: number, fraction: number): number {
+        return starting + (ending - starting) * fraction;
+    };
+    interpolate_vector(starting: tsvector.Vector, ending: tsvector.Vector, fraction: number): tsvector.Vector {
+        return tsvector.vAdd(
+            starting,
+            tsvector.vScale(fraction, tsvector.vSub(ending, starting))
+        );
+    };
+    interpolate_switch<T>(starting: T, ending: T, fraction: number): T {
+        if (fraction < 0.5) {
+            return starting;
+        } else {
+            return ending;
+        }
+    };
+    transition(durationSeconds: number): this {
+        if (!this.onFrame) {
+            throw new Error("Object is not attached to a frame.");
+        };
+        // create an interpolation from the current state and start it immediately
+        const interpolation = new Interpolation(this, this.clone(), durationSeconds);
+        this.onFrame.diagram.addInterpolation(interpolation);
+        // modify the return object to be the ending state of the interpolation.
+        return interpolation.ending;
+    };
+};
+
+export class Interpolation<T extends Styled> {
+    starting: T;
+    ending: T;
+    target: T;
+    duration: number;
+    startTime: number;
+    endTime: number;
+    constructor(target: T, ending: T, durationSeconds: number): T {
+        this.target = target;
+        this.starting = target.clone();
+        this.ending = ending;
+        this.duration = durationSeconds * 1000; // convert to milliseconds
+        this.startTime = Date.now();
+        this.endTime = this.startTime + this.duration;
+    };
+    update(timestamp: number) {
+        // compute fraction restricted to [0,1]
+        const fraction = Math.min(1, Math.max(0, (timestamp - this.startTime) / this.duration));
+        this.target.interpolate(this.starting, this.ending, fraction);
+    };
+    is_complete(timestamp: number): boolean {
+        return timestamp >= this.endTime;
+    };
+};

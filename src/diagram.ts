@@ -2,6 +2,7 @@
 import * as tsvector from 'tsvector';
 import * as frame from './frame';
 import * as styled from './styled';
+import { Interpolation } from './styled';
 
 /** Draw on an HTML element.  Return a frame for the diagram. */
 export function drawOn(container: HTMLElement, width: number, height: number): frame.Frame {
@@ -56,6 +57,8 @@ export class Diagram {
     watchedEvents: Set<string> = new Set<string>();
     // for external named access, keep track of named styled elements
     nameToStyled: Map<string, styled.Styled> = new Map<string, styled.Styled>();
+    // interpolations for animated effects
+    interpolations: Interpolation<styled.Styled>[] = [];
 
     constructor(domObject: HTMLElement, width: number, height: number) {
         //.log(`Diagram: creating a new diagram with width ${width} and height ${height}`);
@@ -104,6 +107,17 @@ export class Diagram {
             throw new Error(`Styled object name ${styled.objectName} already exists in diagram.`);
         }
         n2s.set(styled.objectName, styled);
+    };
+    addInterpolation(interpolation: Interpolation<styled.Styled>) {
+        this.interpolations.push(interpolation);
+    };
+    doInterpolations() {
+        const now = Date.now();
+        // perform interpolation updates and remove completed interpolations
+        this.interpolations = this.interpolations.filter(interp => {
+            interp.update(now);
+            return !interp.is_complete(now);
+        });
     };
     /** Delete a styled object from the diagram's name registry.
      * @param styled The styled object to delete
@@ -241,6 +255,7 @@ export class Diagram {
     draw() {
         try {
             this.disableRedraws();
+            this.doInterpolations();
             this.clear();
             this.mainFrame.prepareForRedraw();
             this.mainFrame.draw();
@@ -253,6 +268,10 @@ export class Diagram {
             this.fit(border);
             this.deferred_fit_border = null;
             this.requestRedraw()
+        }
+        // if there are still interpolations, request another redraw
+        if (this.interpolations.length > 0) {
+            this.requestRedraw();
         }
     };
     disableRedraws() {

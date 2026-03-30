@@ -69,7 +69,7 @@
   // draw a red circle
   frame1.circle([1,2], 0.5).colored('red');
   // draw a green circle
-  frame1.circle([2,1], 0.1).colored('green');
+  const greenCircle = frame1.circle([2,1], 0.1).colored('green');
   // draw a salmon circle
   frame1.circle([2,2], 0.2).colored('salmon');
   //frame0.draw()
@@ -79,6 +79,25 @@
   frame0.fit();
   frame0.diagram.clear();
   //frame0.draw(); // implicitly called by fit()
+
+  let isBig = false;
+  function animateSize() 
+  {
+    debugger
+    console.log("animateSize called, isBig = ", isBig, greenCircle);
+    if (!isBig) {
+      greenCircle.transition(1.0).resize(0.5);
+    } else {
+      greenCircle.transition(1.0).resize(0.1);
+    }
+    isBig = !isBig;
+  }
+
+  // add a button to trigger the animation
+  const button = document.createElement("button");
+  button.innerHTML = "Animate Green Circle";
+  button.onclick = animateSize;
+  document.body.appendChild(button);
 </script>
 </body>
 </html>

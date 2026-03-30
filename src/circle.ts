@@ -13,6 +13,17 @@ export class Circle extends marking.Marking {
         this.radius = radius;
         this.scaled = scaled;
     };
+    clone(): this {
+        const result = new Circle(this.onFrame, this.center, this.radius, this.scaled);
+        return result as this;
+    };
+    interpolate(starting: this, ending: this, fraction: number): this {
+        this.center = this.interpolate_vector(starting.center, ending.center, fraction);
+        this.radius = this.interpolate_number(starting.radius, ending.radius, fraction);
+        // for simplicity, just switch at the halfway point
+        this.scaled = this.interpolate_switch(starting.scaled, ending.scaled, fraction);
+        return this;
+    };
     centerAt(position: tsvector.Vector): Circle {
         // set the center of the circle in frame coordinates
         this.center = position;
