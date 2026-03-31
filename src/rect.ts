@@ -29,6 +29,24 @@ export class Rectangle extends marking.Marking {
         this.scaled = scaled;
         this.rotationDegrees = rotationDegrees;
     };
+    clone(): this {
+        const result = new Rectangle(this.onFrame!, this.point, this.size, this.offset, this.scaled, this.rotationDegrees);
+        result.styleLike(this);
+        return result as this;
+    };
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.point = this.interpolate_vector(starting.point, ending.point, fraction);
+        if (starting.size !== null && ending.size !== null) {
+            this.size = this.interpolate_vector(starting.size, ending.size, fraction);
+        } else {
+            this.size = this.interpolate_switch(starting.size, ending.size, fraction);
+        }
+        this.offset = this.interpolate_vector(starting.offset, ending.offset, fraction);
+        this.scaled = this.interpolate_switch(starting.scaled, ending.scaled, fraction);
+        this.rotationDegrees = this.interpolate_number(starting.rotationDegrees, ending.rotationDegrees, fraction);
+        return this;
+    };
     degrees(rotationDegrees: number): Rectangle {
         // set the rotation of the rectangle in degrees
         this.rotationDegrees = rotationDegrees;
