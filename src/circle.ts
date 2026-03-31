@@ -15,9 +15,11 @@ export class Circle extends marking.Marking {
     };
     clone(): this {
         const result = new Circle(this.onFrame, this.center, this.radius, this.scaled);
+        result.styleLike(this);
         return result as this;
     };
     interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
         this.center = this.interpolate_vector(starting.center, ending.center, fraction);
         this.radius = this.interpolate_number(starting.radius, ending.radius, fraction);
         // for simplicity, just switch at the halfway point
