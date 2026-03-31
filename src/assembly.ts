@@ -62,6 +62,7 @@ export class Star extends Assembly {
     innerRadius: number;
     outerRadius: number;
     rotationDegrees: number;
+    pointFactor: number;
     constructor(
         onFrame: frame.Frame,
         center: tsvector.Vector,
@@ -71,11 +72,31 @@ export class Star extends Assembly {
         degrees: number = 0,
     ) {
         super(onFrame);
+        this.center = center;
         this.numPoints = numPoints;
         this.innerRadius = innerRadius;
+        this.pointFactor = pointFactor;
         this.outerRadius = innerRadius * pointFactor;
         this.rotationDegrees = degrees;
         this.setTranslation(center);
+    };
+    rotateDegrees(rotationDegrees: number): Star {
+        this.rotationDegrees = rotationDegrees;
+        this.requestRedraw();
+        return this;
+    };
+    centerAt(position: tsvector.Vector): Star {
+        debugger;
+        this.center = position;
+        this.setTranslation(position);
+        this.requestRedraw();
+        return this;
+    };
+    resize(innerRadius: number): Star {
+        this.innerRadius = innerRadius;
+        this.outerRadius = innerRadius * this.pointFactor;
+        this.requestRedraw();
+        return this;
     };
     assemble(onFrame: frame.Frame): void {
         const center = [0, 0];
@@ -91,8 +112,24 @@ export class Star extends Assembly {
         }
         const poly = onFrame.polygon(points);
         poly.closed(true);
-        poly.styleLike(this);
         poly.filled();
+        poly.styleLike(this);
+    };
+    clone(): this {
+        const result = new Star(this.onFrame!, this.center, this.innerRadius, this.numPoints, this.outerRadius / this.innerRadius, this.rotationDegrees);
+        result.styleLike(this);
+        return result as this;
+    };
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.center = this.interpolate_vector(starting.center, ending.center, fraction);
+        this.centerAt(this.center);
+        this.numPoints = this.interpolate_integer(starting.numPoints, ending.numPoints, fraction);
+        this.center = this.interpolate_vector(starting.center, ending.center, fraction);
+        this.innerRadius = this.interpolate_number(starting.innerRadius, ending.innerRadius, fraction);
+        this.outerRadius = this.interpolate_number(starting.outerRadius, ending.outerRadius, fraction);
+        this.rotationDegrees = this.interpolate_number(starting.rotationDegrees, ending.rotationDegrees, fraction);
+        return this;
     };
 };
 
@@ -112,13 +149,45 @@ export class Arrow extends Assembly {
         tipFactor: number = 0.1,
     ) {
         super(onFrame);
-        this.back = back;
-        this.tip = tip;
-        this.vector = tsvector.vSub(tip, back);
+        //this.back = back;
+        //this.tip = tip;
+        //this.vector = tsvector.vSub(tip, back);
         this.tipDegrees = tipDegrees;
         this.tipLength = tipLength;
         this.tipFactor = tipFactor;
+        //this.setTranslation(back);
+        this.setGeometry(back, tip);
+    };
+    clone(): this {
+        const result = new Arrow(this.onFrame!, this.back, this.tip, this.tipLength, this.tipDegrees, this.tipFactor);
+        result.styleLike(this);
+        return result as this;
+    };
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.back = this.interpolate_vector(starting.back, ending.back, fraction);
+        this.tip = this.interpolate_vector(starting.tip, ending.tip, fraction);
+        this.tipLength = this.interpolate_switch(starting.tipLength, ending.tipLength, fraction);
+        this.tipDegrees = this.interpolate_number(starting.tipDegrees, ending.tipDegrees, fraction);
+        this.tipFactor = this.interpolate_number(starting.tipFactor, ending.tipFactor, fraction);
+        this.setGeometry(this.back, this.tip);
+        return this;
+    };
+    setGeometry(back: tsvector.Vector, tip: tsvector.Vector): void {
+        this.back = back;
+        this.tip = tip;
+        this.vector = tsvector.vSub(tip, back);
         this.setTranslation(back);
+    };
+    startAt(position: tsvector.Vector): Arrow {
+        this.setGeometry(position, this.tip);
+        this.requestRedraw();
+        return this;
+    };
+    endAt(position: tsvector.Vector): Arrow {
+        this.setGeometry(this.back, position);
+        this.requestRedraw();
+        return this;
     };
     assemble(onFrame: frame.Frame, epsilon=10e-6): void {
         // geometry
