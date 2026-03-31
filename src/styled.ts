@@ -306,12 +306,26 @@ export abstract class Styled {
     interpolate_number(starting: number, ending: number, fraction: number): number {
         return starting + (ending - starting) * fraction;
     };
+    interpolate_integer(starting: number, ending: number, fraction: number): number {
+        return Math.round(this.interpolate_number(starting, ending, fraction));
+    };
     interpolate_vector(starting: tsvector.Vector, ending: tsvector.Vector, fraction: number): tsvector.Vector {
         return tsvector.vAdd(
             starting,
             tsvector.vScale(fraction, tsvector.vSub(ending, starting))
         );
     };
+    interpolate_vectors(starting: tsvector.Vector[], ending: tsvector.Vector[], fraction: number): tsvector.Vector[] {
+        if (starting.length !== ending.length) {
+            // just switch at the halfway point if the arrays are different lengths for now.
+            return this.interpolate_switch(starting, ending, fraction);
+        }
+        const result: tsvector.Vector[] = [];
+        for (let i = 0; i < starting.length; i++) {
+            result.push(this.interpolate_vector(starting[i], ending[i], fraction));
+        }
+        return result;
+    }
     interpolate_switch<T>(starting: T, ending: T, fraction: number): T {
         if (fraction < 0.5) {
             return starting;
