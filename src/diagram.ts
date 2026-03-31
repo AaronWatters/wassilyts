@@ -208,17 +208,18 @@ export class Diagram {
      * @param replace Whether to replace an existing image with the same name (default: true).
      * @returns The diagram for chaining.
     */
-    nameImageFromURL(name: string, url: string, replace: boolean = true) {
+    nameImageFromURL(name: string, url: string, replace: boolean = true): HTMLImageElement {
         if (!replace) {
             const existing = this.nameToImage.get(name);
             if (existing !== undefined) {
                 // do not replace existing image
-                return this;
+                return existing;
             }
         }
         const image = new Image();
         image.src = url;
         this.nameImage(name, image);
+        return image;
     };
     /**
      * Name an image from PNG binary data.
