@@ -35,6 +35,21 @@ export class TextBox extends rect.Rectangle {
         this.alignment = alignment;
         this.shift = shift;
     };
+    clone(): this {
+        const result = new TextBox(this.text, this.onFrame!, this.referencePoint, this.shift, this.alignment, this.background);
+        result.styleLike(this);
+        return result as this;
+    };
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.text = this.interpolate_switch(starting.text, ending.text, fraction);
+        this.background = this.interpolate_switch(starting.background, ending.background, fraction);
+        this.referencePoint = this.interpolate_vector(starting.referencePoint, ending.referencePoint, fraction);
+        this.shift = this.interpolate_vector(starting.shift, ending.shift, fraction);
+        this.alignment = this.interpolate_switch(starting.alignment, ending.alignment, fraction);
+        this.valignment = this.interpolate_switch(starting.valignment, ending.valignment, fraction);
+        return this;
+    };
     // use the reference point for get/set operations
     getFramePoint(): tsvector.Vector {
         return this.referencePoint;
@@ -67,7 +82,13 @@ export class TextBox extends rect.Rectangle {
         this.background = background;
         this.requestRedraw();
         return this;
-    }
+    };
+    locateAt(position: tsvector.Vector): rect.Rectangle {
+        // set the point of the rectangle in frame coordinates
+        this.setFramePoint(position);
+        this.requestRedraw();
+        return this;
+    };
     // override draw to draw the text box
     draw() {
         if (!this.isLive()) {
