@@ -11,6 +11,16 @@ export class Poly extends marking.Marking {
         this.points = points;
         this.stroked();
     };
+    clone(): this {
+        const result = new Poly(this.onFrame!, this.points);
+        result.styleLike(this);
+        return result as this;
+    };
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.points = this.interpolate_vectors(starting.points, ending.points, fraction);
+        return this;
+    };
     vertices(points: tsvector.Vector[]): Poly {
         // set the vertices of the polygon in frame coordinates
         this.points = points;
