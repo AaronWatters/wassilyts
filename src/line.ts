@@ -12,6 +12,17 @@ export class Line extends marking.Marking {
         this.end = end;
         this.stroked();
     };
+    clone(): this {
+        const result = new Line(this.onFrame!, this.start, this.end);
+        result.styleLike(this);
+        return result as this;
+    };
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.start = this.interpolate_vector(starting.start, ending.start, fraction);
+        this.end = this.interpolate_vector(starting.end, ending.end, fraction);
+        return this;
+    };
     startAt(position: tsvector.Vector): Line {
         // set the start point of the line in frame coordinates
         this.start = position;
