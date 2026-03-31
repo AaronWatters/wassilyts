@@ -24,6 +24,24 @@ export class Image extends rect.Rectangle {
         this.source = source;
         this.checkCompletion(source);
     };
+    setURL(url: string): this {
+        const diagram = this.onFrame!.diagram;
+        const newsource = diagram.nameImageFromURL(url, url, false);
+        this.source = newsource;
+        this.checkCompletion(this.source);
+        return this;
+    };
+    clone(): this {
+        const result = new Image(this.source, this.onFrame!, this.point, this.size, this.offset, this.scaled);
+        result.styleLike(this);
+        return result as this;
+    };
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.source = this.interpolate_switch(starting.source, ending.source, fraction);
+        this.checkCompletion(this.source);
+        return this;
+    };
     async checkCompletion(image: HTMLImageElement): Promise<void> {
         if (image.complete && image.naturalWidth !== 0) {
             if (this.size === null) {
