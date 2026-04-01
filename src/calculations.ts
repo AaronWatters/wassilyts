@@ -1,3 +1,6 @@
+
+import * as tsvector from "tsvector";
+
 /**
  * Calculate "nice" tick values for a given range and maximum number of ticks.
  * 
@@ -72,4 +75,18 @@ function niceNumber(x: number): number {
 function roundTo(x: number, step: number): number {
   const precision = Math.max(0, -Math.floor(Math.log10(step)) + 2);
   return Number(x.toFixed(precision));
+};
+
+function rotation2dRadians(radians: number): tsvector.Matrix {
+  const cosTheta = Math.cos(radians);
+  const sinTheta = Math.sin(radians);
+  return [
+      [cosTheta, -sinTheta],
+      [sinTheta, cosTheta]
+  ];
+};
+
+function rotation2dDegrees(degrees: number): tsvector.Matrix {
+  const radians = (degrees * Math.PI) / 180.0;
+  return rotation2dRadians(radians);
 };
