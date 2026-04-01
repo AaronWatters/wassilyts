@@ -355,7 +355,7 @@ export class Interpolation<T extends Styled> {
     constructor(target: T, ending: T, durationSeconds: number): T {
         this.target = target;
         this.starting = target.clone();
-        this.ending = ending;
+        this.ending = ending;  // must be disposable after the transition is complete to avoid memory leaks
         this.duration = durationSeconds * 1000; // convert to milliseconds
         this.startTime = Date.now();
         this.endTime = this.startTime + this.duration;
@@ -366,6 +366,11 @@ export class Interpolation<T extends Styled> {
         this.target.interpolate(this.starting, this.ending, fraction);
     };
     is_complete(timestamp: number): boolean {
-        return timestamp >= this.endTime;
+        const result = timestamp >= this.endTime;
+        if (result) {
+            this.starting.forget();
+            this.ending.forget();
+        }
+        return result;
     };
 };

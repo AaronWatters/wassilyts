@@ -17,6 +17,10 @@ export abstract class Assembly extends marking.Marking {
         this.setTranslation(this.framePoint);
         onFrame.addElement(this.assemblyFrame);
     };
+    forget() {
+        super.forget();
+        this.assemblyFrame.forget();
+    };
     // Method to assemble the marking.  Draw relative to this.framePoint.
     abstract assemble(onFrame: frame.Frame): void;
     // The prepare operation makes the assembly
