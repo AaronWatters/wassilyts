@@ -52,7 +52,7 @@ export abstract class Styled {
     /** Apply the style of another Styled object to this one.
      * @param other The other Styled object to copy the style from.
      */
-    styleLike(other: Styled) {
+    styleLike(other: Styled): this {
         this.color = other.color;
         this.lineWidth = other.lineWidth;
         if (other.lineDash !== null) {
@@ -66,6 +66,7 @@ export abstract class Styled {
         }
         this.stroke = other.stroke;
         this.responsive = other.responsive;
+        return this;
     };
 
     /** Draw the object on the canvas. */
@@ -352,7 +353,7 @@ export class Interpolation<T extends Styled> {
     duration: number;
     startTime: number;
     endTime: number;
-    constructor(target: T, ending: T, durationSeconds: number): T {
+    constructor(target: T, ending: T, durationSeconds: number) {
         this.target = target;
         this.starting = target.clone();
         this.ending = ending;  // must be disposable after the transition is complete to avoid memory leaks
