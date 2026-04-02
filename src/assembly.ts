@@ -138,9 +138,9 @@ export class Star extends Assembly {
 };
 
 export class Arrow extends Assembly {
-    back: tsvector.Vector;
-    tip: tsvector.Vector;
-    vector: tsvector.Vector;
+    back: tsvector.Vector = [0, 0];
+    tip: tsvector.Vector = [0, 0];
+    vector: tsvector.Vector = [0, 0];
     tipDegrees: number = 20;
     tipLength: number | null = 10;
     tipFactor: number = 0.1; // fraction of length if tipLength is null
