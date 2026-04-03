@@ -26,6 +26,22 @@ export class Rect3d extends marking3d.Marking3d {
         this.scaled = scaled;
         this.rotationDegrees = rotationDegrees;
     };
+
+    clone(): this {
+        const result = new Rect3d(this.point, this.size, this.offset, this.onFrame3d, this.scaled, this.rotationDegrees);
+        result.styleLike(this);
+        return result as this;
+    };
+
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.point = this.interpolate_vector(starting.point, ending.point, fraction);
+        this.size = this.interpolate_vector(starting.size!, ending.size!, fraction);
+        this.offset = this.interpolate_vector(starting.offset, ending.offset, fraction);
+        this.scaled = this.interpolate_switch(starting.scaled, ending.scaled, fraction);
+        this.rotationDegrees = this.interpolate_number(starting.rotationDegrees, ending.rotationDegrees, fraction);
+        return this;
+    };
     
     projectTo2D(): marking.Marking {
         const { point2d, size, offset } = this.geometry2d();

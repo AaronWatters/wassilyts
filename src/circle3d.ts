@@ -16,6 +16,20 @@ export class Circle3d extends marking3d.Marking3d {
         this.scaled = scaled;
     };
 
+    clone(): this {
+        const result = new Circle3d(this.center, this.radius, this.onFrame3d, this.scaled);
+        result.styleLike(this);
+        return result as this;
+    };
+
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.center = this.interpolate_vector(starting.center, ending.center, fraction);
+        this.radius = this.interpolate_number(starting.radius, ending.radius, fraction);
+        this.scaled = this.interpolate_switch(starting.scaled, ending.scaled, fraction);
+        return this;
+    };
+
     projectTo2D(): marking.Marking {
         // Project the 3D center to 2D using the projection matrix
         const centerProj = this.onFrame3d.projection.project(this.center);
