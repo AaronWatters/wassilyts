@@ -301,8 +301,8 @@ export class Frame3d extends styled.Styled {
     /**
      * Add a rectangle marking in 3D space.
      * @param point the position of the rectangle in 3D space
-     * @param size the size of the rectangle in 3D space
-     * @param offset the offset of the rectangle in 3D space
+     * @param size the size of the rectangle in 2D space
+     * @param offset the offset of the rectangle in 2D space
      * @param scaled whether to scale the rectangle
      * @param rotationDegrees the rotation of the rectangle in degrees
      * @returns rect3d.Rect3d
