@@ -22,6 +22,9 @@ describe('star assembly', () => {
         expect(star.outerRadius).toEqual(innerRadius * 2);
         expect(star.rotationDegrees).toEqual(0);
         expect(star.getFramePoint()).toEqual(center);
+        // exercise drawPath for coverage.
+        const path = star.drawPath();
+        expect(path).toBeInstanceOf(Path2D);
     });
 
     it('should make a star with custom number of points', () => {
