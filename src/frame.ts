@@ -428,6 +428,15 @@ export class Frame extends styled.Styled {
     toPixel(xy: tsvector.Vector): tsvector.Vector {
         return applyAffine(this.ModelToPixel, xy);
     };
+    /* commented until needed -- unused
+    scaleToPixelLength(modelVector: tsvector.Vector, length: number): tsvector.Vector {
+        const pixelOrigin = this.toPixel([0, 0]);
+        const pixelVector = tsvector.vSub(this.toPixel(modelVector), pixelOrigin);
+        const pixelLength = tsvector.vLength(pixelVector);
+        const scaleFactor = length / pixelLength
+        return tsvector.vScale(scaleFactor, modelVector);
+    };
+    */
     /** Convert from cartesian pixel space to model space
      * @param xy The cartesian pixel coordinates to convert.
      * @returns The model coordinates.
