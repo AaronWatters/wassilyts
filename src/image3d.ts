@@ -20,6 +20,18 @@ export class Image3d extends rect3d.Rect3d {
         this.imagename = name;
     };
 
+    clone(): this {
+        const result = new Image3d(this.imagename, this.point, this.size, this.offset, this.onFrame3d, this.scaled, this.rotationDegrees);
+        result.styleLike(this);
+        return result as this;
+    };
+
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.imagename = this.interpolate_switch(starting.imagename, ending.imagename, fraction);
+        return this;
+    };
+
     projectTo2D(): marking.Marking {
         const { point2d, size, offset } = this.geometry2d();
         const image2d = this.onFrame!.namedImage(point2d, this.imagename, size, offset, this.scaled);

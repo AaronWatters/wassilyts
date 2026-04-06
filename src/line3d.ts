@@ -16,6 +16,19 @@ export class Line3d extends marking3d.Marking3d {
         this.stroked();
     };
 
+    clone(): this {
+        const result = new Line3d(this.start, this.end, this.onFrame3d);
+        result.styleLike(this);
+        return result as this;
+    };
+    
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.start = this.interpolate_vector(starting.start, ending.start, fraction);
+        this.end = this.interpolate_vector(starting.end, ending.end, fraction);
+        return this;
+    };
+
     // xxxx add methods to set start/end...
 
     projectTo2D(): marking.Marking {

@@ -16,6 +16,19 @@ export class Poly3d extends marking3d.Marking3d {
         this.points = points;
     };
 
+    clone(): this {
+        const result = new Poly3d(this.points, this.onFrame3d);
+        result.styleLike(this);
+        return result as this;
+    };
+    
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.points = this.interpolate_vectors(starting.points, ending.points, fraction);
+        this.close = this.interpolate_switch(starting.close, ending.close, fraction);
+        return this;
+    };
+
     closed(value: boolean = true): Poly3d {
         this.close = value;
         this.requestRedraw();

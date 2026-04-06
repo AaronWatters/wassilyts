@@ -27,6 +27,21 @@ export class TextBox3d extends rect3d.Rect3d {
         this.shift = shift;
     };
 
+    clone(): this {
+        const result = new TextBox3d(this.text, this.point, this.shift, this.alignment, this.background, this.onFrame3d);
+        result.styleLike(this);
+        return result as this;
+    };
+
+    interpolate(starting: this, ending: this, fraction: number): this {
+        super.interpolate(starting, ending, fraction);
+        this.text = this.interpolate_switch(starting.text, ending.text, fraction);
+        this.alignment = this.interpolate_switch(starting.alignment, ending.alignment, fraction);
+        this.background = this.interpolate_switch(starting.background, ending.background, fraction);
+        this.shift = this.interpolate_vector(starting.shift, ending.shift, fraction);
+        return this;
+    };
+
     projectTo2D(): marking.Marking {
         const { point2d, size, offset } = this.geometry2d();
         const textbox2d = this.onFrame!.textBox(
