@@ -77,7 +77,7 @@ function roundTo(x: number, step: number): number {
   return Number(x.toFixed(precision));
 };
 
-function rotation2dRadians(radians: number): tsvector.Matrix {
+export function rotation2dRadians(radians: number): tsvector.Matrix {
   const cosTheta = Math.cos(radians);
   const sinTheta = Math.sin(radians);
   return [
@@ -86,7 +86,12 @@ function rotation2dRadians(radians: number): tsvector.Matrix {
   ];
 };
 
-function rotation2dDegrees(degrees: number): tsvector.Matrix {
+export function rotation2dDegrees(degrees: number): tsvector.Matrix {
   const radians = (degrees * Math.PI) / 180.0;
   return rotation2dRadians(radians);
 };
+
+export function rotate2dDegrees(vector: tsvector.Vector, degrees: number): tsvector.Vector {
+  const rotationMatrix = rotation2dDegrees(degrees);
+  return tsvector.MvProduct(rotationMatrix, vector);
+}
