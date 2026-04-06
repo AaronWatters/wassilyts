@@ -90,7 +90,6 @@ export class Star extends Assembly {
         return this;
     };
     centerAt(position: tsvector.Vector): Star {
-        debugger;
         this.center = position;
         this.setTranslation(position);
         this.requestRedraw();
