@@ -12,6 +12,7 @@ import * as projection from './projection';
 import * as image from './image';
 import * as textBox from './text';
 import * as assembly from './assembly';
+import * as axis from './axis';
 
 /** Handler returns true if the event was handled completely (no propagation needed). 
  * @param element The styled element that received the event, or null if none.
@@ -445,6 +446,18 @@ export class Frame extends styled.Styled {
     toModel(xy: tsvector.Vector): tsvector.Vector {
         return applyAffine(this.pixelToModel, xy);
     };
+    modelVectorToPixelVector(modelVector: tsvector.Vector): tsvector.Vector {
+        const pixelOrigin = this.toPixel([0, 0]);
+        const pixelPosition = this.toPixel(modelVector);
+        const pixelVector = tsvector.vSub(pixelPosition, pixelOrigin);
+        return pixelVector;
+    };
+    pixelVectorToModelVector(pixelVector: tsvector.Vector): tsvector.Vector {
+        const modelOrigin = this.toModel([0, 0]);
+        const modelPosition = this.toModel(pixelVector);
+        const modelVector = tsvector.vSub(modelPosition, modelOrigin);
+        return modelVector;
+    };
     /** Convert from canvas coordinates to model coordinates. */
     /* commented for now -- unused.
     canvasToModel(canvasxy: tsvector.Vector): tsvector.Vector {
@@ -582,6 +595,7 @@ export class Frame extends styled.Styled {
     line(start: tsvector.Vector, end: tsvector.Vector): line.Line {
         const result = new line.Line(this, start, end);
         this.addElement(result);
+        result.stroked();
         return result;
     };
     /** A dot is a circle with an unscaled radius.
@@ -757,6 +771,14 @@ export class Frame extends styled.Styled {
         tipFactor: number = 0.1
     ): assembly.Arrow {
         const result = new assembly.Arrow(this, back, tip, tipLength, tipDegrees, tipFactor);
+        this.addElement(result);
+        return result;
+    };
+    axis(
+        minimum: number,
+        maximum: number,
+    ): axis.Axis {
+        const result = new axis.Axis(this, minimum, maximum);
         this.addElement(result);
         return result;
     };
