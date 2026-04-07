@@ -39,21 +39,26 @@
   console.log("The name of the library is: " + name);
   const output = document.getElementById('output');
   //const d = new diagram.Diagram(output, 520, 600);
-  const frame0 = drawOn(output, 600, 400);
+  const frame1 = drawOn(output, 600, 400);
+  const frame0 = frame1.regionFrame([0,0], [600,400], [-150,-50], [200,200]);
   frame0.linedWidth(3);
+  console.log("frame0 = ", frame0);
   const dot1 = frame0.circle([20,0], 10).colored('red');
-  //const rect1 = frame0.rect([20,0], [10,15], [-5,0]).colored('blue');
+  const rect1 = frame0.rect([20,0], [10,15], [-5,0]).colored('blue');
   const square1 = frame0.square([20,0], 10).colored('green');
-  //const dot2 = frame0.circle([20,30], 20).colored('blue');
+  const dot2 = frame0.circle([20,130], 20).colored('blue');
   const dot3 = frame0.circle([50,30], 10).colored('green');
   const dot4 = frame0.circle([50,50], 10).colored('salmon');
   const dot5 = frame0.circle([-70, 3], 10).colored('purple');
-  //frame0.nameImageFromURL("mandrill", "./mandrill.png");
+  frame0.nameImageFromURL("mandrill", "./mandrill.png");
   const imgpoint = [-20,110]
-  const imgsize = [150, 150];
+  const imgsize = [50, 50];
+  //const imgsize = [75, 175];
   const imgoffset = [-75, -75];
+  //const imgoffset = [0,0];
   //const img1 = frame0.namedImage(imgpoint, "mandrill", imgsize, imgoffset, false);
-  const img1 = frame0.imageFromURL(imgpoint, "./mandrill.png", imgsize, imgoffset, false);
+  const img1 = frame0.imageFromURL(imgpoint, "./mandrill.png", imgsize, imgoffset, true);
+  const debugbox = frame0.rect(imgpoint, imgsize, imgoffset, false).linedWidth(1).stroked().colored("red");
   const imgdot = frame0.circle(imgpoint, 25).colored('rgba(0,0,0,0.5)').stroked();
   const imgbox = frame0.box(imgpoint, imgsize, imgoffset, false).linedWidth(10).stroked().colored("red");
   const star = frame0.star([0,50], 15).colored('rgba(255,165,0,0.5)');
@@ -66,12 +71,12 @@
     const radians = degrees * Math.PI / 180;
     const x = start[0] + delta * Math.cos(radians);
     const y = start[1] + delta * Math.sin(radians);
-    frame0.line([x, y], start).colored('blue');
+    //frame0.line([x, y], start).colored('blue');
     console.log("degrees = ", degrees, "radians = ", radians, "x = ", x, "y = ", y);
     //break;
   }
 
-  debugger;
+  //debugger;
   function starPoints(cx, cy, r1, r2, n) {
     const points = [];
     for (let i=0; i<n; i++) {
@@ -91,12 +96,18 @@
   frame0.polygon(star1).colored('red');
   const star2 = starPoints(100, 15, 15, 10, 7);
   frame0.polyline(star2).colored('green');
+
+  frame0.axis(10, 50).from(0, [10, 25]);
+
+  frame0.textBox([-70, 150], "Hello, wassilyjs!").
+  colored('navy').font("20px sans-serif").boxed("yellow");
     
-  frame0.draw();
-  debugger;
+  //frame0.draw();
+  //debugger;
   frame0.fit();
-  frame0.diagram.clear();
-  frame0.draw();
+  //frame0.diagram.clear();
+  //frame0.draw();
+  //frame0.requestRedraw();
   /*
   // make a subframe
   const fromMin = [0,0];
