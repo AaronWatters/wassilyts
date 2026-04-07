@@ -18,8 +18,11 @@ export class Image extends rect.Rectangle {
         point: tsvector.Vector, 
         size: tsvector.Vector | null = null,
         offset: tsvector.Vector = [0, 0],
-        scaled: boolean = false
+        scaled: boolean = true,
     ) {
+        if (size === null) {
+            scaled = false;
+        }
         super(frame, point, size, offset, scaled);
         this.source = source;
         this.checkCompletion(source);
@@ -86,6 +89,8 @@ export class Image extends rect.Rectangle {
             this.awaitingLoad = true;
             return; // image not loaded yet
         }
+        //super.draw(); // debugging
+        //return; // debugging
         // for stats, always compute the background path
         const bgPath = this.drawPath();
         const prep = this.prepare();
