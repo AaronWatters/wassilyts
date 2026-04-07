@@ -86,9 +86,9 @@
     debugger
     console.log("animateSize called, isBig = ", isBig, greenCircle);
     if (!isBig) {
-      greenCircle.transition(1.0).resize(0.5);
+      greenCircle.transition(2.0).resize(0.5).centerAt([1.5, 1.5]).colored('cyan');
     } else {
-      greenCircle.transition(1.0).resize(0.1);
+      greenCircle.transition(4.0).resize(0.1).centerAt([2, 1]).colored('green');
     }
     isBig = !isBig;
   }
