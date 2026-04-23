@@ -17,7 +17,7 @@ export class Axis extends assembly.Assembly {
     tickAlignment: CanvasTextAlign = "left";
     tickValignment: CanvasTextBaseline = "middle";
     tickPixelOffset: number = 10;
-    tickRotationDegrees: number = 0;
+    tickRotationDegrees: number | null = null;
     scale: number = 1;
     constructor(onFrame: frame.Frame, minimum: number, maximum: number) {
         super(onFrame);
@@ -90,6 +90,7 @@ export class Axis extends assembly.Assembly {
         const lineEnd = this.valueToPosition(this.maximum);
         onFrame.line(lineStart, lineEnd).styleLike(this).stroked();
         let ticks: number[];
+        let tickrotationDegrees = this.tickRotationDegrees || 0;
         if (this.tickValues) {
             ticks = this.tickValues;
         } else {
@@ -98,6 +99,10 @@ export class Axis extends assembly.Assembly {
         }
         console.log("ticks", ticks);
         const pixelVector = this.pixelVector();
+        if (this.tickRotationDegrees === null) {
+            // compute the tick rotation from the pixelVector
+            tickrotationDegrees = calculations.vectorToAngleDegrees(pixelVector);
+        }
         const tickPixelShift = tsvector.vScale(this.tickPixelOffset, pixelVector);
         const tickModelShift = onFrame.pixelVectorToModelVector(tickPixelShift);
         for (const tickValue of ticks) {
@@ -111,7 +116,7 @@ export class Axis extends assembly.Assembly {
             onFrame.textBox(tickLabelPosition, tickLabel, [0, 0], this.tickAlignment, null)
                 .styleLike(this)
                 .valigned(this.tickValignment)
-                .degrees(this.tickRotationDegrees);
+                .degrees(tickrotationDegrees);
         }
     };
     tickString(value: number): string {

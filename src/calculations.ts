@@ -95,3 +95,12 @@ export function rotate2dDegrees(vector: tsvector.Vector, degrees: number): tsvec
   const rotationMatrix = rotation2dDegrees(degrees);
   return tsvector.MvProduct(rotationMatrix, vector);
 }
+
+export function vectorToAngleRadians(vector: tsvector.Vector): number {
+  return Math.atan2(vector[1], vector[0]);
+};
+
+export function vectorToAngleDegrees(vector: tsvector.Vector): number {
+  const radians = vectorToAngleRadians(vector);
+  return (radians * 180.0) / Math.PI;
+};
